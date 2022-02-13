@@ -1,0 +1,9 @@
+2020-04-09 13:14:19: -- Analysis Started by User Command
+2020-04-09 13:14:37: Changes: 3, Conflicts: 0, CopyTime: 0, FixState: 0, Errors: 0, All: 11935
+2020-04-09 13:14:37: Left to Right: Copy File: 2 Delete File: 1 
+2020-04-09 13:14:37: == Sync Started by User Command
+2020-04-09 13:14:38: Delete File 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/projects/project_absensis/head_script.blade.php'
+2020-04-09 13:14:38: Copy Over 'E:/wamp64/www/b2/resources/views/maingentelellascanqr.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/maingentelellascanqr.blade.php' (7,178)
+2020-04-09 13:14:38: Copy Over 'E:/wamp64/www/b2/resources/views/projects/project_absensis/scanqr.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/projects/project_absensis/scanqr.blade.php' (426)
+2020-04-09 13:14:40: == Sync Complete. Time: 00:00:22, Speed: 6.26 KB/s, OK: 3, Errors: 0
+2020-04-09 13:14:40: 

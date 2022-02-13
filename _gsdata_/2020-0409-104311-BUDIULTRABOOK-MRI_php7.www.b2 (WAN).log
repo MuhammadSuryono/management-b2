@@ -1,0 +1,8 @@
+2020-04-09 10:43:13: -- Analysis Started by User Command
+2020-04-09 10:43:32: Changes: 2, Conflicts: 0, CopyTime: 0, FixState: 0, Errors: 0, All: 11935
+2020-04-09 10:43:32: Left to Right: Copy File: 2 
+2020-04-09 10:43:32: == Sync Started by User Command
+2020-04-09 10:43:33: Copy Over 'E:/wamp64/www/b2/app/Http/Controllers/Team/TeamsController.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Http/Controllers/Team/TeamsController.php' (5,541)
+2020-04-09 10:43:34: Copy Over 'E:/wamp64/www/b2/resources/views/layouts/gentelella/top_tiles.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/layouts/gentelella/top_tiles.blade.php' (915)
+2020-04-09 10:43:35: == Sync Complete. Time: 00:00:24, Speed: 2.77 KB/s, OK: 2, Errors: 0
+2020-04-09 10:43:35: 

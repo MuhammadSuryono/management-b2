@@ -1,0 +1,4 @@
+2020-04-14 20:29:27: == Sync Started by User Command
+2020-04-14 20:29:28: Copy Over 'E:/wamp64/www/b2/app/Http/Controllers/Respondent/RespondentsController.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Http/Controllers/Respondent/RespondentsController.php' (4,150)
+2020-04-14 20:29:30: == Sync Complete. Time: 00:00:05, Speed: 1.04 KB/s, OK: 1, Errors: 0
+2020-04-14 20:29:30: 

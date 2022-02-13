@@ -1,0 +1,144 @@
+2019-05-23 15:03:24: -- Analysis Started by Analyze And Sync Command
+2019-05-23 15:03:36: Changes: 11, Conflicts: 0, CopyTime: 0, FixState: 1, Errors: 0, All: 8192
+2019-05-23 15:03:36: Left to Right: Copy File: 10 Delete File: 1 
+2019-05-23 15:03:36: == Sync Started by Analyze And Sync Command
+2019-05-23 15:03:36: Delete File '//180.211.92.132/htdocs2/assets/petra/20190522 1359 petra.7z'
+2019-05-23 15:03:36: Copy New 'E:/wamp64/www/assets/petra/20190523 1354 petra.7z' -> '//180.211.92.132/htdocs2/assets/petra/20190523 1354 petra.7z' (3,937)
+2019-05-23 15:03:36: Copy New 'E:/wamp64/www/assets/petra/20190523 1416 petra.7z' -> '//180.211.92.132/htdocs2/assets/petra/20190523 1416 petra.7z' (3,937)
+2019-05-23 15:03:36: Copy Over 'E:/wamp64/www/assets/petra/application.zip' -> '//180.211.92.132/htdocs2/assets/petra/application.zip' (7,282)
+2019-05-23 15:03:37: Copy New 'E:/wamp64/www/assets/petra/view_dashboard_absensiku.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_absensiku.php' (2,861)
+2019-05-23 15:03:37: Copy Over 'E:/wamp64/www/assets/petra/view_dashboard_birthday.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_birthday.php' (1,917)
+2019-05-23 15:03:37: Copy Over 'E:/wamp64/www/assets/petra/view_dashboard_jum_hadir.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_jum_hadir.php' (1,539)
+2019-05-23 15:03:37: Copy New 'E:/wamp64/www/assets/petra/view_dashboard_jum_hadir_acara.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_jum_hadir_acara.php' (1,587)
+2019-05-23 15:03:37: Copy New 'E:/wamp64/www/assets/petra/view_dashboard_komposisi_anggota.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_komposisi_anggota.php' (2,212)
+2019-05-23 15:03:37: Copy Over 'E:/wamp64/www/assets/petra/view_dashboard_next_events_admin.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_next_events_admin.php' (2,894)
+2019-05-23 15:03:37: Copy Over 'E:/wamp64/www/assets/petra/view_dashboard_next_events_jemaat.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_next_events_jemaat.php' (2,598)
+2019-05-23 15:03:38: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSansMono-Bold.ufm
+2019-05-23 15:03:38: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/html5lib/Parser.php
+2019-05-23 15:03:38: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Courier-Bold.afm
+2019-05-23 15:03:38: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Css/AttributeTranslator.php
+2019-05-23 15:03:38: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/Block.php
+2019-05-23 15:03:38: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Courier.afm
+2019-05-23 15:03:38: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/NullFrameReflower.php
+2019-05-23 15:03:38: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSansMono-Oblique.ufm
+2019-05-23 15:03:38: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Positioner/Inline.php
+2019-05-23 15:03:39: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Helvetica-Bold.afm
+2019-05-23 15:03:39: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Helvetica-BoldOblique.afm
+2019-05-23 15:03:39: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/ZapfDingbats.afm
+2019-05-23 15:03:39: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Renderer/AbstractRenderer.php
+2019-05-23 15:03:39: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Canvas.php
+2019-05-23 15:03:39: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/LICENSE.LGPL
+2019-05-23 15:03:39: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSansMono-Bold.ttf
+2019-05-23 15:03:39: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Frame/FrameTreeIterator.php
+2019-05-23 15:03:39: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Adapter/PDFLib.php
+2019-05-23 15:03:39: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSans-Oblique.ufm
+2019-05-23 15:03:40: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSerif-Italic.ufm
+2019-05-23 15:03:40: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Renderer/ListBullet.php
+2019-05-23 15:03:40: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/AbstractFrameReflower.php
+2019-05-23 15:03:40: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Positioner/Block.php
+2019-05-23 15:03:40: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSansMono-Oblique.ttf
+2019-05-23 15:03:40: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/TableCell.php
+2019-05-23 15:03:40: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Positioner/AbstractPositioner.php
+2019-05-23 15:03:40: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/dompdf_font_family_cache.dist.php
+2019-05-23 15:03:40: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Times-Bold.afm
+2019-05-23 15:03:40: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/phpcs.xml
+2019-05-23 15:03:41: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/TableCell.php
+2019-05-23 15:03:41: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Positioner/Absolute.php
+2019-05-23 15:03:41: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/composer.json
+2019-05-23 15:03:41: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/Inline.php
+2019-05-23 15:03:41: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSans-Oblique.ttf
+2019-05-23 15:03:41: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSerif-Italic.ttf
+2019-05-23 15:03:41: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Adapter/GD.php
+2019-05-23 15:03:41: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/LineBox.php
+2019-05-23 15:03:41: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Positioner/Fixed.php
+2019-05-23 15:03:41: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Frame/Factory.php
+2019-05-23 15:03:42: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/Cpdf.php
+2019-05-23 15:03:42: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Helvetica-Oblique.afm
+2019-05-23 15:03:42: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Exception.php
+2019-05-23 15:03:42: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Renderer/Block.php
+2019-05-23 15:03:42: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/html5lib/TreeBuilder.php
+2019-05-23 15:03:42: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/Image.php
+2019-05-23 15:03:42: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Positioner/ListBullet.php
+2019-05-23 15:03:42: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/NullFrameDecorator.php
+2019-05-23 15:03:42: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Renderer/Inline.php
+2019-05-23 15:03:42: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Css/Color.php
+2019-05-23 15:03:43: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/Table.php
+2019-05-23 15:03:43: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Renderer.php
+2019-05-23 15:03:43: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/Text.php
+2019-05-23 15:03:43: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Exception/ImageException.php
+2019-05-23 15:03:43: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/mustRead.html
+2019-05-23 15:03:43: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Css/Style.php
+2019-05-23 15:03:43: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/Page.php
+2019-05-23 15:03:43: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Renderer/TableCell.php
+2019-05-23 15:03:43: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSerif-BoldItalic.ufm
+2019-05-23 15:03:44: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Renderer/TableRowGroup.php
+2019-05-23 15:03:44: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/ListBulletImage.php
+2019-05-23 15:03:44: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/VERSION
+2019-05-23 15:03:44: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Times-BoldItalic.afm
+2019-05-23 15:03:44: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/Inline.php
+2019-05-23 15:03:44: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/Page.php
+2019-05-23 15:03:44: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSans-Bold.ufm
+2019-05-23 15:03:44: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/html5lib/Tokenizer.php
+2019-05-23 15:03:45: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/res/broken_image.svg
+2019-05-23 15:03:45: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/TableRowGroup.php
+2019-05-23 15:03:45: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/Image.php
+2019-05-23 15:03:45: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/CONTRIBUTING.md
+2019-05-23 15:03:45: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Helpers.php
+2019-05-23 15:03:45: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSerif-Bold.ufm
+2019-05-23 15:03:45: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSans.ufm
+2019-05-23 15:03:45: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSansMono-BoldOblique.ufm
+2019-05-23 15:03:45: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/AbstractFrameDecorator.php
+2019-05-23 15:03:46: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSerif-BoldItalic.ttf
+2019-05-23 15:03:46: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/ListBullet.php
+2019-05-23 15:03:46: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/html5lib/InputStream.php
+2019-05-23 15:03:46: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/CanvasFactory.php
+2019-05-23 15:03:46: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Positioner/TableRow.php
+2019-05-23 15:03:46: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Dompdf.php
+2019-05-23 15:03:46: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSans-Bold.ttf
+2019-05-23 15:03:46: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Times-Italic.afm
+2019-05-23 15:03:46: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSansMono.ufm
+2019-05-23 15:03:46: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/Block.php
+2019-05-23 15:03:47: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Frame.php
+2019-05-23 15:03:47: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Renderer/Image.php
+2019-05-23 15:03:47: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/TableRow.php
+2019-05-23 15:03:47: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/res/html.css
+2019-05-23 15:03:47: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSerif-Bold.ttf
+2019-05-23 15:03:47: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/JavascriptEmbedder.php
+2019-05-23 15:03:47: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSans.ttf
+2019-05-23 15:03:47: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSans-BoldOblique.ufm
+2019-05-23 15:03:47: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSansMono-BoldOblique.ttf
+2019-05-23 15:03:47: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Helvetica.afm
+2019-05-23 15:03:48: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSerif.ufm
+2019-05-23 15:03:48: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/TableRow.php
+2019-05-23 15:03:48: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/PhpEvaluator.php
+2019-05-23 15:03:48: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Frame/FrameTreeList.php
+2019-05-23 15:03:48: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/html5lib/Data.php
+2019-05-23 15:03:48: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSansMono.ttf
+2019-05-23 15:03:48: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Positioner/TableCell.php
+2019-05-23 15:03:48: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FontMetrics.php
+2019-05-23 15:03:48: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Positioner/NullPositioner.php
+2019-05-23 15:03:49: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Cellmap.php
+2019-05-23 15:03:49: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Options.php
+2019-05-23 15:03:49: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSans-BoldOblique.ttf
+2019-05-23 15:03:49: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Frame/FrameTree.php
+2019-05-23 15:03:49: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Css/Stylesheet.php
+2019-05-23 15:03:49: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Courier-BoldOblique.afm
+2019-05-23 15:03:49: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/DejaVuSerif.ttf
+2019-05-23 15:03:49: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Times-Roman.afm
+2019-05-23 15:03:49: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Renderer/Text.php
+2019-05-23 15:03:49: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/Table.php
+2019-05-23 15:03:50: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Frame/FrameList.php
+2019-05-23 15:03:50: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/res/broken_image.png
+2019-05-23 15:03:50: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/README.md
+2019-05-23 15:03:50: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/Text.php
+2019-05-23 15:03:50: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Autoloader.php
+2019-05-23 15:03:50: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Frame/FrameListIterator.php
+2019-05-23 15:03:50: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameReflower/TableRowGroup.php
+2019-05-23 15:03:50: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Symbol.afm
+2019-05-23 15:03:51: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Image/Cache.php
+2019-05-23 15:03:51: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/FrameDecorator/ListBullet.php
+2019-05-23 15:03:51: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/fonts/Courier-Oblique.afm
+2019-05-23 15:03:51: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/lib/html5lib/named-character-references.ser
+2019-05-23 15:03:51: Deleted Recycled: //180.211.92.132/htdocs2/assets/_gsdata_/_saved_/dompdf-master/src/Adapter/CPDF.php
+2019-05-23 15:03:51: == Sync Complete. Time: 00:00:15, Speed: 106 KB/s, OK: 12, Errors: 0
+2019-05-23 15:03:51: 

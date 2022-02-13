@@ -1,0 +1,16 @@
+2020-04-08 15:42:27: -- Analysis Started by User Command
+2020-04-08 15:42:46: Changes: 10, Conflicts: 0, CopyTime: 0, FixState: 0, Errors: 0, All: 11935
+2020-04-08 15:42:46: Left to Right: Copy File: 10 
+2020-04-08 15:42:46: == Sync Started by User Command
+2020-04-08 15:42:47: Copy Over 'E:/wamp64/www/b2/app/Http/Controllers/DashboardController.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Http/Controllers/DashboardController.php' (527)
+2020-04-08 15:42:47: Copy Over 'E:/wamp64/www/b2/app/Http/Controllers/Otentikasi/OtentikasiController.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Http/Controllers/Otentikasi/OtentikasiController.php' (2,915)
+2020-04-08 15:42:48: Copy Over 'E:/wamp64/www/b2/resources/views/dashboards/dashboard_gentelella.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/dashboards/dashboard_gentelella.blade.php' (463)
+2020-04-08 15:42:48: Copy Over 'E:/wamp64/www/b2/resources/views/layouts/gentelella/sidebar_general.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/layouts/gentelella/sidebar_general.blade.php' (5,797)
+2020-04-08 15:42:48: Copy Over 'E:/wamp64/www/b2/resources/views/layouts/gentelella/top_tiles.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/layouts/gentelella/top_tiles.blade.php' (639)
+2020-04-08 15:42:49: Copy Over 'E:/wamp64/www/b2/resources/views/maingentelella.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/maingentelella.blade.php' (5,668)
+2020-04-08 15:42:49: Copy Over 'E:/wamp64/www/b2/resources/views/maingentelellaform.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/maingentelellaform.blade.php' (6,805)
+2020-04-08 15:42:50: Copy Over 'E:/wamp64/www/b2/resources/views/maingentelellaformupload.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/maingentelellaformupload.blade.php' (6,635)
+2020-04-08 15:42:50: Copy Over 'E:/wamp64/www/b2/resources/views/maingentelellascanqr.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/maingentelellascanqr.blade.php' (6,983)
+2020-04-08 15:42:51: Copy Over 'E:/wamp64/www/b2/resources/views/maingentelellatable.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/maingentelellatable.blade.php' (7,715)
+2020-04-08 15:42:52: == Sync Complete. Time: 00:00:27, Speed: 22.98 KB/s, OK: 10, Errors: 0
+2020-04-08 15:42:52: 

@@ -1,0 +1,6 @@
+2020-04-09 10:24:53: == Sync Started by User Command
+2020-04-09 10:24:54: Copy Over 'E:/wamp64/www/b2/app/Http/Controllers/DashboardController.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Http/Controllers/DashboardController.php' (590)
+2020-04-09 10:24:54: Copy Over 'E:/wamp64/www/b2/app/Http/Controllers/Team/TeamsController.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Http/Controllers/Team/TeamsController.php' (5,551)
+2020-04-09 10:24:55: Copy Over 'E:/wamp64/www/b2/resources/views/layouts/gentelella/top_tiles.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/layouts/gentelella/top_tiles.blade.php' (918)
+2020-04-09 10:24:56: == Sync Complete. Time: 00:00:04, Speed: 33.00 KB/s, OK: 3, Errors: 0
+2020-04-09 10:24:56: 

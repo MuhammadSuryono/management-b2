@@ -1,0 +1,8 @@
+2019-06-25 14:11:32: == Sync Started by User Command
+2019-06-25 14:11:32: Copy New 'E:/www/assets/mri/.project' -> 'sftp://180.211.92.131/var/www/html/assets/mri/.project' (207)
+2019-06-25 14:11:32: Copy New 'E:/www/assets/mri/view_dashboard_absensi_kegiatanku.php' -> 'sftp://180.211.92.131/var/www/html/assets/mri/view_dashboard_absensi_kegiatanku.php' (3,223)
+2019-06-25 14:11:32: Copy New 'E:/www/assets/mri/view_dashboard_next_events_absen.php' -> 'sftp://180.211.92.131/var/www/html/assets/mri/view_dashboard_next_events_absen.php' (2,946)
+2019-06-25 14:11:32: Copy New 'E:/www/assets/mri/view_dashboard_next_events_admin.php' -> 'sftp://180.211.92.131/var/www/html/assets/mri/view_dashboard_next_events_admin.php' (3,035)
+2019-06-25 14:11:32: Copy New 'E:/www/assets/mri/view_detil_kegiatan.php' -> 'sftp://180.211.92.131/var/www/html/assets/mri/view_detil_kegiatan.php' (2,546)
+2019-06-25 14:11:33: == Sync Complete. Time: 00:00:02, Speed: 34.4 KB/s, OK: 5, Errors: 0
+2019-06-25 14:11:33: 

@@ -1,0 +1,23 @@
+2020-04-08 14:53:07: == Sync Started by User Command
+2020-04-08 14:53:08: Delete File 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/dashboard_gentelella.blade.php'
+2020-04-08 14:53:08: Create Folder 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/dashboards'
+2020-04-08 14:53:08: Copy Over 'E:/wamp64/www/b2/app/Http/Controllers/DashboardController.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Http/Controllers/DashboardController.php' (1,006)
+2020-04-08 14:53:09: Copy Over 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Http/Controllers/Project/ProjectAbsensisController.php' -> 'E:/wamp64/www/b2/app/Http/Controllers/Project/ProjectAbsensisController.php' (4,391)
+2020-04-08 14:53:09: Copy Over 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Http/Controllers/Project/ProjectKegiatansController.php' -> 'E:/wamp64/www/b2/app/Http/Controllers/Project/ProjectKegiatansController.php' (4,184)
+2020-04-08 14:53:10: Copy Over 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Http/Controllers/Project/ProjectPlansController.php' -> 'E:/wamp64/www/b2/app/Http/Controllers/Project/ProjectPlansController.php' (10,837)
+2020-04-08 14:53:10: Copy Over 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Http/Controllers/Project/ProjectsController.php' -> 'E:/wamp64/www/b2/app/Http/Controllers/Project/ProjectsController.php' (10,448)
+2020-04-08 14:53:10: Copy Over 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/app/Project_plan.php' -> 'E:/wamp64/www/b2/app/Project_plan.php' (519)
+2020-04-08 14:53:10: Copy New 'E:/wamp64/www/b2/resources/views/dashboards/dashboard_gentelella.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/dashboards/dashboard_gentelella.blade.php' (407)
+2020-04-08 14:53:11: Copy New 'E:/wamp64/www/b2/resources/views/dashboards/w_gender.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/dashboards/w_gender.blade.php' (1,402)
+2020-04-08 14:53:11: Copy New 'E:/wamp64/www/b2/resources/views/dashboards/w_ses.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/dashboards/w_ses.blade.php' (1,404)
+2020-04-08 14:53:12: Copy Over 'E:/wamp64/www/b2/resources/views/projects/project_kegiatans/script.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/projects/project_kegiatans/script.blade.php' (183)
+2020-04-08 14:53:12: Copy New 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/projects/project_plans/create2.blade.php' -> 'E:/wamp64/www/b2/resources/views/projects/project_plans/create2.blade.php' (346)
+2020-04-08 14:53:12: Copy Over 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/projects/project_plans/edit.blade.php' -> 'E:/wamp64/www/b2/resources/views/projects/project_plans/edit.blade.php' (368)
+2020-04-08 14:53:13: Copy New 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/projects/project_plans/edit2.blade.php' -> 'E:/wamp64/www/b2/resources/views/projects/project_plans/edit2.blade.php' (2,258)
+2020-04-08 14:53:13: Copy New 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/projects/project_plans/form_project_plan2.blade.php' -> 'E:/wamp64/www/b2/resources/views/projects/project_plans/form_project_plan2.blade.php' (2,043)
+2020-04-08 14:53:13: Copy New 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/projects/project_plans/indexIwayRiway3.blade.php' -> 'E:/wamp64/www/b2/resources/views/projects/project_plans/indexIwayRiway3.blade.php' (1,577)
+2020-04-08 14:53:13: Copy Over 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/projects/projects/edit.blade.php' -> 'E:/wamp64/www/b2/resources/views/projects/projects/edit.blade.php' (4,653)
+2020-04-08 14:53:14: Copy Over 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/projects/projects/index.blade.php' -> 'E:/wamp64/www/b2/resources/views/projects/projects/index.blade.php' (2,730)
+2020-04-08 14:53:14: Copy Over 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/routes/web.php' -> 'E:/wamp64/www/b2/routes/web.php' (14,036)
+2020-04-08 14:53:16: == Sync Complete. Time: 00:00:11, Speed: 124.52 KB/s, OK: 20, Errors: 0
+2020-04-08 14:53:16: 

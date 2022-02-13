@@ -1,0 +1,11 @@
+2019-05-20 10:00:43: -- Analysis Started by Analyze And Sync Command
+2019-05-20 10:00:58: Changes: 5, Conflicts: 0, CopyTime: 0, FixState: 0, Errors: 0, All: 8174
+2019-05-20 10:00:58: Left to Right: Copy File: 5 
+2019-05-20 10:00:58: == Sync Started by Analyze And Sync Command
+2019-05-20 10:00:58: Copy New 'E:/wamp64/www/assets/petra/20190519 1717 petra.7z' -> '//180.211.92.132/htdocs2/assets/petra/20190519 1717 petra.7z' (2,939)
+2019-05-20 10:00:59: Copy Over 'E:/wamp64/www/assets/petra/tentang.php' -> '//180.211.92.132/htdocs2/assets/petra/tentang.php' (9,129)
+2019-05-20 10:00:59: Copy New 'E:/wamp64/www/assets/petra/view_dashboard_birthday.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_birthday.php' (1,940)
+2019-05-20 10:00:59: Copy New 'E:/wamp64/www/assets/petra/view_dashboard_next_events_admin.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_next_events_admin.php' (2,885)
+2019-05-20 10:00:59: Copy New 'E:/wamp64/www/assets/petra/view_dashboard_next_events_jemaat.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_next_events_jemaat.php' (2,589)
+2019-05-20 10:01:00: == Sync Complete. Time: 00:00:02, Speed: 35.4 KB/s, OK: 5, Errors: 0
+2019-05-20 10:01:00: 

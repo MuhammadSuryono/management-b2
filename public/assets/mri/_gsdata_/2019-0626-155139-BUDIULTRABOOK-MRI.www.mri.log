@@ -1,0 +1,5 @@
+2019-06-26 15:51:41: == Sync Started by User Command
+2019-06-26 15:51:41: Copy Over 'E:/www/assets/mri/view_dashboard_next_events_absen.php' -> 'sftp://180.211.92.131/var/www/html/assets/mri/view_dashboard_next_events_absen.php' (2,929)
+2019-06-26 15:51:42: Copy Over 'E:/www/assets/mri/view_dashboard_next_events_admin.php' -> 'sftp://180.211.92.131/var/www/html/assets/mri/view_dashboard_next_events_admin.php' (3,018)
+2019-06-26 15:51:42: == Sync Complete. Time: 00:00:01, Speed: 10.9 KB/s, OK: 2, Errors: 0
+2019-06-26 15:51:42: 

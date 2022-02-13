@@ -1,0 +1,7 @@
+2020-04-22 17:27:53: -- Analysis Started by User Command
+2020-04-22 17:28:13: Changes: 1, Conflicts: 0, CopyTime: 0, FixState: 0, Errors: 0, All: 11940
+2020-04-22 17:28:13: Left to Right: Copy File: 1 
+2020-04-22 17:28:13: == Sync Started by User Command
+2020-04-22 17:28:14: Copy Over 'E:/wamp64/www/b2/resources/views/umums/kotas/index.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/umums/kotas/index.blade.php' (928)
+2020-04-22 17:28:15: == Sync Complete. Time: 00:00:24, Speed: 38.00/s, OK: 1, Errors: 0
+2020-04-22 17:28:15: 

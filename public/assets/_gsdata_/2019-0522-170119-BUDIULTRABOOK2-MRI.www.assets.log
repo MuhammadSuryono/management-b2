@@ -1,0 +1,25 @@
+2019-05-22 17:01:19: -- Analysis Started by Analyze And Sync Command
+2019-05-22 17:01:35: Changes: 19, Conflicts: 0, CopyTime: 0, FixState: 0, Errors: 0, All: 8186
+2019-05-22 17:01:35: Left to Right: Copy File: 18 Delete File: 1 
+2019-05-22 17:01:35: == Sync Started by Analyze And Sync Command
+2019-05-22 17:01:35: Delete File '//180.211.92.132/htdocs2/assets/petra/20190519 1717 petra.7z'
+2019-05-22 17:01:36: Copy Over 'E:/wamp64/www/assets/gentelella-master/build/js/custom.js' -> '//180.211.92.132/htdocs2/assets/gentelella-master/build/js/custom.js' (117,443)
+2019-05-22 17:01:36: Copy New 'E:/wamp64/www/assets/gentelella-master/build/js/custom.js.bak' -> '//180.211.92.132/htdocs2/assets/gentelella-master/build/js/custom.js.bak' (117,672)
+2019-05-22 17:01:37: Copy New 'E:/wamp64/www/assets/gentelella-master/build/js/custom.min - Copy.js' -> '//180.211.92.132/htdocs2/assets/gentelella-master/build/js/custom.min - Copy.js' (72,450)
+2019-05-22 17:01:37: Copy Over 'E:/wamp64/www/assets/gentelella-master/build/js/custom.min.js' -> '//180.211.92.132/htdocs2/assets/gentelella-master/build/js/custom.min.js' (72,450)
+2019-05-22 17:01:38: Copy New 'E:/wamp64/www/assets/gentelella-master/build/js/custom.min.js.bak' -> '//180.211.92.132/htdocs2/assets/gentelella-master/build/js/custom.min.js.bak' (72,643)
+2019-05-22 17:01:38: Copy Over 'E:/wamp64/www/assets/gentelella-master/src/js/custom.js' -> '//180.211.92.132/htdocs2/assets/gentelella-master/src/js/custom.js' (7,021)
+2019-05-22 17:01:38: Copy New 'E:/wamp64/www/assets/gentelella-master/src/js/custom.js.bak' -> '//180.211.92.132/htdocs2/assets/gentelella-master/src/js/custom.js.bak' (7,250)
+2019-05-22 17:01:38: Copy New 'E:/wamp64/www/assets/images/logo_petra_jemaat.ico' -> '//180.211.92.132/htdocs2/assets/images/logo_petra_jemaat.ico' (2,462)
+2019-05-22 17:01:38: Copy New 'E:/wamp64/www/assets/js/anggota_kelompok.js' -> '//180.211.92.132/htdocs2/assets/js/anggota_kelompok.js' (2,611)
+2019-05-22 17:01:39: Copy New 'E:/wamp64/www/assets/js/jquery-3.4.1.min.js' -> '//180.211.92.132/htdocs2/assets/js/jquery-3.4.1.min.js' (88,145)
+2019-05-22 17:01:39: Copy New 'E:/wamp64/www/assets/js/listbox_functions.js' -> '//180.211.92.132/htdocs2/assets/js/listbox_functions.js' (1,640)
+2019-05-22 17:01:39: Copy New 'E:/wamp64/www/assets/js/listbox_functions.js.bak' -> '//180.211.92.132/htdocs2/assets/js/listbox_functions.js.bak' (0)
+2019-05-22 17:01:39: Copy New 'E:/wamp64/www/assets/petra/20190522 1359 petra.7z' -> '//180.211.92.132/htdocs2/assets/petra/20190522 1359 petra.7z' (3,264)
+2019-05-22 17:01:39: Copy New 'E:/wamp64/www/assets/petra/application.zip' -> '//180.211.92.132/htdocs2/assets/petra/application.zip' (5,085)
+2019-05-22 17:01:39: Copy Over 'E:/wamp64/www/assets/petra/view_dashboard_birthday.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_birthday.php' (1,908)
+2019-05-22 17:01:39: Copy New 'E:/wamp64/www/assets/petra/view_dashboard_jum_hadir.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_jum_hadir.php' (1,684)
+2019-05-22 17:01:40: Copy Over 'E:/wamp64/www/assets/petra/view_dashboard_next_events_admin.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_next_events_admin.php' (2,885)
+2019-05-22 17:01:40: Copy Over 'E:/wamp64/www/assets/petra/view_dashboard_next_events_jemaat.php' -> '//180.211.92.132/htdocs2/assets/petra/view_dashboard_next_events_jemaat.php' (2,589)
+2019-05-22 17:01:40: == Sync Complete. Time: 00:00:05, Speed: 126 KB/s, OK: 19, Errors: 0
+2019-05-22 17:01:40: 
