@@ -12,6 +12,20 @@
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
+            @if($project_jabatan->jabatan->jabatan != "Team Leader (TL)")
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="form-group">
+                        <select name="leader" class="form-control" required>
+                            <option>Pilih Team Leader</option>
+                            @foreach($teamLeaders->project_team as $leader)
+                                <option value="{{ $leader->team->id }}" {{ app('request')->input('leader') == $leader->team->id ? 'selected' : '' }}>{{ $leader->team->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+            @endif
             <div class="row">
                 <div class="col-sm-12">
                     <div class="card-box table-responsive">
@@ -29,6 +43,7 @@
                                     <th>HP</th>
                                     <th>Alamat</th>
                                     <th>Honor</th>
+                                    <th>Jenis TL</th>
                                     <th>Rate Card</th>
                                 </tr>
                             </thead>
@@ -60,6 +75,15 @@
                                             <input type="text" id="honor-{{$item->id}}" name="honor[]" class="form-control honor" disabled="true" value="">
                                         </div>
                                     </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <select class="form-control" name="jenis_tl[]" id="jenis_tl-{{$item->id}}" disabled="true">
+                                                <option value="">Pilih Jenis TL</option>
+                                                <option value="reguler">Reguler</option>
+                                                <option value="borongan">Borongan</option>
+                                            </select>
+                                        </div>
+                                    </td>
                                     <td class="text-center">
                                         @if($item->rate_card)
                                         <a href="{{url('/projects/view')}}/{{$item->rate_card}}" target="_blank"> <i class="fa fa-eye"></i></a>
@@ -81,7 +105,6 @@
 <script>
     $(document).ready(function() {
         $("#selectAll").click(function() {
-            console.log($(this).is(':checked'));
             $("input[type=checkbox]").prop('checked', $(this).prop('checked'));
             if ($(this).is(':checked')) {
                 $(".honor").prop('disabled', false);
@@ -95,9 +118,11 @@
             e.addEventListener("change", function() {
                 if (e.checked) {
                     $(`#honor-${e.value}`).prop('disabled', false);
+                    $(`#jenis_tl-${e.value}`).prop('disabled', false);
                 } else {
                     $(`#honor-${e.value}`).val('');
                     $(`#honor-${e.value}`).prop('disabled', true);
+                    $(`#jenis_tl-${e.value}`).prop('disabled', true);
                 }
             })
         });

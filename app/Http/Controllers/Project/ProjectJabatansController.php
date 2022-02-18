@@ -29,7 +29,6 @@ class ProjectJabatansController extends Controller
     {
         $project_kota = Project_kota::firstWhere('id', $project_kota_id);
         $jabatans = DB::select('select DISTINCT jabatans.id, jabatan from jabatans left join project_jabatans on jabatans.id = project_jabatans.jabatan_id where jabatans.id not in (select jabatan_id from project_jabatans where project_kota_id= ' . $project_kota_id . ')');
-        // dd('tet');
         return view('projects.project_jabatans.add_jabatan_list', compact('jabatans', 'project_kota'));
     }
 

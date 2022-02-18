@@ -83,6 +83,7 @@ Route::middleware(['checklogin'])->group(function () {
     Route::post('project_team_managements/denda_tl', 'Project\ProjectTeamManagementsController@dendaTl');
     Route::post('project_team_managements/tambah_honor_gift', 'Project\ProjectTeamManagementsController@tambahHonorGift');
     Route::get('project_team_managements/hapus_honor_gift/{id}', 'Project\ProjectTeamManagementsController@hapusHonorGift');
+    Route::get('project_team_managements/leader/{teamId}/kota/{projectKotaId}', 'Project\ProjectTeamManagementsController@get_leader');
     // Route::get('project_plans/{project}','Project\ProjectPlansController@index');
 
     //Project Plan
@@ -149,6 +150,8 @@ Route::middleware(['checklogin'])->group(function () {
     Route::get('project_teams/{project_team}/edit', 'Project\ProjectTeamsController@edit');
     Route::patch('project_teams/{project_team}', 'Project\ProjectTeamsController@update');
     Route::get('/project_teams/delete/{project_team}', 'Project\ProjectTeamsController@delete');
+    Route::get('/project_teams/leader/{teamLeaderId}/member', 'Project\ProjectTeamsController@member_team_leader');
+    Route::post('project_teams/edit/leader/team/{id}', 'Project\ProjectTeamsController@update_team_leader');
 
     //Umum
     Route::get('/kotas/delete/{id}', 'Umum\KotasController@delete');
@@ -209,7 +212,7 @@ Route::middleware(['checklogin'])->group(function () {
     //Rekap Gift
     Route::resource('rekap_budget', 'Finance\RekapBudgetController');
 
-    //Team 
+    //Team
     Route::get('/bahasas/delete/{id}', 'Team\BahasasController@delete');
     Route::get('/jabatans/delete/{id}', 'Team\JabatansController@delete');
     Route::get('/teams/delete/{id}', 'Team\TeamsController@delete');
@@ -340,7 +343,7 @@ Route::middleware(['checklogin'])->group(function () {
 
 
     //******************************************************/
-    //**********  ----------- Produk -----------  ********** 
+    //**********  ----------- Produk -----------  **********
     //Ini ada 3 level : Kategori, Tipe, Nama
     //Tipe Produk tidak bisa pakai resource karena harus bawa $kategori_produk_id
 

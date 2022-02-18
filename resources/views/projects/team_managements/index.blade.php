@@ -6,14 +6,9 @@
 <thead>
     <tr class="text-center">
         <th>
-            Kota Test
-            {{-- PAK BUDI --}}
-            {{-- <a title="tambah kota di proyek {{$project->nama}}" type="button" href="{{ url('/project_kotas/create/'.$project->id)}}" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i></a> --}}
-            {{-- AKHIR  --}}
-
-            {{-- IWAYRIWAY --}}
+            Kota
             <button title="tambah kota di proyek {{$project->nama}}" type="button" data-toggle="modal" data-target=".bs-example-modal-lg" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i></button>
-            {{-- AKHIR IWAYRIWAY --}}
+
         </th>
         <th>Team Dibutuhkan</th>
         <th>Nama Personel</th>
@@ -72,6 +67,7 @@
         <td rowspan="{{$num_rows[$i]}}" style="vertical-align: middle;">
             <div class="dropdown">
                 <strong>{{$item->kota}}</strong> ({{$item->jumlah}})
+                <br/>
                 <div class="btn-group">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownHonorButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 10px; padding: 1px; margin: 0;"> Honor
                     </button>
@@ -165,7 +161,19 @@
             <span data-toggle="modal" data-target="#honorDoTlModal">
                 <button type="button" class="close mr-2" data-toggle="tooltip" data-placement="bottom" title="Tambah Denda DO" data-id="<?= $item->project_team_id ?>" data-denda="<?= ($item->denda) ? $item->denda : 0 ?>" id="btn-denda"><span aria-hidden="true"><i class="fa fa-money"></i></span></button>
             </span>
-            {{$item->team}} (Rp.{{number_format($item->gaji)}})
+                    @if($item->jabatan == "Team Leader (TL)")
+            <span data-toggle="modal" data-target="#anggota-leader">
+                <button type="button" class="close mr-2" data-toggle="tooltip" data-placement="bottom" title="Show Anggota" onclick="getMemberLeader({{$item->team_id}})"><span aria-hidden="true"><i class="fa fa-users"></i></span></button>
+            </span>
+                    @endif
+                    @if($item->jabatan != "Team Leader (TL)")
+            <span>
+                <button type="button" class="close mr-2" data-toggle="tooltip" data-placement="bottom" title="Show Leader" onclick="setupLeader({{$item->team_id}}, {{$item->project_kota_id}}, {{$item->project_team_id}})"><span aria-hidden="true"><i class="fa fa-user"></i></span></button>
+            </span>
+                    @endif
+            {{$item->team}} <br>
+                    - Honor Rp.{{number_format($item->gaji)}} <br/>
+                    - Jenis TL {{ ucwords($item->type_tl) }} <br/>
             <?php
             if ($item->denda) {
                 $team = DB::table('teams')->where('id', $item->team_id)->first();
@@ -211,6 +219,7 @@
         </div>
     </div>
 </div>
+
 <!-- <a href="{{url('projects/' . Session::get('current_project_id')) . '/edit'}}" class="btn btn-primary float-right mr-3 text-white">Back</a> -->
 
 
@@ -466,6 +475,64 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="anggota-leader" tabindex="-1" role="dialog" aria-labelledby="anggota-leaderLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="anggota-leaderLabel">Anggota Team Leader</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6>Nama Leader : <span id="leader-name"></span></h6>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Jabatan</th>
+                        <th>Honor</th>
+                    </tr>
+                    </thead>
+                    <tbody id="data-member">
+
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="setup-leader" tabindex="-1" role="dialog" aria-labelledby="setup-leaderLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="setup-leaderLabel">Anggota Team Leader</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ url('/project_teams/edit/leader/')}}" id="form-setup-leader" method="POST">
+            <div class="modal-body">
+                @csrf
+                <div class="form-group">
+                    <select name="leader" id="leaders" class="form-control" required>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
 {{-- AKHIR MODAL TAMBAH KOTA --}}
 
 @endsection('content')
@@ -473,11 +540,67 @@
 @section('javascript')
 <script>
     $('#btn-denda').click(function() {
-        console.log('here');
         $('input[name=project_team_id]').val($(this).data("id"));
         $('#dendaTl').val($(this).data("denda"));
 
     });
+
+    function getMemberLeader(leaderId) {
+        var url = "{{ url('project_teams/leader')}}" + "/"  + leaderId  + "/member";
+        $("#anggota-leader").modal("show");
+        $('#data-member').html("");
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            dataType: "json",
+            success: function(hasil) {
+                html = "";
+                hasil.forEach((e) => {
+                    html += "<tr>";
+                    html += "<td>" + e.team.nama + "</td>";
+                    html += "<td>" + e.project_jabatan.jabatan.jabatan + "</td>";
+                    html += "<td>" + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(e.gaji) + "</td>";
+                    html += "</tr>";
+                });
+
+                $('#leader-name').html(hasil[0].leader_name);
+                $('#data-member').append(html);
+            },
+            error: function(error) {
+                console.log(error)
+            }
+        });
+    }
+
+
+    function setupLeader(teamId, kotaId, id) {
+        var url = "{{ url('project_team_managements/leader')}}" + "/"  + teamId + "/kota/" + kotaId;
+        $("#setup-leader").modal("show");
+        $('#leaders').html("");
+
+        var urlAction = "{{ url('/project_teams/edit/leader/team')}}" + "/" + id
+        document.getElementById("form-setup-leader").setAttribute("action", urlAction);
+        $.ajax({
+            url: url,
+            type: "GET",
+            dataType: "json",
+            success: function(hasil) {
+                html = "<option>Pilih Team Leader</option>";
+                hasil.teamLeaders.project_team.forEach((e) => {
+                    let selected = ""
+                    if (e.team.id === hasil.leader) selected = "selected"
+                    html += "<option value='"+e.team.id+"' "+selected+">" + e.team.nama + "</option>";
+                });
+
+                $('#leaders').html(html);
+            },
+            error: function(error) {
+                console.log(error)
+            }
+        });
+    }
+
 
     $(document).ready(function() {
 

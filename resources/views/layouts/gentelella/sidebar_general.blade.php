@@ -1,8 +1,8 @@
 <?php $acc_menu = session('accessible_menus');
 ?>
 <div class="menu_section">
-    <h2 class="text-light bg-primary">Project Moduls</h2>
-    <ul class="nav side-menu">
+    <h3>Project Moduls</h3>
+    <ul class="nav side-menu mb-4">
         {{-- PROJECT --}}
         <li><a><i class="fa fa-gears"></i> Project <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
@@ -79,7 +79,9 @@
             </ul>
         </li>
     </ul>
-    <h2 class="text-light bg-primary">Finance</h2>
+
+
+    <h3>Finance</h3>
     <ul class="nav side-menu">
         {{-- MENU BUDGET --}}
         @if( array_search('Budget (Direksi)', $acc_menu,TRUE))
@@ -136,16 +138,13 @@
                 @if( array_search('Rekap Budget Project', $acc_menu,TRUE))
                 <li> <a href="{{url('/rekap_budget')}}">Rekap Budget Project</a> </li>
                 @endif
-                <!-- <li> -->
-                <!-- <ul> -->
-                <!-- </ul> -->
-                <!-- </li> -->
             </ul>
         </li>
         @endif
-        {{-- AKHIR MENU BUDGET --}}
     </ul>
-    <h2 class="text-light bg-primary">General</h2>
+
+
+    <h3>General</h3>
     <ul class="nav side-menu">
         <li><a><i class="fa fa-circle-o"></i>Umum<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
@@ -189,4 +188,5 @@
 
         </li>
     </ul>
+
 </div>
