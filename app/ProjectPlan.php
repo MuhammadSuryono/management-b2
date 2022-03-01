@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    protected $table = 'my_flights';
+    protected $table = 'project_plans';
 }
