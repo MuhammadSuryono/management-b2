@@ -22,8 +22,11 @@ class OtentikasiController extends Controller
 
     public function cek_login(Request $request)
     {
-        DB::connection()->getPdo();
-        exit();
+        try {
+            DB::connection()->getPdo();
+        } catch (\Exception $e) {
+            die("Could not connect to the database.  Please check your configuration. error:" . $e );
+        }
         Session::put('logged_in', false);
         if (isset($request->user_login)) {
             $logged_in = Otentikasi::where('user_login', $request->user_login)
