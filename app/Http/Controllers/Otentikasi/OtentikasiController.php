@@ -22,6 +22,8 @@ class OtentikasiController extends Controller
 
     public function cek_login(Request $request)
     {
+        DB::connection()->getPdo();
+        exit();
         Session::put('logged_in', false);
         if (isset($request->user_login)) {
             $logged_in = Otentikasi::where('user_login', $request->user_login)
