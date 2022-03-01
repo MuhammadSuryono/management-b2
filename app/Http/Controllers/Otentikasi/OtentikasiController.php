@@ -25,7 +25,7 @@ class OtentikasiController extends Controller
         try {
             DB::connection()->getPdo();
         } catch (\Exception $e) {
-            die("Could not connect to the database.  Please check your configuration. error:" . $e );
+            die("Could not connect to the database.  Please check your configuration. error:" . $e->getMessage() );
         }
         Session::put('logged_in', false);
         if (isset($request->user_login)) {
