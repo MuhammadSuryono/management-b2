@@ -1,7 +1,0 @@
-2020-04-08 14:58:49: -- Analysis Started by User Command
-2020-04-08 14:59:07: Changes: 1, Conflicts: 0, CopyTime: 0, FixState: 0, Errors: 0, All: 11935
-2020-04-08 14:59:07: Left to Right: Copy File: 1 
-2020-04-08 14:59:07: == Sync Started by User Command
-2020-04-08 14:59:08: Copy Over 'E:/wamp64/www/b2/resources/views/dashboards/dashboard_gentelella.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/dashboards/dashboard_gentelella.blade.php' (417)
-2020-04-08 14:59:09: == Sync Complete. Time: 00:00:21, Speed: 19.00/s, OK: 1, Errors: 0
-2020-04-08 14:59:09: 

@@ -1,4 +1,0 @@
-2020-04-09 13:13:05: == Sync Started by User Command
-2020-04-09 13:13:06: Copy Over 'E:/wamp64/www/b2/resources/views/projects/project_absensis/head_script.blade.php' -> 'sftp://180.211.92.133:33904/var/www/mkp-operation.com/public/b2/resources/views/projects/project_absensis/head_script.blade.php' (186)
-2020-04-09 13:13:07: == Sync Complete. Time: 00:00:03, Speed: 62.00/s, OK: 1, Errors: 0
-2020-04-09 13:13:07: 

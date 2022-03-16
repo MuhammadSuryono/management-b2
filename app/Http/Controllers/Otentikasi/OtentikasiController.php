@@ -16,7 +16,6 @@ class OtentikasiController extends Controller
     public function login()
     {
         return view('otentikasis.login');
-        // return 'test';
     }
 
 
