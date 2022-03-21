@@ -1,3 +1,8 @@
+@if(session('status-fail') != null)
+    <div class="alert alert-danger">
+        {{ session('status-fail') }}
+    </div>
+@endif
 <div class="col-md-12 col-sm-12 ">
     <div class="x_panel">
         <div class="x_title">
@@ -17,10 +22,12 @@
                 <div class="col-lg-5">
                     <div class="form-group">
                         <select name="leader" class="form-control" required>
-                            <option>Pilih Team Leader</option>
-                            @foreach($teamLeaders->project_team as $leader)
-                                <option value="{{ $leader->team->id }}" {{ app('request')->input('leader') == $leader->team->id ? 'selected' : '' }}>{{ $leader->team->nama }}</option>
-                            @endforeach
+                            <option value="">Pilih Team Leader</option>
+                            @if(($teamLeaders != null))
+                                @foreach($teamLeaders->project_team as $leader)
+                                    <option value="{{ $leader->team->id }}" {{ app('request')->input('leader') == $leader->team->id ? 'selected' : '' }}>{{ $leader->team->nama }}</option>
+                                @endforeach
+                            @endif
                         </select>
                     </div>
                 </div>
@@ -119,10 +126,14 @@
                 if (e.checked) {
                     $(`#honor-${e.value}`).prop('disabled', false);
                     $(`#jenis_tl-${e.value}`).prop('disabled', false);
+                    $(`#honor-${e.value}`).prop('required', true);
+                    $(`#jenis_tl-${e.value}`).prop('required', true);
                 } else {
                     $(`#honor-${e.value}`).val('');
                     $(`#honor-${e.value}`).prop('disabled', true);
                     $(`#jenis_tl-${e.value}`).prop('disabled', true);
+                    $(`#honor-${e.value}`).prop('required', false);
+                    $(`#jenis_tl-${e.value}`).prop('required', false);
                 }
             })
         });

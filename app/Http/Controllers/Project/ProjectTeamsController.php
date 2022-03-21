@@ -85,9 +85,16 @@ class ProjectTeamsController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->available_team_id == null) {
+            return redirect()->back()->with('status-fail', 'Team tidak ditemukan');
+        }
+
         if (count($request->available_team_id) > 0) {
             $i = 0;
             foreach ($request->available_team_id as $new_team_id) {
+                if ($request->jenis_tl[$i] == "" || $request->jenis_tl[$i] == null){
+                    continue;
+                }
                 Project_team::create([
                     'project_jabatan_id' => $request->project_jabatan_id,
                     'team_id' => $new_team_id,
