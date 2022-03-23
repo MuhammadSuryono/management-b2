@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Project;
 
 use App\Http\Controllers\Controller;
+use App\Project_kota;
 use App\Project_team;
 use App\Project_jabatan;
 use App\Team_jabatan;
@@ -89,22 +90,32 @@ class ProjectTeamsController extends Controller
             return redirect()->back()->with('status-fail', 'Team tidak ditemukan');
         }
 
+        $jabatan = Project_jabatan::find($request->project_jabatan_id);
+        $allJabatan = Project_jabatan::where('project_kota_id', $jabatan->project_kota_id)->pluck('id')->toArray();
+
         if (count($request->available_team_id) > 0) {
             $i = 0;
             foreach ($request->available_team_id as $new_team_id) {
                 if ($request->jenis_tl[$i] == "" || $request->jenis_tl[$i] == null){
                     continue;
                 }
+
                 Project_team::create([
                     'project_jabatan_id' => $request->project_jabatan_id,
                     'team_id' => $new_team_id,
                     'gaji' => !is_null($request->honor[$i]) ? $request->honor[$i] : 0,
                     'user_id' => session('user_id'),
                     'type_tl' => $request->jenis_tl[$i],
+                    'target_tl' => $request->target[$i],
                     'team_leader' => (int)$request->leader
                 ]);
                 $i++;
             }
+
+            $totalTarget = Project_team::whereIn('project_jabatan_id', $allJabatan)->sum('target_tl');
+            $projectKota = Project_kota::find($jabatan->project_kota_id);
+            $projectKota->jumlah = $totalTarget;
+            $projectKota->save();
         }
         return redirect('/project_team_managements/' . session('current_project_id'))->with('status', 'Saved');
     }

@@ -55,13 +55,13 @@ class ProjectKotasController extends Controller
         //     'jumlah' => $request->jumlah,
         //     'user_id' => $request->user_id,
         // ]);
-        
+
         // return redirect('/project_team_managements/' . $request->project_id ) ->with('status','Saved');
         // AKHIR PAK BUDI
 
         // IwayRiway
         $kota = explode('-', $request->kota);
-        
+
         if($kota[0] == 'lain'){
             $cek = DB::table('kotas')
                         ->where('kota', 'like', '%'.$request->kotaBaru.'%')
@@ -73,12 +73,12 @@ class ProjectKotasController extends Controller
                         ['id_provinsi'=>$request->provinsi, 'kota'=>$request->kotaBaru]
                     );
                 // akhir
-                
+
                 // simpan tbl project_kota
                 $kota = Kota::where('kota', '=', $request->kotaBaru)->first();
                 Project_kota::firstOrCreate(
                         ['kode_project'=>$request->kode_project,'project_id'=>$request->project_id,'kota_id'=>$kota->id],
-                        ['id_provinsi' => $request->provinsi,'jumlah' => $request->jumlah,'user_id'=>session('user_id')]
+                        ['id_provinsi' => $request->provinsi,'jumlah' => 0,'user_id'=>session('user_id')]
                     );
                 // akhir
             }
@@ -86,7 +86,7 @@ class ProjectKotasController extends Controller
         } else {
             Project_kota::firstOrCreate(
                         ['kode_project'=>$request->kode_project,'project_id'=>$request->project_id,'kota_id'=>$kota[0]],
-                        ['id_provinsi' => $request->provinsi,'jumlah' => $request->jumlah,'user_id'=>session('user_id')]
+                        ['id_provinsi' => $request->provinsi,'jumlah' => 0,'user_id'=>session('user_id')]
                     );
         }
 
@@ -163,5 +163,5 @@ class ProjectKotasController extends Controller
 
         return redirect('/project_team_managements/' . $request->project_id ) ->with('status','Saved');
     }
-    
+
 }

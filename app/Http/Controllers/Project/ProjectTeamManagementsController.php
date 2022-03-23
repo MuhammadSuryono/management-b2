@@ -25,7 +25,7 @@ class ProjectTeamManagementsController extends Controller
     public function index(Project $project)
     {
         $project_full_teams = DB::select('SELECT pk.kota_id AS id_kota,
-            pk.jumlah AS jumlah, pk.id AS project_kota_id, pj.id AS project_jabatan_id, pt.id AS project_team_id, k.kota, j.jabatan, t.nama AS team, xx.nama AS nama_prov, pt.gaji, pt.denda, pt.team_id, pt.type_tl, pt.team_leader
+            pk.jumlah AS jumlah, pk.id AS project_kota_id, pj.id AS project_jabatan_id, pt.id AS project_team_id, k.kota, j.jabatan, t.nama AS team, xx.nama AS nama_prov, pt.gaji, pt.denda, pt.team_id, pt.type_tl, pt.team_leader, pt.target_tl
         FROM  project_kotas pk
             LEFT JOIN project_jabatans pj ON pk.id = pj.project_kota_id
             LEFT JOIN project_teams pt ON pj.id = pt.project_jabatan_id
