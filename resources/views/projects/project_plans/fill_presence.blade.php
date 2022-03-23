@@ -403,9 +403,9 @@
                     <label for="bank" style="margin-right: 10px;"><b>Nama</b></label>
                     <select name="user" id="" class="selectpicker" data-show-subtext="true" data-live-search="true">
                         @foreach($team as $t)
-                        @if(in_array($t->id, $peserta_external))
+{{--                        @if(in_array($t->id, $peserta_external))--}}
                         <option value="{{$t->id}}">{{$t->nama}}</option>
-                        @endif
+{{--                        @endif--}}
                         @endforeach
                     </select>
                 <?php endif; ?>

@@ -152,9 +152,10 @@ class ProjectTeamManagementsController extends Controller
             }])->get();
         }])->where('project_kota_id', $projectKotaId)->where('jabatan_id', '9')->first();
 
-        $leader = Project_team::with(['project_jabatan' => function($q) use($projectKotaId) {
-            $q->with(['project_kota'])->where('project_kota_id', $projectKotaId);
-        }])->where('team_id', $teamId)->first()->team_leader;
+        $leader = Project_team::leftJoin("project_jabatans", "project_teams.project_jabatan_id", "=", "project_jabatans.id")
+            ->where('project_teams.team_id', $teamId)
+            ->where("project_jabatans.project_kota_id", $projectKotaId)
+            ->first()->team_leader;
 
         return response()->json((object) [
             'leader' => $leader,

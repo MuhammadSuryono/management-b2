@@ -157,11 +157,14 @@ class ProjectTeamsController extends Controller
         return redirect('/project_team_managements/' . session('current_project_id'))->with('status', 'Deleted');
     }
 
-    public function member_team_leader($teamLeaderId)
+    public function member_team_leader($kotaId, $teamLeaderId)
     {
         $member = Project_team::with(['team', 'project_jabatan' => function($q) {
             $q->with(['jabatan']);
-        }])->where('team_leader', $teamLeaderId)->get();
+        }])
+            ->leftJoin("project_jabatans", "project_teams.project_jabatan_id", "=", "project_jabatans.id")
+            ->where("project_jabatans.project_kota_id", $kotaId)
+            ->where('team_leader', $teamLeaderId)->get();
         $leaderName = Team::find($teamLeaderId)->nama;
         $member[0]->leader_name = $leaderName;
         return response()->json($member);

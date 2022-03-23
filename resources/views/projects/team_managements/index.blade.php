@@ -163,7 +163,7 @@
             </span>
                     @if($item->jabatan == "Team Leader (TL)")
             <span data-toggle="modal" data-target="#anggota-leader">
-                <button type="button" class="close mr-2" data-toggle="tooltip" data-placement="bottom" title="Show Anggota" onclick="getMemberLeader({{$item->team_id}})"><span aria-hidden="true"><i class="fa fa-users"></i></span></button>
+                <button type="button" class="close mr-2" data-toggle="tooltip" data-placement="bottom" title="Show Anggota" onclick="getMemberLeader({{$item->project_kota_id}},{{$item->team_id}})"><span aria-hidden="true"><i class="fa fa-users"></i></span></button>
             </span>
                     @endif
                     @if($item->jabatan != "Team Leader (TL)")
@@ -545,8 +545,9 @@
 
     });
 
-    function getMemberLeader(leaderId) {
-        var url = "{{ url('project_teams/leader')}}" + "/"  + leaderId  + "/member";
+    function getMemberLeader(kotaId, leaderId) {
+        let path = `/project_teams/kota/${kotaId}/leader/${leaderId}/member`;
+        var url = "{{ url('')}}" + path;
         $("#anggota-leader").modal("show");
         $('#data-member').html("");
 

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Project;
 
 use App\Http\Controllers\Controller;
+use App\Project_jabatan;
+use App\Project_kota;
+use App\Project_team;
 use App\Task;
 use App\Lokasi;
 use App\Project;
@@ -594,15 +597,18 @@ class ProjectPlansController extends Controller
 
     public function fill_presence(Request $request)
     {
-        $team = Team::all()->sortBy('nama');
         $project_plan = Project_plan::where('id', $request->id)->first();
-        if (@unserialize($project_plan->peserta_external_id)) {
-            $peserta_external = unserialize($project_plan->peserta_external_id);
-        } else {
-            $peserta_external = [];
-        }
+        $peserta_external = [];
 
-        // $respondents = Respondent::where('project_id', $project_plan->project_id)->get()->sortBy('respname');
+        $projectKotaIds = Project_kota::where("project_id", $project_plan->project_id)->pluck("id")->toArray();
+        $projectJabatanIds = Project_jabatan::whereIn("project_kota_id", $projectKotaIds)->pluck("id")->toArray();
+
+        $team = Project_team::select("teams.*")->leftJoin("teams", "teams.id", "=", "project_teams.team_id")
+            ->whereIn("project_jabatan_id", $projectJabatanIds)
+            ->orderBy("teams.nama")
+            ->groupBy("teams.id")
+            ->get();
+//         $respondents = Respondent::where('project_id', $project_plan->project_id)->get()->sortBy('respname');
 
         $is_respondent = 0;
         return view('projects.project_plans.fill_presence', compact('team', 'project_plan', 'peserta_external', 'is_respondent'));
