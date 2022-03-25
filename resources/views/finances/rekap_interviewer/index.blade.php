@@ -30,7 +30,6 @@
         </div>
     </div>
 </div>
-
 <div class="col-md-12 col-sm-12 ">
     <div class="x_panel">
         <div class="x_title">
@@ -175,7 +174,7 @@ if (isset($_GET['project_id'])) {
         <tr>
             <th>No</th>
             <th>Nama</th>
-            <th>Kota</th>
+            <th>Kota Asal</th>
             <th>Bank</th>
             <th>Nomor Rekening</th>
             @if(isset($_GET['project_id']))

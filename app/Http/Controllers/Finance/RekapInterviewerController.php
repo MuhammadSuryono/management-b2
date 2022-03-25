@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
+use App\Project_kota;
+use App\Project_team;
 use App\User;
 use App\Team;
 use App\User_role;
@@ -42,9 +44,12 @@ class RekapInterviewerController extends Controller
      */
     public function index(Request $request)
     {
-        // dd('here');
         $honor_category = [];
         $honor_do_category = [];
+        $kotas = Project_kota::join('kotas', 'project_kotas.kota_id', '=', 'kotas.id')->select('kotas.*')
+            ->when(isset($request->project_id) && $request->project_id != 'all', function ($query) use ($request) {
+                return $query->where('project_id', $request->project_id);
+            })->orderBy('kotas.kota', 'ASC')->distinct()->get();
         if ($request->project_id != 'all' && $request->project_id) {
             $checkBudgetIntegration = Project_budget_integration::where('project_id', $request->project_id)->whereNotNull('item_budget_id_pembayaran_interviewer')->first();
             if (!isset($checkBudgetIntegration)) {
@@ -57,19 +62,22 @@ class RekapInterviewerController extends Controller
                 $pembayaran_interviewer = [];
 
             if (in_array('internal', $pembayaran_interviewer) && in_array('external', $pembayaran_interviewer)) {
-                $teams = Team_payment_marking::select('*')
-                    ->join('teams', 'teams.id', '=', 'team_payment_markings.team_id')
+
+                $teams = Team_payment_marking::select('teams.*')
+                    ->leftJoin('project_teams', 'project_teams.id', '=', 'team_payment_markings.project_team_id')
+                    ->leftJoin('project_jabatans', 'project_jabatans.id', '=', 'project_teams.project_jabatan_id')
+                    ->leftJoin('project_kotas', 'project_kotas.id', '=', 'project_jabatans.project_kota_id')
+                    ->leftJoin('teams', 'teams.id', '=', 'team_payment_markings.team_id')
                     ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-                        return $query->where('kota_id', '=', $request->kota_id);
+                        return $query->where('project_kotas.kota_id', '=', $request->kota_id);
                     })
                     ->whereNotIn('team_payment_markings.team_id', function ($query) {
                         $query->select('team_id')->from('pembayaran_interviewers');
                     })
-                    ->where('project_id', $request->project_id)
+                    ->where('team_payment_markings.project_id', $request->project_id)
                     ->where('posisi', 'Interviewer')
                     ->get();
 
-                $kotas = Team_payment_marking::join('teams', 'teams.id', '=', 'team_payment_markings.team_id')->join('kotas', 'teams.kota_id', '=', 'kotas.id')->select('kotas.*')->where('project_id', $request->project_id)->where('posisi', 'Interviewer')->orderBy('kotas.kota', 'ASC')->distinct()->get();
             } else if (in_array('internal', $pembayaran_interviewer)) {
                 $respondents = Respondent::where('project_id', '=', $request->project_id)
                     ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
@@ -103,7 +111,6 @@ class RekapInterviewerController extends Controller
                         }
                     }
                 }
-                $kotas = Respondent::join('kotas', 'respondents.kota_id', '=', 'kotas.id')->select('kotas.*')->where('project_id', '=', $request->project_id)->orderBy('kotas.kota', 'ASC')->distinct()->get();
             }
 
             $honor_category = Project_honor::join('project_kotas', 'project_kotas.id', '=', 'project_honors.project_kota_id')

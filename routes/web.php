@@ -152,7 +152,9 @@ Route::middleware(['checklogin'])->group(function () {
     Route::get('/project_teams/delete/{project_team}', 'Project\ProjectTeamsController@delete');
     Route::get('/project_teams/kota/{kotaId}/leader/{teamLeaderId}/member', 'Project\ProjectTeamsController@member_team_leader');
     Route::post('project_teams/edit/leader/team/{id}', 'Project\ProjectTeamsController@update_team_leader');
+    Route::get('project_teams/project-jabatan/{projectJabatanId}/teams', 'Project\ProjectTeamsController@get_teams');
 
+    
     //Umum
     Route::get('/kotas/delete/{id}', 'Umum\KotasController@delete');
     Route::get('/kelurahans/delete/{id}', 'Umum\KelurahansController@delete');

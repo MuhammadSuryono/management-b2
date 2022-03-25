@@ -21,11 +21,11 @@
             <div class="row">
                 <div class="col-lg-5">
                     <div class="form-group">
-                        <select name="leader" class="form-control" required>
+                        <select name="leader" class="form-control" id="select-tl" required>
                             <option value="">Pilih Team Leader</option>
                             @if(($teamLeaders != null))
                                 @foreach($teamLeaders->project_team as $leader)
-                                    <option value="{{ $leader->team->id }}" {{ app('request')->input('leader') == $leader->team->id ? 'selected' : '' }}>{{ $leader->team->nama }}</option>
+                                    <option data-typeTl="{{$leader->type_tl}}" value="{{ $leader->team->id }}" {{ app('request')->input('leader') == $leader->team->id ? 'selected' : '' }}><strong>{{ $leader->team->nama }}</strong> (<small>{{ucwords($leader->type_tl)}}</small>)</option>
                                 @endforeach
                             @endif
                         </select>
@@ -49,55 +49,73 @@
                                     <th>Gender</th>
                                     <th>HP</th>
                                     <th>Alamat</th>
+                                    @if($showColumnHonor)
                                     <th>Honor</th>
                                     <th>Jenis TL</th>
+                                    @endif
+                                    @if($project_jabatan->jabatan->jabatan == "Team Leader (TL)")
+                                        <th>Target</th>
+                                    @endif
                                     <th>Rate Card</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach ($teams as $item)
-                                <tr>
-                                    <th width="6%">
-                                        <input type="checkbox" id="available_team_id[]" class="checkboxHonor" name="available_team_id[]" style="width:20px; height:20px" value="{{ $item->id }} ">
-                                    </th>
+                            <tbody id="body-teams">
 
-                                    <td>
-                                        @if(isset($item->nama))
-                                        {{$item->nama}}
+                            @if($showTeam)
+                                @foreach ($teams as $item)
+                                    <tr>
+                                        <th width="6%">
+                                            <input type="checkbox" id="available_team_id[]" class="checkboxHonor" name="available_team_id[]" style="width:20px; height:20px" value="{{ $item->id }} ">
+                                        </th>
+
+                                        <td>
+                                            @if(isset($item->nama))
+                                                {{$item->nama}}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if(isset($item->gender_id))
+                                                @if($item->gender_id=1)
+                                                    Laki-laki
+                                                @else
+                                                    Perempuan
+                                                @endif
+                                            @endif
+                                        </td>
+                                        <td>{{ $item->hp }} </td>
+                                        <td>{{ $item->alamat }} </td>
+                                        @if($showColumnHonor)
+                                        <td>
+                                            <div class="item form-group">
+                                                <input type="text" id="honor-{{$item->id}}" name="honor[]" class="form-control honor" disabled="true" value="">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select class="form-control" name="jenis_tl[]" id="jenis_tl-{{$item->id}}" disabled="true">
+                                                    <option value="">Pilih Jenis TL</option>
+                                                    <option value="reguler" {{app('request')->input('type_tl') == 'reguler' ? 'selected':''}}>Reguler</option>
+                                                    <option value="borongan" {{app('request')->input('type_tl') == 'borongan' ? 'selected':''}}>Borongan</option>
+                                                </select>
+                                            </div>
+                                        </td>
                                         @endif
-                                    </td>
-                                    <td>
-                                        @if(isset($item->gender_id))
-                                        @if($item->gender_id=1)
-                                        Laki-laki
-                                        @else
-                                        Perempuan
+                                        @if($project_jabatan->jabatan->jabatan == "Team Leader (TL)")
+                                            <td>
+                                                <div class="item form-group">
+                                                    <input type="text" id="target-{{$item->id}}" name="target[]" class="form-control honor" disabled="true" value="">
+                                                </div>
+                                            </td>
                                         @endif
-                                        @endif
-                                    </td>
-                                    <td>{{ $item->hp }} </td>
-                                    <td>{{ $item->alamat }} </td>
-                                    <td>
-                                        <div class="item form-group">
-                                            <input type="text" id="honor-{{$item->id}}" name="honor[]" class="form-control honor" disabled="true" value="">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="form-group">
-                                            <select class="form-control" name="jenis_tl[]" id="jenis_tl-{{$item->id}}" disabled="true">
-                                                <option value="">Pilih Jenis TL</option>
-                                                <option value="reguler">Reguler</option>
-                                                <option value="borongan">Borongan</option>
-                                            </select>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        @if($item->rate_card)
-                                        <a href="{{url('/projects/view')}}/{{$item->rate_card}}" target="_blank"> <i class="fa fa-eye"></i></a>
-                                        @endif
-                                    </td>
-                                </tr>
+                                        <td class="text-center">
+                                            @if($item->rate_card)
+                                                <a href="{{url('/projects/view')}}/{{$item->rate_card}}" target="_blank"> <i class="fa fa-eye"></i></a>
+                                            @endif
+                                        </td>
+                                    </tr>
                                 @endforeach
+
+                            @endif
                             </tbody>
                         </table>
                     </div>
@@ -110,6 +128,14 @@
 <!-- <script src="{{url('../assets')}}/js/jquery.min.js"></script> -->
 @section('javascript')
 <script>
+
+    $('#select-tl').change(() => {
+        let typeTl = $('#select-tl option:selected').data('typetl')
+        let value = $('#select-tl option:selected').val()
+        let projectJabatan = "{{$project_jabatan->id}}"
+        let path = `/project_teams/create/${projectJabatan}?type_tl=${typeTl}&leader=${value}`
+        window.location.href = path
+    })
     $(document).ready(function() {
         $("#selectAll").click(function() {
             $("input[type=checkbox]").prop('checked', $(this).prop('checked'));
@@ -119,7 +145,6 @@
                 $(".honor").prop('disabled', true);
             }
         });
-
         const checkbox = document.querySelectorAll(".checkboxHonor");
         checkbox.forEach(function(e, i) {
             e.addEventListener("change", function() {
@@ -128,12 +153,16 @@
                     $(`#jenis_tl-${e.value}`).prop('disabled', false);
                     $(`#honor-${e.value}`).prop('required', true);
                     $(`#jenis_tl-${e.value}`).prop('required', true);
+                    $(`#target-${e.value}`).prop('required', false);
+                    $(`#target-${e.value}`).prop('disabled', false);
                 } else {
                     $(`#honor-${e.value}`).val('');
                     $(`#honor-${e.value}`).prop('disabled', true);
                     $(`#jenis_tl-${e.value}`).prop('disabled', true);
                     $(`#honor-${e.value}`).prop('required', false);
                     $(`#jenis_tl-${e.value}`).prop('required', false);
+                    $(`#target-${e.value}`).prop('required', true);
+                    $(`#target-${e.value}`).prop('disabled', true);
                 }
             })
         });

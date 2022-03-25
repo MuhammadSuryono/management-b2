@@ -172,8 +172,14 @@
             </span>
                     @endif
             {{$item->team}} <br>
-                    - Honor Rp.{{number_format($item->gaji)}} <br/>
-                    - Jenis TL {{ ucwords($item->type_tl) }} <br/>
+                    @if($item->jabatan != "Interviewer")
+                        - Honor Rp.{{number_format($item->gaji)}} <br/>
+                        - Jenis TL {{ ucwords($item->type_tl) }} <br/>
+                    @endif
+                    
+                    @if($item->jabatan == "Team Leader (TL)")
+                        - Target TL {{ ucwords($item->target_tl) }} respondent <br/>
+                    @endif
             <?php
             if ($item->denda) {
                 $team = DB::table('teams')->where('id', $item->team_id)->first();
