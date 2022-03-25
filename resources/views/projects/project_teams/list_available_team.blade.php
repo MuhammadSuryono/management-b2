@@ -134,7 +134,7 @@
         let value = $('#select-tl option:selected').val()
         let projectJabatan = "{{$project_jabatan->id}}"
         let path = `/project_teams/create/${projectJabatan}?type_tl=${typeTl}&leader=${value}`
-        window.location.href = path
+        window.location.href = "{{url("")}}" + path
     })
     $(document).ready(function() {
         $("#selectAll").click(function() {
