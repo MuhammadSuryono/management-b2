@@ -62,12 +62,9 @@ class RekapInterviewerController extends Controller
                 $pembayaran_interviewer = [];
 
             if (in_array('internal', $pembayaran_interviewer) && in_array('external', $pembayaran_interviewer)) {
-
-                $teams = Team_payment_marking::select('teams.*')
+                $teamPaymentMarking = Team_payment_marking::with(['team'])
                     ->leftJoin('project_teams', 'project_teams.id', '=', 'team_payment_markings.project_team_id')
-                    ->leftJoin('project_jabatans', 'project_jabatans.id', '=', 'project_teams.project_jabatan_id')
-                    ->leftJoin('project_kotas', 'project_kotas.id', '=', 'project_jabatans.project_kota_id')
-                    ->leftJoin('teams', 'teams.id', '=', 'team_payment_markings.team_id')
+                    ->leftJoin('project_kotas', 'project_kotas.id', '=', 'project_teams.project_kota_id')
                     ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
                         return $query->where('project_kotas.kota_id', '=', $request->kota_id);
                     })
@@ -77,6 +74,13 @@ class RekapInterviewerController extends Controller
                     ->where('team_payment_markings.project_id', $request->project_id)
                     ->where('posisi', 'Interviewer')
                     ->get();
+
+                $teams = [];
+                if ($teamPaymentMarking != null) {
+                    foreach ($teamPaymentMarking as $team) {
+                        $teams[] = $team->team;
+                    }
+                }
 
             } else if (in_array('internal', $pembayaran_interviewer)) {
                 $respondents = Respondent::where('project_id', '=', $request->project_id)
@@ -492,39 +496,14 @@ class RekapInterviewerController extends Controller
 
     public function marking(Request $request)
     {
-
-        // dd($request->id);
-        // $honor_category = [];
-        // $honor_do_category = [];
-
-        // $checkBudgetIntegration = Project_budget_integration::where('project_id', $request->project_id)->whereNotNull('item_budget_id_pembayaran_interviewer')->first();
-        // if (!isset($checkBudgetIntegration)) {
-        //     return redirect(url()->previous())->with('status-fail', 'Harap untuk melakukan integrasi untuk item budget terlebih dahulu');
-        // }
-
-        // $honor_category = Project_honor::join('project_kotas', 'project_kotas.id', '=', 'project_honors.project_kota_id')
-        //     ->where('project_kotas.project_id', '=', $request->project_id)
-        //     ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-        //         return $query->where('kota_id', '=', $request->kota_id);
-        //     })
-        //     ->get();
-        // dd($honor_category);
-        // $honor_do_category = Project_honor_do::join('project_kotas', 'project_kotas.id', '=', 'project_honor_dos.project_kota_id')
-        //     ->where('project_kotas.project_id', '=', $request->project_id)
-        //     ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-        //         return $query->where('kota_id', '=', $request->kota_id);
-        //     })
-        //     ->get();
         $respondents = Respondent::where('project_id', '=', $request->id)
-            // ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-            //     return $query->where('kota_id', '=', $request->kota_id);
-            // })
             ->get();
+        $dbDigitalisasiMarketing = DB::connection('mysql3');
 
         $teams = [];
         $checkId = [];
+
         foreach ($respondents as $r) {
-            // dd($respondents);
             if ($r->srvyr) {
                 $pwtCode = substr($r->srvyr, 3, 6);
                 $pwtCode = (int)$pwtCode;
@@ -532,31 +511,40 @@ class RekapInterviewerController extends Controller
                 $cityCode = substr($r->srvyr, 0, 3);
                 $cityCode = (int)$cityCode;
 
-                // var_dump($pwtCode);
-                // var_dump($cityCode);
+                $projectTeam = Project_team::with(['team','projectKota' => function($q) use ($cityCode) {
+                    $q->with(['kota']);
+                }])
+                    ->where('team_leader', '!=', 0)
+                    ->where('team_id', $pwtCode)->where("project_kota_id", $cityCode)->first();
 
-                $pwt = DB::table('teams')
-                    ->where('no_team', $pwtCode)
-                    ->where('kota_id', $cityCode)
-                    ->first();
-                // dd($respondents);
+                if ($projectTeam != null) {
+                    $leader = Project_team::where("project_kota_id", $cityCode)->where('team_leader', $projectTeam->team_leader)->first();
+                    if (isset($projectTeam->team) && $leader->type_tl != "borongan") {
+                        $projectKota = $projectTeam->projectKota;
+                        $pwt = $projectTeam->team;
+                        if (!in_array($pwt->id, $checkId)) {
+                            $bank = $dbDigitalisasiMarketing->table('bank')->where('kode', '=', $pwt->kode_bank)->first();
+                            $pwt->type_tl = $leader->type_tl;
+                            $pwt->project_kota = $projectKota->kota->kota;
+                            $pwt->bank = $bank != null ? $bank->nama : "-";
+                            $pwt->project_team_id = $projectTeam->id;
 
-                if ($pwt) {
-                    // $checkData = Pembayaran_interviewer::where('project_id', $request->project_id)->where('team_id', $pwt->id)->first();
-                    // if (!$checkData) {
-                    if (!in_array($pwt->id, $checkId)) {
-                        array_push($teams, $pwt);
-                        array_push($checkId, $pwt->id);
+                            $bgColor = "";
+                            $isCanMarking = true;
+                            if ($pwt->bank == "-" && $pwt->nomor_rekening == "") {
+                                $isCanMarking = false;
+                                $bgColor = "bg-danger";
+                            }
+
+                            $pwt->is_can_marking = $isCanMarking;
+                            $pwt->bg_color = $bgColor;
+                            array_push($teams, $pwt);
+                            array_push($checkId, $pwt->id);
+                        }
                     }
-                    // }
                 }
             }
         }
-
-        // $kotas = Respondent::join('kotas', 'respondents.kota_id', '=', 'kotas.id')->select('kotas.*')->where('project_id', '=', $request->project_id)->orderBy('kotas.kota', 'ASC')->distinct()->get();
-
-        // dd(count($teams));
-
 
         // $menus = Menu::all();
         $add_url = url('/menus/create');
@@ -573,11 +561,14 @@ class RekapInterviewerController extends Controller
                     'project_id' => $request->project_id,
                     'team_id' => $request->id,
                     'posisi' => 'Interviewer',
+                    'project_team_id' => $request->project_team_id,
                     'created_at' => date('Y-m-d H:i:s')
                 ]);
             }
         } else if ($request->status == 'unmark') {
-            $update = Team_payment_marking::where('project_id', $request->project_id)->where('team_id', $request->id)->where('posisi', 'Interviewer')->delete();
+            $update = Team_payment_marking::where('project_id', $request->project_id)
+                ->where('project_team_id', $request->project_team_id)
+                ->where('team_id', $request->id)->where('posisi', 'Interviewer')->delete();
         }
 
         echo $update;

@@ -17,6 +17,7 @@
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
+            <input class="form-control" value="{{$project_jabatan->project_kota_id}}" name="projectKotaId" hidden>
             @if($project_jabatan->jabatan->jabatan != "Team Leader (TL)")
             <div class="row">
                 <div class="col-lg-5">
@@ -39,9 +40,10 @@
                         <p class="text-muted font-13 m-b-30">
                             Pilih semua nama yang ingin ditambahkan, lalu klik Save
                         </p>
-                        <table id="datatable-checkbox" class="table table-striped table-bordered bulk_action" style="width:100%">
+                        <div class="table-scroll">
+                        <table id="datatable-checkbox" class="table table-striped table-bordered bulk_action table-hover tableFixHead" style="width:100%">
                             <thead>
-                                <tr>
+                                <tr class="warning">
                                     <th width="6%">
                                         <input type="checkbox" id="selectAll" style="width:20px; height:20px"></button>
                                     </th>
@@ -75,7 +77,7 @@
                                         </td>
                                         <td>
                                             @if(isset($item->gender_id))
-                                                @if($item->gender_id=1)
+                                                @if($item->gender_id==1)
                                                     Laki-laki
                                                 @else
                                                     Perempuan
@@ -118,6 +120,7 @@
                             @endif
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -133,7 +136,8 @@
         let typeTl = $('#select-tl option:selected').data('typetl')
         let value = $('#select-tl option:selected').val()
         let projectJabatan = "{{$project_jabatan->id}}"
-        let path = `/project_teams/create/${projectJabatan}?type_tl=${typeTl}&leader=${value}`
+        let team = "{{$project_jabatan->jabatan->jabatan}}"
+        let path = `/project_teams/create/${projectJabatan}?type_tl=${typeTl}&leader=${value}&team=${team}`
         window.location.href = "{{url("")}}" + path
     })
     $(document).ready(function() {

@@ -57,6 +57,28 @@
     @endif
 
 </head>
+<style>
+    .table-scroll {
+        max-height: 380px;
+        overflow: auto;
+        display: inline-block;
+        width: 100%;
+        scrollbar-width: none;
+    }
+    .tableFixHead          {
+        overflow: auto;
+        height: 100px;
+    }
+    .tableFixHead thead th {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #2A3F54;
+        color: white;
+        border-color: white;
+    }
+</style>
 
 <body class="nav-md">
     <div class="container body">
@@ -87,7 +109,7 @@
             <!-- /top navigation -->
 
             <!-- page content -->
-            <div class="right_col" role="main">
+            <div class="right_col content-height" role="main" style="min-height: 851px;">
                 {{-- form --}}
                 <div class="row">
                     <div class="col-md-12 col-sm-12 ">

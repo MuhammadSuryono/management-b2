@@ -32,7 +32,8 @@
     <tr>
         <th>No</th>
         <th>Nama</th>
-        <th>Kota</th>
+        <th>Kota Asal</th>
+        <th>Kota Project</th>
         <th>Bank</th>
         <th>Nomor Rekening</th>
         <th>Total Respondent</th>
@@ -45,25 +46,13 @@
 <tbody>
     @foreach ($teams as $item)
     <?php $total = 0; ?>
-    <tr>
+    <tr class="{{$item->bg_color}}">
         <th scope='row'>{{$loop->iteration}}</th>
         <td>{{$item->nama}}</td>
-        <td>
-            <?php $kota = DB::table('kotas')->where('id', '=', $item->kota_id)->first(); ?>
-            {{$kota->kota}}
-        </td>
-        <td> @if(isset($item->nama_bank))
-            {{$item->nama_bank}}
-            @else
-            Kosong
-            @endisset
-        </td>
-        <td> @if($item->nomor_rekening!='')
-            {{$item->nomor_rekening}}
-            @else
-            Kosong
-            @endif
-        </td>
+        <td>{{$item->kota->kota}}</td>
+        <td>{{$item->project_kota}}</td>
+        <td>{{$item->bank}}</td>
+        <td>{{$item->nomor_rekening}}</td>
         <td>
             <!-- total respondent -->
             <?php $teamCode = sprintf('%04d', $item->no_team); ?>
@@ -112,11 +101,14 @@
         </td>
 
         <td>
-            <?php $check = DB::table('team_payment_markings')->where('project_id', session('current_project_id'))->where('team_id', $item->id)->where('posisi', 'Interviewer')->count();
+            <?php
+            if ($item->is_can_marking) {
+            $check = DB::table('team_payment_markings')->where('project_id', session('current_project_id'))->where('team_id', $item->id)->where('posisi', 'Interviewer')->count();
             ?>
-            <button class='btn btn-sm <?= (!$check) ? 'btn-primary btn-mark' : 'btn-danger btn-unmark' ?>' type="button" data-id="<?= $item->id ?>" data-project_id="<?= session('current_project_id') ?>">
+            <button class='btn btn-sm <?= (!$check) ? 'btn-primary btn-mark' : 'btn-danger btn-unmark' ?>' type="button" data-id="<?= $item->id ?>" data-project_team_id="{{$item->project_team_id}}" data-project_id="<?= session('current_project_id') ?>">
                 <?= (!$check) ? '<i class="fa fa-flag"></i>' : '<i class="fa fa-times"></i>' ?>
             </button>
+            <?php } ?>
         </td>
     </tr>
     @endforeach
@@ -138,6 +130,7 @@
             data: {
                 'id': id,
                 'project_id': project_id,
+                'project_team_id': $(this).data('project_team_id'),
                 'status': status,
                 '_token': _token
             },

@@ -46,9 +46,13 @@ class ProjectTeamsController extends Controller
         $showColumnHonor = true;
         $typeTl = app('request')->input('type_tl');
         $leader = app('request')->input('leader');
+        $team = app('request')->input('team');
         if ($typeTl != null && $typeTl == 'borongan') {
             $showColumnHonor = false;
         }
+
+        if ($typeTl != null && $team == "Interviewer") $showColumnHonor = false;
+
         $teams = DB::select('select teams.* from teams join team_jabatans on teams.id = team_jabatans.team_id where jabatan_id=?
         and team_id not in (select team_id from project_teams where project_jabatan_id=?)', [$project_jabatan->jabatan_id, $project_jabatan_id]);
         if ($project_jabatan->jabatan->jabatan != "Team Leader (TL)") {
@@ -60,6 +64,7 @@ class ProjectTeamsController extends Controller
                     $query->select('id', 'nama');
                 }])->get();
             }])->where('project_kota_id', $project_jabatan->project_kota_id)->where('jabatan_id', '9')->first();
+//            dd(json_encode($teams));
             return view('projects.project_teams.add_team_list', compact('showTeam','project_jabatan', 'teamLeaders', 'teams', 'showColumnHonor'));
         }
         return view('projects.project_teams.add_team_list', compact('showTeam','teams', 'project_jabatan', 'showColumnHonor'));
@@ -101,9 +106,6 @@ class ProjectTeamsController extends Controller
             return redirect()->back()->with('status-fail', 'Team tidak ditemukan');
         }
 
-        $jabatan = Project_jabatan::find($request->project_jabatan_id);
-        $allJabatan = Project_jabatan::where('project_kota_id', $jabatan->project_kota_id)->pluck('id')->toArray();
-
         if (count($request->available_team_id) > 0) {
             $i = 0;
             foreach ($request->available_team_id as $new_team_id) {
@@ -117,6 +119,7 @@ class ProjectTeamsController extends Controller
                 $typeTl = isset($request->jenis_tl[$i]) ? $request->jenis_tl[$i] : "";
                 Project_team::create([
                     'project_jabatan_id' => $request->project_jabatan_id,
+                    'project_kota_id' => $request->projectKotaId,
                     'team_id' => $new_team_id,
                     'gaji' => !is_null($honor) ? $honor : 0,
                     'user_id' => session('user_id'),
@@ -127,59 +130,27 @@ class ProjectTeamsController extends Controller
                 $i++;
             }
 
-            $totalTarget = Project_team::whereIn('project_jabatan_id', $allJabatan)->sum('target_tl');
-            $projectKota = Project_kota::find($jabatan->project_kota_id);
+            $totalTarget = Project_team::where('project_kota_id', $request->projectKotaId)->sum('target_tl');
+            $projectKota = Project_kota::find($request->projectKotaId);
             $projectKota->jumlah = $totalTarget;
             $projectKota->save();
         }
         return redirect('/project_team_managements/' . session('current_project_id'))->with('status', 'Saved');
     }
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Project_team  $projectTeam
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Project_team $projectTeam)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Project_team  $projectTeam
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Project_team $project_team)
-    {
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Project_team  $projectTeam
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Project_team $project_team)
-    {
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Project_team  $projectTeam
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Project_team $projectTeam)
-    {
-        //
-    }
 
     public function delete(Project_team $projectTeam)
     {
-        Project_team::destroy($projectTeam->id);
+        $projectTeamData = Project_team::find($projectTeam->id);
+        if ($projectTeam->team_leader == 0) {
+            Project_team::where("id", $projectTeam->id)->delete();
+            Project_team::Where("team_leader", $projectTeamData->team_id)->where("project_kota_id", $projectTeamData->project_kota_id)->delete();
+
+            $projectKota = Project_kota::find($projectTeamData->project_kota_id);
+            $projectKota->jumlah = $projectKota->jumlah - $projectTeamData->target_tl;
+            $projectKota->save();
+        } else {
+            Project_team::where("id", $projectTeam->id)->delete();
+        }
         return redirect('/project_team_managements/' . session('current_project_id'))->with('status', 'Deleted');
     }
 

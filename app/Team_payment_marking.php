@@ -15,4 +15,9 @@ class Team_payment_marking extends Model
     {
         return $this->belongsTo('App\Team');
     }
+
+    public function projectTeam()
+    {
+        return $this->belongsTo('App\Project_team', 'project_team_id');
+    }
 }

@@ -19,7 +19,7 @@ class Team extends Model
     }
     public function kota()
     {
-        return $this->belongsTo('App\Kota');
+        return $this->belongsTo('App\Kota', 'kota_id');
     }
     public function pendidikan()
     {

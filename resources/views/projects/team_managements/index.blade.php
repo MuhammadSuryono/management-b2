@@ -3,13 +3,10 @@
 @section('title2', 'Setting Team per kota')
 @section('content')
 @include('layouts.gentelella.table_top')
+<button title="tambah kota di proyek {{$project->nama}}" type="button" data-toggle="modal" data-target=".bs-example-modal-lg" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Tambah Kota</button>
 <thead>
     <tr class="text-center">
-        <th>
-            Kota
-            <button title="tambah kota di proyek {{$project->nama}}" type="button" data-toggle="modal" data-target=".bs-example-modal-lg" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i></button>
-
-        </th>
+        <th>Kota</th>
         <th>Team Dibutuhkan</th>
         <th>Nama Personel</th>
     </tr>
@@ -176,7 +173,7 @@
                         - Honor Rp.{{number_format($item->gaji)}} <br/>
                         - Jenis TL {{ ucwords($item->type_tl) }} <br/>
                     @endif
-                    
+
                     @if($item->jabatan == "Team Leader (TL)")
                         - Target TL {{ ucwords($item->target_tl) }} respondent <br/>
                     @endif
@@ -240,62 +237,22 @@
             </div>
             <div class="modal-body">
                 <form action="{{url('/project_kotas')}}" method="POST">
-                    @csrf
-                    <input type="hidden" name="kode_project" value="{{$project->kode_project}}">
-                    <input type="hidden" name="project_id" value="{{$project->id}}">
-                    <div class="form-group row">
-                        <label class="control-label col-md-3 col-sm-3 ">Pilih Kota</label>
-                        <div class="col-md-9 col-sm-9 ">
-                            <select class="selectpicker" name="kota" id="kota" data-live-search="true" data-width="100%" required>
-                                <option value="">Kota / Kab</option>
-                                @foreach ($kota as $db)
-                                <option value="{{$db->id}}-{{$db->id_provinsi}}" data-tokens="{{$db->kota}}">{{$db->kota}}</option>
-                                @endforeach
-                                <option value="lain" data-tokens="lain">Lainnya</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- <section id="lainnya">
-                        {{-- <div class="form-group row">
-                        <label class="control-label col-md-3 col-sm-3 ">Nama Kota</label>
-                        <div class="col-md-9 col-sm-9 ">
-                                <input type="text" class="form-control" name="kotaBaru" id="kotaBaru" placeholder="Nama Kota" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="control-label col-md-3 col-sm-3 ">Pilih Provinsi</label>
-                        <div class="col-md-9 col-sm-9 ">
-                            <select class="selectpicker" name="provinsi" id="provinsi" data-live-search="true" data-width="100%" required>
-                            <option>Kota / Kab</option>
+                @csrf
+                <input type="hidden" name="kode_project" value="{{$project->kode_project}}">
+                <input type="hidden" name="project_id" value="{{$project->id}}">
+                <div class="form-group row">
+                    <label class="control-label col-md-3 col-sm-3 ">Pilih Kota</label>
+                    <div class="col-md-9 col-sm-9 ">
+                        <select class="selectpicker" name="kota" id="kota" data-live-search="true" data-width="100%" required>
+                            <option value="">Kota / Kab</option>
                             @foreach ($kota as $db)
-                                <option value="{{$db->id}}-{{$db->id_provinsi}}" data-tokens="{{$db->kota}}">{{$db->kota}}</option>
-                        @endforeach
-                        <option value="lain" data-tokens="lain">Lainnya</option>
+                            <option value="{{$db->id}}-{{$db->id_provinsi}}" data-tokens="{{$db->kota}}">{{$db->kota}}</option>
+                            @endforeach
+                            <option value="lain" data-tokens="lain">Lainnya</option>
                         </select>
-                    </section> -->
-            </div>
+                    </div>
+                </div>
         </div>
-
-        <!-- <section id="kotaProvinsi">
-            {{-- <div class="form-group row">
-                        <label class="control-label col-md-3 col-sm-3 ">Pilih Provinsi</label>
-                        <div class="col-md-9 col-sm-9 ">
-                                <input type="text" class="form-control" name="provinsi" id="provinsi" readonly placeholder="Provinsi">
-                        </div>
-                    </div> --}}
-        </section> -->
-
-        <div class="form-group row">
-            <label class="control-label col-md-3 col-sm-3 ">Target Perolehan Respondent</label>
-            <div class="col-md-9 col-sm-9 ">
-                <input type="number" class="form-control" name="jumlah" id="jumlah" placeholder="Jumlah" required>
-            </div>
-        </div>
-
-
-    </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
         <button type="submit" class="btn btn-primary">Simpan</button>
@@ -493,18 +450,20 @@
             </div>
             <div class="modal-body">
                 <h6>Nama Leader : <span id="leader-name"></span></h6>
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Nama</th>
-                        <th>Jabatan</th>
-                        <th>Honor</th>
-                    </tr>
-                    </thead>
-                    <tbody id="data-member">
+                <div class="table-scroll">
+                    <table class="table table-striped tableFixHead">
+                        <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Jabatan</th>
+                            <th>Honor</th>
+                        </tr>
+                        </thead>
+                        <tbody id="data-member">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
 
             </div>
             <div class="modal-footer">
