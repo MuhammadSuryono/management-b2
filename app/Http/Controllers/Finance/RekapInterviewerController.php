@@ -88,6 +88,7 @@ class RekapInterviewerController extends Controller
                         return $query->where('kota_id', '=', $request->kota_id);
                     })
                     ->get();
+                $dbDigitalisasiMarketing = DB::connection('mysql3');
 
                 $teams = [];
                 $checkId = [];
@@ -99,17 +100,38 @@ class RekapInterviewerController extends Controller
                         $cityCode = substr($r->srvyr, 0, 3);
                         $cityCode = (int)$cityCode;
 
-                        $pwt = DB::table('teams')
-                            ->where('no_team', $pwtCode)
-                            ->where('kota_id', $cityCode)
-                            ->first();
+                        $projectTeam = Project_team::with(['team','projectKota' => function($q) use ($cityCode) {
+                            $q->with(['kota']);
+                        }])
+                            ->where('team_leader', '!=', 0)
+                            ->where('team_id', $pwtCode)->where("project_kota_id", $cityCode)->first();
 
-                        if ($pwt) {
-                            $checkData = Pembayaran_interviewer::where('project_id', $request->project_id)->where('team_id', $pwt->id)->first();
-                            if (!$checkData) {
-                                if (!in_array($pwt->id, $checkId)) {
-                                    array_push($teams, $pwt);
-                                    array_push($checkId, $pwt->id);
+                        if ($projectTeam != null) {
+                            $leader = Project_team::where("project_kota_id", $cityCode)->where('team_leader', $projectTeam->team_leader)->first();
+                            if (isset($projectTeam->team) && $leader->type_tl != "borongan") {
+                                $projectKota = $projectTeam->projectKota;
+                                $pwt = $projectTeam->team;
+                                $isAlreadyPayment = Pembayaran_interviewer::where('project_id', $request->project_id)->where('team_id', $pwt->id)->first();
+                                if (!$isAlreadyPayment) {
+                                    if (!in_array($pwt->id, $checkId)) {
+                                        $bank = $dbDigitalisasiMarketing->table('bank')->where('kode', '=', $pwt->kode_bank)->first();
+                                        $pwt->type_tl = $leader->type_tl;
+                                        $pwt->project_kota = $projectKota->kota->kota;
+                                        $pwt->bank = $bank != null ? $bank->nama : "-";
+                                        $pwt->project_team_id = $projectTeam->id;
+
+                                        $bgColor = "";
+                                        $isCanMarking = true;
+                                        if ($pwt->bank == "-" && $pwt->nomor_rekening == "") {
+                                            $isCanMarking = false;
+                                            $bgColor = "bg-danger";
+                                        }
+
+                                        $pwt->is_can_marking = $isCanMarking;
+                                        $pwt->bg_color = $bgColor;
+                                        array_push($teams, $pwt);
+                                        array_push($checkId, $pwt->id);
+                                    }
                                 }
                             }
                         }
@@ -117,23 +139,25 @@ class RekapInterviewerController extends Controller
                 }
             }
 
-            $honor_category = Project_honor::join('project_kotas', 'project_kotas.id', '=', 'project_honors.project_kota_id')
-                ->where('project_kotas.project_id', '=', $request->project_id)
-                ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-                    return $query->where('kota_id', '=', $request->kota_id);
-                })
-                ->get();
-            $honor_do_category = Project_honor_do::join('project_kotas', 'project_kotas.id', '=', 'project_honor_dos.project_kota_id')
-                ->where('project_kotas.project_id', '=', $request->project_id)
-                ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-                    return $query->where('kota_id', '=', $request->kota_id);
-                })
-                ->get();
         } else {
             $teams = [];
             // dd(count($teams));
             $kotas = Kota::all()->sortBy('kota');
         }
+
+        $honor_category = Project_honor::join('project_kotas', 'project_kotas.id', '=', 'project_honors.project_kota_id')
+            ->where('project_kotas.project_id', '=', $request->project_id)
+            ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
+                return $query->where('kota_id', '=', $request->kota_id);
+            })
+            ->get();
+
+        $honor_do_category = Project_honor_do::join('project_kotas', 'project_kotas.id', '=', 'project_honor_dos.project_kota_id')
+            ->where('project_kotas.project_id', '=', $request->project_id)
+            ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
+                return $query->where('kota_id', '=', $request->kota_id);
+            })
+            ->get();
         $projects = Project::all()->sortBy('nama');
         $pendidikans = Pendidikan::all()->sortBy('pendidikan');
         $ses_finals = SesFinal::all();
@@ -177,57 +201,15 @@ class RekapInterviewerController extends Controller
 
 
             $kotas = Pembayaran_interviewer::join('teams', 'teams.id', '=', 'pembayaran_interviewers.team_id')->join('kotas', 'teams.kota_id', '=', 'kotas.id')->select('kotas.*')->where('project_id', $request->project_id)->orderBy('kotas.kota', 'ASC')->distinct()->get();
-
-            // dd($request->project_id);
-
-            // $teams = [];
-            // $checkId = [];
-            // foreach ($respondents as $r) {
-            //     if ($r->srvyr) {
-            //         $pwtCode = substr($r->srvyr, 3, 6);
-            //         $pwtCode = (int)$pwtCode;
-
-            //         $cityCode = substr($r->srvyr, 0, 3);
-            //         $cityCode = (int)$cityCode;
-
-            //         $pwt = DB::table('teams')
-            //             ->where('no_team', $pwtCode)
-            //             ->where('kota_id', $cityCode)
-            //             ->first();
-
-            //         $checkData = Pembayaran_interviewer::where('project_id', $request->project_id)->where('team_id', $pwt->id)->first();
-
-            //         if ($pwt && !$checkData) {
-            //             if (!in_array($pwt->id, $checkId)) {
-            //                 array_push($teams, $pwt);
-            //                 array_push($checkId, $pwt->id);
-            //             }
-            //         }
-            //     }
-            // }
-
-            // $kotas = Respondent::join('kotas', 'respondents.kota_id', '=', 'kotas.id')->select('kotas.*')->where('project_id', '=', $request->project_id)->orderBy('kotas.kota', 'ASC')->distinct()->get();
-
-            // dd(count($teams));
         } else {
-
-            // $teams = Pembayaran_interviewer::join('teams', 'teams.id', '=', 'pembayaran_interviewers.team_id')
-            //     ->when(isset($request->status_pembayaran_id) && trim($request->status_pembayaran_id) !== 'all', function ($query2) use ($request) {
-            //         $query2->where('pembayaran_interviewers.status_pembayaran_id', '=', trim($request->status_pembayaran_id));
-            //     })
-            //     ->get();
-
             $teams = [];
-
-            // dd(count($teams));
             $kotas = Kota::all()->sortBy('kota');
         }
-        // dd($teams);
+
         $projects = Project::all()->sortBy('nama');
         $pendidikans = Pendidikan::all()->sortBy('pendidikan');
         $ses_finals = SesFinal::all();
         $genders = Gender::all();
-        // $teams = Team::all();
         $pekerjaans = Pekerjaan::all()->sortBy('pekerjaan');
         $is_valids = Isvalid::all();
 
