@@ -493,9 +493,7 @@ class RekapInterviewerController extends Controller
                 $pwtCode = substr($r->srvyr, 3, 6);
                 $pwtCode = (int)$pwtCode;
 
-                $cityCode = substr($r->srvyr, 0, 3);
-                $cityCode = (int)$cityCode;
-
+                $cityCode = $r->kota_id;
                 $projectTeam = Project_team::with(['team','projectKota' => function($q) use ($cityCode) {
                     $q->with(['kota']);
                 }])
