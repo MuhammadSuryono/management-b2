@@ -171,7 +171,7 @@ if (isset($_GET['project_id'])) {
     @include('layouts.gentelella.table_top')
 
     <thead>
-        <tr>
+        <tr class="text-center">
             <th>No</th>
             <th>Nama</th>
             <th>Kota Asal</th>
@@ -185,13 +185,13 @@ if (isset($_GET['project_id'])) {
             <!-- <th>Respondent BTF</th> -->
             @if(isset($honor_category) && isset($_GET['kota_id']) && $_GET['kota_id'] != 'all')
             @foreach($honor_category as $hc)
-            <th>{{$hc->nama_honor}} @<?= number_format($hc->honor) ?></th>
+            <th>{{ucwords($hc->nama_honor)}} @<?= number_format($hc->honor) ?></th>
             @endforeach
             @endif
             <th>Responden DO</th>
             @if(isset($honor_do_category) && isset($_GET['kota_id']) && $_GET['kota_id'] != 'all')
             @foreach($honor_do_category as $hc)
-            <th>DO {{$hc->nama_honor_do}} @<?= number_format($hc->honor_do) ?></th>
+            <th>DO {{ucwords($hc->nama_honor_do)}} @<?= number_format($hc->honor_do) ?></th>
             @endforeach
             @endif
             @if(isset($_GET['project_id']) && isset($_GET['kota_id']) && $_GET['kota_id'] != 'all')
@@ -204,41 +204,13 @@ if (isset($_GET['project_id'])) {
     <tbody>
         @foreach ($teams as $item)
         <?php $total = 0; ?>
-        <tr>
+        <tr class="{{$item->bg_color}}" title="{{$item->is_can_marking ? '':'Lengkapi data rekening'}}">
             <th scope='row'>{{$loop->iteration}}</th>
-            <td>{{$item->nama}}</td>
-            <td>
-                <?php $kota = DB::table('kotas')->where('id', '=', $item->kota_id)->first(); ?>
-                {{$kota->kota}}
-            </td>
-            <td>
-                @if(isset($item->kode_bank))
-                <?php
-                $bank = DB::connection('mysql3')->table('bank')->where('kode', '=', $item->kode_bank)->first();
-                if ($bank) {
-                    echo $bank->nama;
-                }
-                ?>
-                @endif
-            </td>
-            <td> @if($item->nomor_rekening!='')
-                {{$item->nomor_rekening}}
-                @else
-                Kosong
-                @endif
-            </td>
-            <?php if (isset($_GET['project_id'])) :
-                // $queryProjectKota = DB::table('project_kotas')->where('project_id', '=', $_GET['project_id'])->where('kota_id', '=', $item->kota_id)->first();
-            ?>
-                <!-- <td>
-                @if(isset($queryProjectKota->jumlah))
-                {{$queryProjectKota->jumlah}}
-                @else
-                Kosong
-                @endif
-            </td> -->
-            <?php endif; ?>
-            <td>
+            <td>{{$item->nama ?? ''}}</td>
+            <td>{{$item->kota->kota ?? ''}}</td>
+            <td>{{$item->bank ?? ''}}</td>
+            <td>{{$item->nomor_rekening ?? ''}}</td>
+            <td class="text-center">
                 <!-- total respondent -->
                 <?php $teamCode = sprintf('%04d', $item->no_team); ?>
                 <?php $cityCode = sprintf('%03d', $item->kota_id); ?>
@@ -251,7 +223,7 @@ if (isset($_GET['project_id'])) {
                 <?php $code = $cityCode . $teamCode ?>
                 {{$count}}
             </td>
-            <td>
+            <td class="text-center">
                 <!-- respondent OK -->
                 <?php
                 if (isset($_GET['project_id'])) {
@@ -264,14 +236,14 @@ if (isset($_GET['project_id'])) {
             </td>
             @if(isset($honor_category) && isset($_GET['kota_id']) && $_GET['kota_id'] != 'all')
             @foreach($honor_category as $hc)
-            <td>
+            <td class="text-center">
                 <?php $count = DB::table('respondents')->where('srvyr', '=', $cityCode . $teamCode)->where('project_id', $_GET['project_id'])->whereIn('status_qc_id',  array(5, 1, 0, 10))->where(DB::raw('lower(kategori_honor)'), '=', strtolower($hc->nama_honor))->where('kota_id', '=', $hc->kota_id)->count(); ?>
                 {{$count}}
             </td>
             <?php $total += $hc->honor * $count; ?>
             @endforeach
             @endif
-            <td>
+            <td class="text-center">
                 <!-- respondent DO -->
                 <?php
                 if (isset($_GET['project_id'])) {
@@ -285,7 +257,7 @@ if (isset($_GET['project_id'])) {
 
             @if(isset($honor_do_category) && isset($_GET['kota_id']) && $_GET['kota_id'] != 'all')
             @foreach($honor_do_category as $hc)
-            <td>
+            <td class="text-center">
                 <?php $count = DB::table('respondents')->where('srvyr', '=', $cityCode . $teamCode)->where('project_id', $_GET['project_id'])->whereIn('status_qc_id', array(2, 3, 6, 9))->where(DB::raw('lower(kategori_honor_do)'), '=', strtolower($hc->nama_honor_do))->where('kota_id', '=', $hc->kota_id)->count(); ?>
                 {{$count}}
             </td>
@@ -320,7 +292,7 @@ if (isset($_GET['project_id'])) {
                     }
                 }
             ?>
-                <td><?= number_format($honorBrief) ?></td>
+                <td class="text-center"><?= number_format($honorBrief) ?></td>
                 <?php $total += $honorBrief; ?>
                 <?php $totalKeseluruhan += $total; ?>
                 <td>
@@ -329,7 +301,7 @@ if (isset($_GET['project_id'])) {
 
                 <td>
                     <!-- <div class="form-check"> -->
-                    <input class="ajukanCheck" type="checkbox" value="<?= $item->id ?>" name="id[]" style="width: 1.5rem;height: 1.5rem;">
+                    <input class="ajukanCheck" type="checkbox" value="<?= $item->id ?>" name="id[]" style="width: 1.5rem;height: 1.5rem;" {{$item->is_can_marking ? "":"disabled"}}>
                     <input type="hidden" name="total-<?= $item->id ?>" value="<?= $total ?>">
                     <input type="hidden" name="nextStatus" value="2">
                     <input type="hidden" name="project_id" value="<?= isset($_GET['project_id']) ? $_GET['project_id'] : '' ?>">

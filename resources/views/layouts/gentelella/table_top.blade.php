@@ -42,4 +42,4 @@
                                 @if(isset($cropNotif))
                             </div>
                             @endif
-                            <table id="datatable-buttons" class="table table-striped table-bordered" style="width:100%">
+                            <table id="datatable-buttons" class="table table-striped table-bordered table-hover tableFixHead" style="width:100%">
