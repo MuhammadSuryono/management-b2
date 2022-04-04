@@ -101,7 +101,9 @@ class RekapInterviewerController extends Controller
                         $projectTeam = Project_team::with(['team','projectKota' => function($q) {
                             $q->with(['kota']);
                         }])
+                            ->leftJoin('project_kotas', 'project_teams.project_kota_id', '=', 'project_kotas.id')
                             ->where('team_leader', '!=', 0)
+                            ->where('project_kotas.project_id', $request->project_id)
                             ->where('srvyr', $r->srvyr)->first();
 
                         if ($projectTeam != null) {
@@ -490,7 +492,6 @@ class RekapInterviewerController extends Controller
                 }])
                     ->leftJoin('project_kotas', 'project_teams.project_kota_id', '=', 'project_kotas.id')
                     ->where('team_leader', '!=', 0)
-                    ->where('project_kotas.kota_id', $r->kota_id)
                     ->where('project_kotas.project_id', $request->id)
                     ->where('srvyr', $r->srvyr)->first();
 

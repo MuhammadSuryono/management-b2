@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Team_payment_marking extends Model
 {
-    protected $fillable = ['project_id', 'team_id', 'posisi', 'created_at'];
+    protected $fillable = ['project_id', 'team_id', 'posisi', 'kota_id', 'created_at'];
     public function project()
     {
         return $this->belongsTo('App\Project');
