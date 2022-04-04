@@ -83,7 +83,6 @@ class RekapInterviewerController extends Controller
                         $teams[] = $team->team;
                     }
                 }
-                dd($teams);
 
             } else if (in_array('internal', $pembayaran_interviewer)) {
                 $respondents = Respondent::where('project_id', '=', $request->project_id)
@@ -490,18 +489,17 @@ class RekapInterviewerController extends Controller
 
         foreach ($respondents as $r) {
             if ($r->srvyr) {
-                $pwtCode = substr($r->srvyr, 3, 6);
-                $pwtCode = (int)$pwtCode;
-
-                $cityCode = $r->kota_id;
-                $projectTeam = Project_team::with(['team','projectKota' => function($q) use ($cityCode) {
+                $projectTeam = Project_team::with(['team','projectKota' => function($q) {
                     $q->with(['kota']);
                 }])
+                    ->leftJoin('project_kotas', 'project_teams.project_kota_id', '=', 'project_kotas.id')
                     ->where('team_leader', '!=', 0)
-                    ->where('team_id', $pwtCode)->where("project_kota_id", $cityCode)->first();
+                    ->where('project_kotas.kota_id', $r->kota_id)
+                    ->where('project_kotas.project_id', $request->id)
+                    ->where('srvyr', $r->srvyr)->first();
 
                 if ($projectTeam != null) {
-                    $leader = Project_team::where("project_kota_id", $cityCode)->where('team_leader', $projectTeam->team_leader)->first();
+                    $leader = Project_team::where("project_kota_id", $projectTeam->project_kota_id)->where('team_leader', $projectTeam->team_leader)->first();
                     if (isset($projectTeam->team) && $leader->type_tl != "borongan") {
                         $projectKota = $projectTeam->projectKota;
                         $pwt = $projectTeam->team;
