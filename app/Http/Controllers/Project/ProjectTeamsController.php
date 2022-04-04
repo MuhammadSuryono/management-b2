@@ -117,6 +117,7 @@ class ProjectTeamsController extends Controller
                 $target = isset($request->target[$i]) ? $request->target[$i] : 0;
                 $honor = isset($request->honor[$i]) ? $request->honor[$i] : 0;
                 $typeTl = isset($request->jenis_tl[$i]) ? $request->jenis_tl[$i] : "";
+                $team = Team::find($new_team_id);
                 Project_team::create([
                     'project_jabatan_id' => $request->project_jabatan_id,
                     'project_kota_id' => $request->projectKotaId,
@@ -125,7 +126,8 @@ class ProjectTeamsController extends Controller
                     'user_id' => session('user_id'),
                     'type_tl' => $typeTl,
                     'target_tl' => $target,
-                    'team_leader' => (int)$request->leader
+                    'team_leader' => (int)$request->leader,
+                    'srvyr' => sprintf("%03d%04d", $team->kota_id, $team->no_team),
                 ]);
                 $i++;
             }
