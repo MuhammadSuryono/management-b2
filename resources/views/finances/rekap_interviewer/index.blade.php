@@ -204,7 +204,7 @@ if (isset($_GET['project_id'])) {
     <tbody>
         @foreach ($teams as $item)
         <?php $total = 0; ?>
-        <tr class="{{$item->bg_color}}" title="{{$item->is_can_marking ? '':'Lengkapi data rekening'}}">
+        <tr class="{{$item->bg_color ?? ''}}" title="{{$item->is_can_marking ? '':'Lengkapi data rekening'}}">
             <th scope='row'>{{$loop->iteration}}</th>
             <td>{{$item->nama ?? ''}}</td>
             <td>{{$item->kota->kota ?? ''}}</td>

@@ -78,9 +78,12 @@ class RekapInterviewerController extends Controller
                 $teams = [];
                 if ($teamPaymentMarking != null) {
                     foreach ($teamPaymentMarking as $team) {
+                        $team->team->is_can_marking = '';
+                        $team->team->bg_color = '';
                         $teams[] = $team->team;
                     }
                 }
+                dd($teams);
 
             } else if (in_array('internal', $pembayaran_interviewer)) {
                 $respondents = Respondent::where('project_id', '=', $request->project_id)
