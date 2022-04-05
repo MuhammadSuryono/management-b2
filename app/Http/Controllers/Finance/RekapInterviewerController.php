@@ -542,13 +542,18 @@ class RekapInterviewerController extends Controller
                     'kota_id' => $request->kota_id,
                     'created_at' => date('Y-m-d H:i:s')
                 ]);
+                echo $update;
+                return;
             }
         } else if ($request->status == 'unmark') {
             $update = Team_payment_marking::where('project_id', $request->project_id)
                 ->where('project_team_id', $request->project_team_id)
                 ->where('team_id', $request->id)->where('posisi', 'Interviewer')->delete();
+
+            echo $update;
+            return;
         }
 
-        echo $update;
+        echo $request->status;
     }
 }
