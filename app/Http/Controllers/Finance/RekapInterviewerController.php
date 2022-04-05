@@ -44,8 +44,6 @@ class RekapInterviewerController extends Controller
      */
     public function index(Request $request)
     {
-        $honor_category = [];
-        $honor_do_category = [];
         $kotas = Project_kota::join('kotas', 'project_kotas.kota_id', '=', 'kotas.id')->select('kotas.*')
             ->when(isset($request->project_id) && $request->project_id != 'all', function ($query) use ($request) {
                 return $query->where('project_id', $request->project_id);
@@ -162,7 +160,6 @@ class RekapInterviewerController extends Controller
         $pendidikans = Pendidikan::all()->sortBy('pendidikan');
         $ses_finals = SesFinal::all();
         $genders = Gender::all();
-        // $teams = Team::all();
         $pekerjaans = Pekerjaan::all()->sortBy('pekerjaan');
         $is_valids = Isvalid::all();
 
@@ -507,6 +504,7 @@ class RekapInterviewerController extends Controller
                             $pwt->project_kota_id = $projectKota->kota_id;
                             $pwt->bank = $bank != null ? $bank->nama : "-";
                             $pwt->project_team_id = $projectTeam->id;
+                            $pwt->project_id = $projectTeam->project_id;
 
                             $bgColor = "";
                             $isCanMarking = true;
