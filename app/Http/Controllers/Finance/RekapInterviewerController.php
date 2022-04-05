@@ -504,6 +504,7 @@ class RekapInterviewerController extends Controller
                             $pwt->project_kota_id = $projectKota->kota_id;
                             $pwt->bank = $bank != null ? $bank->nama : "-";
                             $pwt->project_team_id = $projectTeam->id;
+                            $pwt->project_id = $projectTeam->project_id;
 
                             $bgColor = "";
                             $isCanMarking = true;
