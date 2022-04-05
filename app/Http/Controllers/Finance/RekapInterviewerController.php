@@ -554,6 +554,6 @@ class RekapInterviewerController extends Controller
             return;
         }
 
-        echo false;
+        echo $request->status;
     }
 }
