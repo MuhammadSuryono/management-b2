@@ -183,7 +183,7 @@ if (isset($_GET['project_id'])) {
             <th>Total Respondent</th>
             <th>Respondent OK</th>
             <!-- <th>Respondent BTF</th> -->
-            @if(isset($honor_category) && isset($_GET['kota_id']) && $_GET['kota_id'] != 'all')
+            @if(isset($honor_category))
             @foreach($honor_category as $hc)
             <th>{{ucwords($hc->nama_honor)}} @<?= number_format($hc->honor) ?></th>
             @endforeach
@@ -194,7 +194,7 @@ if (isset($_GET['project_id'])) {
             <th>DO {{ucwords($hc->nama_honor_do)}} @<?= number_format($hc->honor_do) ?></th>
             @endforeach
             @endif
-            @if(isset($_GET['project_id']) && isset($_GET['kota_id']) && $_GET['kota_id'] != 'all')
+            @if(isset($_GET['project_id']))
             <th>Honor Briefing</th>
             <th>Total</th>
             <th>Action</th>
@@ -234,7 +234,7 @@ if (isset($_GET['project_id'])) {
                 <?php $code = $cityCode . $teamCode ?>
                 {{$countOk}}
             </td>
-            @if(isset($honor_category) && isset($_GET['kota_id']) && $_GET['kota_id'] != 'all')
+            @if(isset($honor_category))
             @foreach($honor_category as $hc)
             <td class="text-center">
                 <?php $count = DB::table('respondents')->where('srvyr', '=', $cityCode . $teamCode)->where('project_id', $_GET['project_id'])->whereIn('status_qc_id',  array(5, 1, 0, 10))->where(DB::raw('lower(kategori_honor)'), '=', strtolower($hc->nama_honor))->where('kota_id', '=', $hc->kota_id)->count(); ?>
@@ -255,7 +255,7 @@ if (isset($_GET['project_id'])) {
                 {{$count}}
             </td>
 
-            @if(isset($honor_do_category) && isset($_GET['kota_id']) && $_GET['kota_id'] != 'all')
+            @if(isset($honor_do_category))
             @foreach($honor_do_category as $hc)
             <td class="text-center">
                 <?php $count = DB::table('respondents')->where('srvyr', '=', $cityCode . $teamCode)->where('project_id', $_GET['project_id'])->whereIn('status_qc_id', array(2, 3, 6, 9))->where(DB::raw('lower(kategori_honor_do)'), '=', strtolower($hc->nama_honor_do))->where('kota_id', '=', $hc->kota_id)->count(); ?>
@@ -266,7 +266,7 @@ if (isset($_GET['project_id'])) {
             @endforeach
             @endif
             <?php
-            if (isset($_GET['project_id']) && isset($_GET['kota_id']) && $_GET['kota_id'] != 'all') :
+            if (isset($_GET['project_id'])) :
                 $queryProjectKota = DB::table('project_kotas')->where('project_id', '=', $_GET['project_id'])->where('kota_id', '=', $item->kota_id)->first();
                 if ($queryProjectKota) {
                     $n = (($queryProjectKota->jumlah / count($teams)) / 2);
