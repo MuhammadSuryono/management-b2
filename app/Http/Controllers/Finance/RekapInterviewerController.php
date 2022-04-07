@@ -532,7 +532,10 @@ class RekapInterviewerController extends Controller
     public function updateMarking(Request $request)
     {
         if ($request->status == 'mark') {
-            $checkData = Team_payment_marking::where('project_id', $request->project_id)->where('team_id', $request->id)->where('posisi', 'Interviewer')->count();
+            $checkData = Team_payment_marking::where('project_id', $request->project_id)
+                ->where('team_id', $request->id)
+                ->where('project_team_id', $request->project_team_id)
+                ->where('posisi', 'Interviewer')->count();
             if ($checkData == null) {
                 $update = Team_payment_marking::insert([
                     'project_id' => $request->project_id,
