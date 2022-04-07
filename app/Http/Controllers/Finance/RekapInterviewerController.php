@@ -61,6 +61,7 @@ class RekapInterviewerController extends Controller
 
             if (in_array('internal', $pembayaran_interviewer) && in_array('external', $pembayaran_interviewer)) {
                 DB::enableQueryLog();
+                $dbDigitalisasiMarketing = DB::connection('mysql3');
                 $teamPaymentMarking = Team_payment_marking::select("team_payment_markings.*")->with(['team'])
                     ->leftJoin('project_teams', 'project_teams.id', '=', 'team_payment_markings.project_team_id')
                     ->leftJoin('project_kotas', 'project_kotas.id', '=', 'project_teams.project_kota_id')
@@ -77,8 +78,17 @@ class RekapInterviewerController extends Controller
                 $teams = [];
                 if ($teamPaymentMarking != null) {
                     foreach ($teamPaymentMarking as $team) {
-                        $team->team->is_can_marking = '';
-                        $team->team->bg_color = '';
+                        $bank = $dbDigitalisasiMarketing->table('bank')->where('kode', '=', $team->team->kode_bank)->first();
+                        $team->team->bank = $bank != null ? $bank->nama : "-";
+
+                        $bgColor = "";
+                        $isCanMarking = true;
+                        if ($team->team->bank == null && $team->team->nomor_rekening == "") {
+                            $isCanMarking = false;
+                            $bgColor = "bg-danger";
+                        }
+                        $team->team->is_can_marking = $isCanMarking;
+                        $team->team->bg_color = $bgColor;
                         $teams[] = $team->team;
                     }
                 }
