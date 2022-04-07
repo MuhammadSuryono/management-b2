@@ -142,20 +142,24 @@ class RekapInterviewerController extends Controller
             // dd(count($teams));
             $kotas = Kota::all()->sortBy('kota');
         }
+        $honor_category = [];
+        $honor_do_category = [];
+        if (isset($request->project_id)) {
+            $honor_category = Project_honor::join('project_kotas', 'project_kotas.id', '=', 'project_honors.project_kota_id')
+                ->where('project_kotas.project_id', '=', $request->project_id)
+                ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
+                    return $query->where('kota_id', '=', $request->kota_id);
+                })
+                ->get();
 
-        $honor_category = Project_honor::join('project_kotas', 'project_kotas.id', '=', 'project_honors.project_kota_id')
-            ->where('project_kotas.project_id', '=', $request->project_id)
-            ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-                return $query->where('kota_id', '=', $request->kota_id);
-            })
-            ->get();
+            $honor_do_category = Project_honor_do::join('project_kotas', 'project_kotas.id', '=', 'project_honor_dos.project_kota_id')
+                ->where('project_kotas.project_id', '=', $request->project_id)
+                ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
+                    return $query->where('kota_id', '=', $request->kota_id);
+                })
+                ->get();
+        }
 
-        $honor_do_category = Project_honor_do::join('project_kotas', 'project_kotas.id', '=', 'project_honor_dos.project_kota_id')
-            ->where('project_kotas.project_id', '=', $request->project_id)
-            ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-                return $query->where('kota_id', '=', $request->kota_id);
-            })
-            ->get();
         $projects = Project::all()->sortBy('nama');
         $pendidikans = Pendidikan::all()->sortBy('pendidikan');
         $ses_finals = SesFinal::all();
@@ -163,8 +167,8 @@ class RekapInterviewerController extends Controller
         $pekerjaans = Pekerjaan::all()->sortBy('pekerjaan');
         $is_valids = Isvalid::all();
 
-        $add_url = url('/menus/create');
-        return view('finances.rekap_interviewer.index', compact('teams', 'add_url', 'projects', 'kotas', 'pendidikans', 'ses_finals', 'genders', 'teams', 'pekerjaans', 'is_valids', 'honor_category', 'honor_do_category'));
+//        $add_url = url('/menus/create');
+        return view('finances.rekap_interviewer.index', compact('teams',  'projects', 'kotas', 'pendidikans', 'ses_finals', 'genders', 'teams', 'pekerjaans', 'is_valids', 'honor_category', 'honor_do_category'));
     }
 
     public function indexRtp(Request $request)

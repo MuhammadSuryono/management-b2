@@ -72,21 +72,23 @@
                                                 </div>
                                             </div>
 
-                                            <div class="form-group row row-filter-kota" style="display: none;">
-                                                <label class="col-form-label col-md-3 col-sm-3" for="kota_id">Kota</label>
-                                                <div class="col-md-9 col-sm-9">
-                                                    <select id="kota_id" name="kota_id" class="form-control">
-                                                        <option value="all">All</option>
-                                                        @foreach($kotas as $db)
-                                                        @if(isset($_GET['kota_id']) and $_GET['kota_id'] == $db['id'])
-                                                        <option value="{{$db['id']}}" selected>{{$db['kota']}}</option>
-                                                        @else
-                                                        <option value="{{$db['id']}}"> {{$db['kota']}}</option>
-                                                        @endif
-                                                        @endforeach
-                                                    </select>
+                                            @if(isset($_GET['project_id']))
+                                                <div class="form-group row row-filter-kota">
+                                                    <label class="col-form-label col-md-3 col-sm-3" for="kota_id">Kota</label>
+                                                    <div class="col-md-9 col-sm-9">
+                                                        <select id="kota_id" name="kota_id" class="form-control">
+                                                            <option value="all">All</option>
+                                                            @foreach($kotas as $db)
+                                                                @if(isset($_GET['kota_id']) and $_GET['kota_id'] == $db['id'])
+                                                                    <option value="{{$db['id']}}" selected>{{$db['kota']}}</option>
+                                                                @else
+                                                                    <option value="{{$db['id']}}"> {{$db['kota']}}</option>
+                                                                @endif
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endif
                                             <input type="hidden" id="link_from" name="link_from" value="{{session('link_from')}}">
 
                                         </div>
@@ -189,7 +191,7 @@ if (isset($_GET['project_id'])) {
             @endforeach
             @endif
             <th>Responden DO</th>
-            @if(isset($honor_do_category) && isset($_GET['kota_id']) && $_GET['kota_id'] != 'all')
+            @if(isset($honor_do_category))
             @foreach($honor_do_category as $hc)
             <th>DO {{ucwords($hc->nama_honor_do)}} @<?= number_format($hc->honor_do) ?></th>
             @endforeach
@@ -371,8 +373,7 @@ if (isset($_GET['project_id'])) {
         }
 
         $('.total-keseluruhan').text(formatRupiah('<?= $totalKeseluruhan ?>'));
-        console.log('<?= $totalKeseluruhan ?>')
-
+        console.log($('#project_id').val())
         if ($('#project_id').val() != 'all') {
             $('.row-filter-kota').show();
         } else {
