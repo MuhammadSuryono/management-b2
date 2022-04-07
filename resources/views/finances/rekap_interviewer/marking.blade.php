@@ -103,7 +103,7 @@
         <td>
             <?php
             if ($item->is_can_marking) {
-            $check = DB::table('team_payment_markings')->where('project_id', session('current_project_id'))->where('team_id', $item->id)->where('posisi', 'Interviewer')->count();
+            $check = DB::table('team_payment_markings')->where('project_id', session('current_project_id'))->where('team_id', $item->id)->where('posisi', 'Interviewer')->where('project_team_id', $item->project_team_id)->count();
 
             ?>
             <button class='btn btn-sm <?= (!$check) ? 'btn-primary btn-mark' : 'btn-danger btn-unmark' ?>' type="button" data-id="<?= $item->id ?>" data-project_team_id="{{$item->project_team_id}}" data-kota_id="{{$item->project_kota_id}}" data-project_id="{{$item->project_id}}">
