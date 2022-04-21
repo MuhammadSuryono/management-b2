@@ -74,7 +74,7 @@
                                             </div>
                                         </div>
 
-                                        <div align="left" class="col-md-4 col-sm-4 col-xs-12">
+                                        {{-- <div align="left" class="col-md-4 col-sm-4 col-xs-12">
                                             <div class="form-group row row-filter-jabatan">
                                                 <label class="col-form-label col-md-3 col-sm-3" for="jabatan_id">Jabatan</label>
                                                 <div class="col-md-9 col-sm-9">
@@ -90,7 +90,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> --}}
 
                                         <div align="left" class="col-md-4 col-sm-4 col-xs-12">
                                             <div class="form-group row row-filter-kota">
@@ -137,7 +137,6 @@
         <tr>
             <th>No</th>
             <th>Nama</th>
-            <th>Alamat</th>
             <th>Kota</th>
             <th>No. Telp</th>
             <th>Email</th>
@@ -158,31 +157,26 @@
         <?php $total = 0; ?>
         <tr>
             <th scope='row'>{{$loop->iteration}}</th>
-            <td>{{$item->nama}}</td>
+            <td>{{$item->team->nama}}</td>
             <td>
-                @if(isset($item->alamat))
-                {{$item->alamat}}
+                @if(isset($item->projectKota->kota))
+                {{$item->projectKota->kota->kota}}
                 @endif
             </td>
             <td>
-                @if(isset($item->kota))
-                {{$item->kota}}
+                @if(isset($item->team->hp))
+                {{$item->team->hp}}
                 @endif
             </td>
             <td>
-                @if(isset($item->hp))
-                {{$item->hp}}
+                @if(isset($item->team->email))
+                {{$item->team->email}}
                 @endif
             </td>
             <td>
-                @if(isset($item->email))
-                {{$item->email}}
-                @endif
-            </td>
-            <td>
-                @if(isset($item->kode_bank))
+                @if(isset($item->team->kode_bank))
                 <?php
-                $bank = DB::connection('mysql3')->table('bank')->where('kode', '=', $item->kode_bank)->first();
+                $bank = DB::connection('mysql3')->table('bank')->where('kode', '=', $item->team->kode_bank)->first();
                 if ($bank) {
                     echo $bank->nama;
                 }
@@ -190,14 +184,14 @@
                 @endif
             </td>
             <td>
-                @if(isset($item->nomor_rekening))
-                {{$item->nomor_rekening}}
+                @if(isset($item->team->nomor_rekening))
+                {{$item->team->nomor_rekening}}
                 @endif
             </td>
             <td>
                 <?php
                 if (isset($item->gaji)) {
-                    echo  "Rp. " . number_format($item->gaji);
+                    echo  "Rp. " . number_format($item->default_honor);
                 } else {
                     echo  "Rp. 0";
                 }
@@ -232,7 +226,7 @@
             </td>
             <td>
                 <?php
-                $total = $item->gaji - $item->denda * $count;
+                $total = $item->default_honor - $item->denda * $count;
                 echo "Rp. " . number_format($total);
                 ?>
             </td>

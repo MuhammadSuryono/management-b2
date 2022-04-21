@@ -16,7 +16,7 @@
                 <li><a class="close-link"><i class="fa fa-close"></i></a>
                 </li>
             </ul>
-            
+
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -99,7 +99,7 @@
                                         <a href="{{url()->current()}}" type="button" class="btn btn-info text-white"> Reset </a>
                                         <button type="submit" class="btn btn-info"> Show </button>
                                         <?php
-                                        $request = ltrim($_SERVER['QUERY_STRING'], !empty($_SERVER['QUERY_STRING']));
+                                        $request = isset($_SERVER['QUERY_STRING']) ? ltrim($_SERVER['QUERY_STRING'], !empty($_SERVER['QUERY_STRING']))ltrim($_SERVER['QUERY_STRING'], !empty($_SERVER['QUERY_STRING'])) ;
                                         ?>
                                         <!-- <a href="{{url('respondents/pick_respondent?')}}{{$request}}" type="button" class="btn btn-info" id="btn-pick-respondent">Pick Respondent </a> -->
                                     </div>

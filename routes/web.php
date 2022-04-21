@@ -86,6 +86,10 @@ Route::middleware(['checklogin'])->group(function () {
     Route::get('project_team_managements/leader/{teamId}/kota/{projectKotaId}', 'Project\ProjectTeamManagementsController@get_leader');
     // Route::get('project_plans/{project}','Project\ProjectPlansController@index');
 
+    Route::get('project/{projectId}/variable-denda', 'Project\ProjectTeamManagementsController@variableDenda')->name('variable-denda');
+    Route::post('project/{projectId}/variable', 'Project\ProjectTeamManagementsController@storeVariableDenda')->name('variable-denda-store');
+    Route::post('project/{projectId}/variable/{id}', 'Project\ProjectTeamManagementsController@updateVariableDenda')->name('variable-denda-update');
+    Route::post('project/{projectId}/variable/{id}/delete', 'Project\ProjectTeamManagementsController@deleteVariableDenda')->name('variable-denda-delete');
     //Project Plan
     Route::get('project_plans', 'Project\ProjectPlansController@index');
     Route::get('project_plans/{project_plan}/edit', 'Project\ProjectPlansController@edit');
@@ -152,9 +156,10 @@ Route::middleware(['checklogin'])->group(function () {
     Route::get('/project_teams/delete/{project_team}', 'Project\ProjectTeamsController@delete');
     Route::get('/project_teams/kota/{kotaId}/leader/{teamLeaderId}/member', 'Project\ProjectTeamsController@member_team_leader');
     Route::post('project_teams/edit/leader/team/{id}', 'Project\ProjectTeamsController@update_team_leader');
+    Route::post('/project_teams/leader/update', 'Project\ProjectTeamsController@update_leader');
     Route::get('project_teams/project-jabatan/{projectJabatanId}/teams', 'Project\ProjectTeamsController@get_teams');
 
-    
+
     //Umum
     Route::get('/kotas/delete/{id}', 'Umum\KotasController@delete');
     Route::get('/kelurahans/delete/{id}', 'Umum\KelurahansController@delete');
@@ -385,6 +390,10 @@ Route::middleware(['checklogin'])->group(function () {
     Route::get('/budgets/print/{waktu}', 'BudgetsController@print');
 
     // AKHIR ROUTE BUDGET
+
+
+    Route::get('/project/{projectId}/nominal-denda/type/{type}/selection/{selectionId}', 'Project\NominalDendaController@showNominalDenda');
+    Route::post('/project/nominal-denda', 'Project\NominalDendaController@storeNominalDenda');
 
 });
 

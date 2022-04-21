@@ -98,6 +98,10 @@
                         <button type="button" class="dropdown-item btn-add-honor-gift" data-toggle="modal" data-target="#honorGiftModal" style="background-color: lightblue;" data-id="{{$item->project_kota_id}}"><i class="fa fa-plus"></i> Gift Category</button>
                     </div>
                 </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-danger" type="button" id="dropdownGiftButton" data-project="{{json_encode($item)}}" onclick="showDendaKotaModal(this)" style="font-size: 10px; padding: 1px; margin: 0;"> Denda Kota </button>
+                </div>
             </div>
 
 
@@ -161,6 +165,9 @@
                     @if($item->jabatan == "Team Leader (TL)")
             <span data-toggle="modal" data-target="#anggota-leader">
                 <button type="button" class="close mr-2" data-toggle="tooltip" data-placement="bottom" title="Show Anggota" onclick="getMemberLeader({{$item->project_kota_id}},{{$item->team_id}})"><span aria-hidden="true"><i class="fa fa-users"></i></span></button>
+            </span>
+            <span data-toggle="modal" data-target="#editLeader">
+                <button type="button" class="close mr-2" data-toggle="tooltip" data-placement="bottom" title="Edit TL" onclick="editTl('{{$item->type_tl}}',{{$item->gaji}},{{$item->target_tl}},{{$item->project_team_id}})"><span aria-hidden="true"><i class="fa fa-edit"></i></span></button>
             </span>
                     @endif
                     @if($item->jabatan != "Team Leader (TL)")
@@ -498,17 +505,187 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="editLeader" tabindex="-1" role="dialog" aria-labelledby="editLeaderLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editLeaderLabel">Edit Data Leader</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ url('/project_teams/leader/update')}}" id="form-edit-leader" method="POST">
+                <div class="modal-body">
+                    @csrf
+                    <div class="form-group">
+                        <label>Project Team ID</label>
+                        <input type="text" class="form-control" name="project_team_id" id="project_team_id" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Type TL</label>
+                        <select name="type_tl" id="type_tl" class="form-control" required>
+                            <option value="">Pilih Type TL</option>
+                            <option value="reguler">Reguler</option>
+                            <option value="borongan">Borongan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Honor</label>
+                        <input type="text" class="form-control" name="honor_tl" id="honor_tl">
+                    </div>
+                    <div class="form-group">
+                        <label>Target</label>
+                        <input type="text" class="form-control" name="target" id="target">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {{-- AKHIR MODAL TAMBAH KOTA --}}
+
+<div class="modal fade" id="dendaKota" tabindex="-1" role="dialog" aria-labelledby="dendaKotaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dendaKotaLabel">Denda Kota</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formDendaKota">
+                    <div class="row">
+                        <input type="text" id="project_id" name="project_id" value="{{$project->id}}" hidden>
+                        <input type="text" id="selection_id" name="selection_id" hidden>
+                        <div class="col-sm">
+                            <div class="form-group">
+                                <label>Variable</label>
+                                <select class="form-control" name="variable_id" required>
+                                    <option value="">Pilih Variable Denda</option>
+                                    @foreach ($variables as $variable)
+                                        <option value="{{ $variable->id }}">{{ $variable->variable_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="form-group">
+                                <label>Nominal Denda</label>
+                                <input type="text" class="form-control" name="nominal" required>
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <button class="btn btn-success" type="submit" style="margin-top: 25px;">Tambah</button>
+                        </div>
+                    </div>
+                </form>
+                <hr/>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered tableFixHead">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Nominal Denda</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="data-denda-kota">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection('content')
 
 @section('javascript')
 <script>
+    function showDendaKotaModal(e) {
+        $('#dendaKota').modal('show');
+        let form = $('#formDendaKota');
+        let data = e.dataset.project
+        data = JSON.parse(data);
+        form[0].reset();
+        $('#selection_id').val(data.project_kota_id);
+        getDataDenda(data.project_kota_id, 'data-denda-kota', editDendaKota);
+    }
+
+    function getDataDenda(selectionId, bodyTable, handleEdit) {
+        let path = `/project/{{$project->id}}/nominal-denda/type/project_kota/selection/${selectionId}`;
+        var url = "{{ url('')}}" + path;
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            dataType: "json",
+            success: function(hasil) {
+                html = "";
+                hasil.forEach((e) => {
+                    html += "<tr>";
+                    html += "<td>" + e.variable.variable_name + "</td>";
+                    html += "<td>" + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(e.nominal) + "</td>";
+                    html += `<td><button class="btn btn-sm btn-primary" onclick="handleEdit(e.variable.id, e.nominal)">Edit</button> <button class="btn btn-sm btn-danger">Hapus</button></td>`;
+                    html += "</tr>";
+                });
+
+                $(`#${bodyTable}`).html(html);
+            },
+            error: function(error) {
+                console.log(error)
+            }
+        });
+    }
+
+    $('#formDendaKota').on('submit', function(e) {
+        e.preventDefault();
+        let form = $(this);
+        let body = form.serializeArray();
+        body.push({name: '_token', value: '{{ csrf_token() }}'});
+        body.push({name: 'type', value: 'project_kota'});
+        $.ajax({
+            url: "{{ url('project/nominal-denda') }}",
+            type: "POST",
+            data: body,
+            dataType: "json",
+            success: function(hasil) {
+                getDataDenda(body[1].value, 'data-denda-kota', editDendaKota);
+            },
+            error: function(error) {
+                console.log(error)
+            }
+        });
+    })
+
+    function editDendaKota(variableId, nominal) {
+        console.log(variableId, nominal);
+    }
+
     $('#btn-denda').click(function() {
         $('input[name=project_team_id]').val($(this).data("id"));
         $('#dendaTl').val($(this).data("denda"));
 
     });
+
+    function editTl(typeTl, honor, target, id) {
+        $('#editLeader').modal('show');
+        $('#type_tl').val(typeTl);
+        $('#project_team_id').val(id);
+        $('#honor_tl').val(honor);
+        $('#target').val(target);
+    }
 
     function getMemberLeader(kotaId, leaderId) {
         let path = `/project_teams/kota/${kotaId}/leader/${leaderId}/member`;

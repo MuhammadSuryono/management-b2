@@ -185,4 +185,19 @@ class ProjectTeamsController extends Controller
 
         return response()->json($teams);
     }
+
+    public function update_leader(Request $request)
+    {
+        $project_team = Project_team::find($request->project_team_id);
+        $project_team->gaji = $request->honor_tl;
+        $project_team->target_tl = $request->target;
+        $project_team->type_tl = $request->type_tl;
+        $project_team->save();
+
+        $totalTarget = Project_team::where('project_kota_id', $project_team->project_kota_id)->sum('target_tl');
+        $projectKota = Project_kota::find($project_team->project_kota_id);
+        $projectKota->jumlah = $totalTarget;
+        $projectKota->save();
+        return redirect('/project_team_managements/' . session('current_project_id'))->with('status', 'Saved');
+    }
 }

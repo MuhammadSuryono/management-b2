@@ -176,8 +176,7 @@ class RekapInterviewerController extends Controller
         $genders = Gender::all();
         $pekerjaans = Pekerjaan::all()->sortBy('pekerjaan');
         $is_valids = Isvalid::all();
-
-//        $add_url = url('/menus/create');
+        
         return view('finances.rekap_interviewer.index', compact('teams',  'projects', 'kotas', 'pendidikans', 'ses_finals', 'genders', 'teams', 'pekerjaans', 'is_valids', 'honor_category', 'honor_do_category'));
     }
 

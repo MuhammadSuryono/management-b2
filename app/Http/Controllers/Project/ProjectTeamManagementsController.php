@@ -11,6 +11,7 @@ use App\Project_honor_do;
 use App\Project_honor_gift;
 use App\Project_jabatan;
 use App\Project_team;
+use App\ProjectVariable;
 use App\Team;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -49,8 +50,9 @@ class ProjectTeamManagementsController extends Controller
             }
         }
         $num_rows[] = $num_row;
+        $variables = ProjectVariable::where('project_id', $project->id)->get();
 
-        return view('projects.team_managements.index', compact('project_full_teams', 'project', 'kota', 'num_rows'));
+        return view('projects.team_managements.index', compact('project_full_teams', 'project', 'kota', 'num_rows', 'variables'));
     }
 
     public function ambilData()
@@ -161,5 +163,35 @@ class ProjectTeamManagementsController extends Controller
             'leader' => $leader,
             'teamLeaders' => $teamLeaders
         ]);
+    }
+
+    public function variableDenda($projectId)
+    {
+        $projectVariables = ProjectVariable::where('project_id', $projectId)->get();
+        return view('projects.project_teams.variable', compact('projectId', 'projectVariables'));
+    }
+
+    public function storeVariableDenda(Request $request, $projectId)
+    {
+        $variable = new ProjectVariable();
+        $variable->project_id = $projectId;
+        $variable->variable_name = $request->variable_name;
+        $isSaved = $variable->save();
+        return redirect()->route('variable-denda', ['status' => $isSaved, 'message' => $isSaved ? 'Berhasil menambahkan variable':'Gagal menambahkan variable', 'projectId' => $projectId]);
+    }
+
+    public function updateVariableDenda(Request $request, $projectId, $id)
+    {
+        $variable = ProjectVariable::find($id);
+        $variable->variable_name = $request->variable_name;
+        $isSaved = $variable->save();
+        return redirect()->route('variable-denda', ['status' => $isSaved, 'message' => $isSaved ? 'Berhasil mengubah variable':'Gagal mengubah variable', 'projectId' => $projectId]);
+    }
+
+    public function deleteVariableDenda(Request $request, $projectId, $id)
+    {
+        $variable = ProjectVariable::find($id);
+        $isSaved = $variable->delete();
+        return redirect()->route('variable-denda', ['status' => $isSaved, 'message' => $isSaved ? 'Berhasil menghapus variable':'Gagal menghapus variable', 'projectId' => $projectId]);
     }
 }
