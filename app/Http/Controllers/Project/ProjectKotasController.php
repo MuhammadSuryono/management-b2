@@ -7,6 +7,8 @@ use App\Project_kota;
 use App\Project;
 use App\Kota;
 use App\Customer;
+use App\NominalDenda;
+use App\ProjectVariable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -84,10 +86,23 @@ class ProjectKotasController extends Controller
             }
 
         } else {
-            Project_kota::firstOrCreate(
+            $projectKota = Project_kota::firstOrCreate(
                         ['kode_project'=>$request->kode_project,'project_id'=>$request->project_id,'kota_id'=>$kota[0]],
                         ['id_provinsi' => $request->provinsi,'jumlah' => 0,'user_id'=>session('user_id')]
                     );
+
+            $variableDefault = ProjectVariable::where('project_id', 0)->where('default', 1)->get();
+            foreach ($variableDefault as $variable) {
+                $nominalDenda = new NominalDenda();
+                $nominalDenda->variable_id = $variable->id;
+                $nominalDenda->project_id = $request->project_id;
+                $nominalDenda->selection_id = $projectKota->id;
+                $nominalDenda->type = 'project_kota';
+                $nominalDenda->nominal = '0.02';
+                $nominalDenda->from = '[total]';
+                $nominalDenda->save();
+            }
+
         }
 
         return redirect('/project_team_managements/' . $request->project_id ) ->with('status','Saved');
