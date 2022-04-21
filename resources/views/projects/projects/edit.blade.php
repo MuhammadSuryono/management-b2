@@ -15,9 +15,12 @@
 </div>
 @endif
 
-<div class="well">Manage:
+<div class="well">Manage:<br/>
     <a href="{{ url('/project_team_managements')}}/{{$project->id}}">
         <button title="Menu untuk RA dan Finance" class='btn btn-primary' target="_blank" <?= (!in_array(Session::get('divisi_id'), [1, 3, 5])) ? 'disabled' : '' ?>><i class="fa fa-group"></i> Kota Survey </button>
+    </a>
+    <a class="btn btn-primary" href="{{ url('/project')}}/{{$project->id}}/variable-denda">
+        <i class="fa fa-list-alt"></i> Variable Denda
     </a>
     <?php if ($unlock_budget) : ?>
         <a href="{{ url('/projects/budget_integration')}}/{{$project->id}}">
@@ -139,7 +142,7 @@
 {{-- @section('action_url',  url('/projects').'/'.$project->id)
     @method('patch')
     @csrf
-    <? //php $for_create_edit='edit'; 
+    <? //php $for_create_edit='edit';
     ?>
     @include('projects.projects.form_project') --}}
 {{-- AKHIR PAK BUDI --}}

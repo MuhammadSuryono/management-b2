@@ -98,7 +98,7 @@
                                         <!-- <a href="{{url()->current()}}" type="button" class="btn btn-info text-white"> Reset </a> -->
                                         <button type="submit" class="btn btn-info"> Show </button>
                                         <?php
-                                        $request = isset($_SERVER['QUERY_STRING']) ? ltrim($_SERVER['QUERY_STRING'], !empty($_SERVER['QUERY_STRING'])) : '';
+                                        $request = isset($_SERVER['QUERY_STRING']) ? ltrim($_SERVER['QUERY_STRING'], !empty($_SERVER['QUERY_STRING']))  : '';
                                         ?>
                                         <!-- <a href="{{url('respondents/pick_respondent?')}}{{$request}}" type="button" class="btn btn-info" id="btn-pick-respondent">Pick Respondent </a> -->
                                     </div>

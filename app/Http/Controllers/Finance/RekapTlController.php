@@ -26,6 +26,7 @@ use App\Team_payment_marking;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\RekapTLProjectTeams as ResourceRekapTLProjectTeams;
 
 class RekapTlController extends Controller
 {
@@ -36,7 +37,15 @@ class RekapTlController extends Controller
      */
     public function index(Request $request)
     {
+
+        $kotas = Project_kota::join('kotas', 'project_kotas.kota_id', '=', 'kotas.id')->select('kotas.*')
+        ->when(isset($request->project_id) && $request->project_id != 'all', function ($query) use ($request) {
+            return $query->where('project_id', $request->project_id);
+        })->orderBy('kotas.kota', 'ASC')->distinct()->get();
+
+
         if ($request->project_id != 'all' && $request->project_id) {
+
             if ($request->jabatan_id != 'all' && $request->jabatan_id) {
                 $checkBudgetIntegration = Project_budget_integration_tl::where('project_id', $request->project_id)->where('jabatan_id', $request->jabatan_id)->whereNotNull('item_budget_id')->first();
                 if (!isset($checkBudgetIntegration)) {
@@ -65,47 +74,33 @@ class RekapTlController extends Controller
                         ->get();
                 } else {
 
-                    $teams = Project_team::select('project_teams.*', 'teams.nama', 'teams.alamat', 'teams.hp', 'teams.email', 'teams.kode_bank', 'teams.nomor_rekening', 'teams.no_team', 'teams.kota_id', 'kotas.kota')
-                        ->join('teams', 'teams.id', '=', 'project_teams.team_id')
-                        ->join('project_jabatans', 'project_jabatans.id', '=', 'project_teams.project_jabatan_id')
-                        ->join('jabatans', 'jabatans.id', '=', 'project_jabatans.jabatan_id')
-                        ->join('kotas', 'kotas.id', '=', 'teams.kota_id')
-                        ->join('project_kotas', 'project_kotas.id', '=', 'project_jabatans.project_kota_id')
-                        // ->join('mysql3.bank', 'mysql3.bank.kode', '=', 'teams.kode_bank')
-                        ->where('project_kotas.project_id', '=', $request->project_id)
-                        ->whereNotIn('project_teams.id', function ($query) {
-                            $query->select('project_team_id')->from('pembayaran_tls');
-                        })
-                        ->when(($request->kota_id != 'all' && $request->kota_id), function ($query2) use ($request) {
-                            return $query2->where('teams.kota_id', '=',  $request->kota_id);
-                        })
-                        ->when(($request->jabatan_id != 'all' && $request->jabatan_id), function ($query2) use ($request) {
-                            return $query2->where('project_jabatans.jabatan_id', '=',  $request->jabatan_id);
-                        })
-                        ->get();
-                }
-            } else {
-                $teams = Project_team::select('project_teams.*', 'teams.nama', 'teams.alamat', 'teams.hp', 'teams.email', 'teams.kode_bank', 'teams.nomor_rekening', 'teams.no_team', 'teams.kota_id', 'kotas.kota')
-                    ->join('teams', 'teams.id', '=', 'project_teams.team_id')
-                    ->join('project_jabatans', 'project_jabatans.id', '=', 'project_teams.project_jabatan_id')
-                    ->join('jabatans', 'jabatans.id', '=', 'project_jabatans.jabatan_id')
-                    ->join('kotas', 'kotas.id', '=', 'teams.kota_id')
-                    ->join('project_kotas', 'project_kotas.id', '=', 'project_jabatans.project_kota_id')
-                    // ->join('mysql3.bank', 'mysql3.bank.kode', '=', 'teams.kode_bank')
-                    ->where('project_kotas.project_id', '=', $request->project_id)
+                    $teams = Project_team::with(['team','projectKota' => function($q) {
+                        $q->with(['kota']);
+                    }])
+                    ->leftJoin('project_kotas', 'project_teams.project_kota_id', '=', 'project_kotas.id')
+                    ->where('team_leader', '=', 0)
                     ->whereNotIn('project_teams.id', function ($query) {
                         $query->select('project_team_id')->from('pembayaran_tls');
                     })
                     ->when(($request->kota_id != 'all' && $request->kota_id), function ($query2) use ($request) {
-                        return $query2->where('teams.kota_id', '=',  $request->kota_id);
+                        return $query2->where('project_kotas.id', '=',  $request->kota_id);
                     })
-                    ->when(($request->jabatan_id != 'all' && $request->jabatan_id), function ($query2) use ($request) {
-                        return $query2->where('project_jabatans.jabatan_id', '=',  $request->jabatan_id);
-                    })
-                    ->get();
+                    ->where('project_kotas.project_id', $request->project_id)->get();
+                }
+            } else {
+                $teams = Project_team::with(['team','projectKota' => function($q) {
+                    $q->with(['kota']);
+                }])
+                ->leftJoin('project_kotas', 'project_teams.project_kota_id', '=', 'project_kotas.id')
+                ->where('team_leader', '=', 0)
+                ->whereNotIn('project_teams.id', function ($query) {
+                    $query->select('project_team_id')->from('pembayaran_tls');
+                })
+                ->when(($request->kota_id != 'all' && $request->kota_id), function ($query2) use ($request) {
+                    return $query2->where('project_kotas.id', '=',  $request->kota_id);
+                })
+                ->where('project_kotas.project_id', $request->project_id)->get();
             }
-
-            $kotas = Project_kota::join('kotas', 'project_kotas.kota_id', '=', 'kotas.id')->select('kotas.*')->where('project_id', '=', $request->project_id)->orderBy('kotas.kota', 'ASC')->distinct()->get();
 
             $jabatans = DB::select('SELECT pk.kota_id AS id_kota,
             pk.id AS project_kota_id, pj.id AS project_jabatan_id, j.jabatan, pj.jabatan_id AS id
@@ -116,24 +111,38 @@ class RekapTlController extends Controller
             WHERE pk.project_id = ' . $request->project_id .
                 ' AND pb.item_budget_id IS NOT NULL GROUP BY jabatan');
         } else {
-            $teams = Project_team::select('project_teams.*', 'teams.nama', 'teams.alamat', 'teams.hp', 'teams.email', 'teams.kode_bank', 'teams.nomor_rekening', 'kotas.kota')
-                ->join('teams', 'teams.id', '=', 'project_teams.team_id')
-                ->join('project_jabatans', 'project_jabatans.id', '=', 'project_teams.project_jabatan_id')
-                ->join('jabatans', 'jabatans.id', '=', 'project_jabatans.jabatan_id')
-                ->join('kotas', 'kotas.id', '=', 'teams.kota_id')
-                ->whereNotIn('project_teams.id', function ($query) {
-                    $query->select('project_team_id')->from('pembayaran_tls');
-                })
-                ->when(($request->kota_id != 'all' && $request->kota_id), function ($query2) use ($request) {
-                    return $query2->where('teams.kota_id', '=',  $request->kota_id);
-                })
-                ->get();
+            $teams = Project_team::with(['team','projectKota' => function($q) {
+                $q->with(['kota']);
+            }])
+            ->leftJoin('project_kotas', 'project_teams.project_kota_id', '=', 'project_kotas.id')
+            ->where('team_leader', '=', 0)
+            ->whereNotIn('project_teams.id', function ($query) {
+                $query->select('project_team_id')->from('pembayaran_tls');
+            })
+            ->when(($request->kota_id != 'all' && $request->kota_id), function ($query2) use ($request) {
+                return $query2->where('project_kotas.id', '=',  $request->kota_id);
+            })->get();
 
-            $kotas = Kota::all()->sortBy('kota');
             $jabatans = Jabatan::all()->sortBy('jabatan');
         }
-        // dd($jabatans);
+
         $projects = Project::all()->sortBy('nama');
+
+        foreach ($teams as $team) {
+            if ($team->type_tl == "reguler") {
+                $team->default_honor = $team->gaji;
+            } else if ($team->type_tl == "borongan") {
+                $totalRespondent = Respondent::where('project_id', '=', $team->projectKota->project_id)
+                ->whereIn('status_qc_id', array(5, 1, 0, 10))->count();
+
+                $honor_category = Project_honor::where('project_kota_id', $team->project_kota_id)->get();
+                if ($honor_category != null) {
+                    foreach ($honor_category as $key => $value) {
+                        $team->default_honor += $value->honor * $totalRespondent;
+                    }
+                }
+            }
+        }
 
         return view('finances.rekap_tl.index', compact('teams', 'projects', 'kotas', 'jabatans'));
     }
