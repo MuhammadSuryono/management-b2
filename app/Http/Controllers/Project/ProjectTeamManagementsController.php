@@ -50,7 +50,7 @@ class ProjectTeamManagementsController extends Controller
             }
         }
         $num_rows[] = $num_row;
-        $variables = ProjectVariable::where('project_id', $project->id)->get();
+        $variables = ProjectVariable::whereIn('project_id', array($project->id, 0))->get();
 
         return view('projects.team_managements.index', compact('project_full_teams', 'project', 'kota', 'num_rows', 'variables'));
     }

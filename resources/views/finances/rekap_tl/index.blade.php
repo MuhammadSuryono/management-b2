@@ -143,6 +143,11 @@
             <th>Bank</th>
             <th>Nomor Rekening</th>
             <th>Honor</th>
+            @if ($nominalDenda != null)
+                @foreach ($nominalDenda as $denda)
+                    <th>{{$denda->variable->variable_name}} <br/>{{$denda->variable->default ? "":"Rp."}} {{$denda->variable->default ? $denda->nominal : number_format($denda->nominal)}}{{$denda->variable->default ? "%":""}}</th>
+                @endforeach
+            @endif
             <th>Denda</th>
             <th>Respondent DO</th>
             <th>Total Denda</th>
@@ -198,6 +203,12 @@
                 ?>
 
             </td>
+
+            @if ($nominalDenda != null)
+                @foreach ($nominalDenda as $denda)
+                    <td>Rp. 0</td>
+                @endforeach
+            @endif
             <td>
                 <?php
                 if (isset($item->denda)) {
@@ -288,6 +299,12 @@
     </div>
 </div>
 
+@php
+    function dataFunc($data) {
+        return $data;
+    }
+@endphp
+
 
 @section('javascript')
 <script>
@@ -303,6 +320,13 @@
             $('input[name=total]').val($(this).data('total'));
             $('input[name=nextStatus]').val(nextStatus);
         })
+
+        iniJs("MASUK")
     });
+
+    function iniJs(data) {
+        const show= `@php echo dataFunc("`+ data +`") @endphp`;
+        console.log(show);
+    }
 </script>
 @endsection

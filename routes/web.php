@@ -394,7 +394,7 @@ Route::middleware(['checklogin'])->group(function () {
 
     Route::get('/project/{projectId}/nominal-denda/type/{type}/selection/{selectionId}', 'Project\NominalDendaController@showNominalDenda');
     Route::post('/project/nominal-denda', 'Project\NominalDendaController@storeNominalDenda');
-
+    Route::delete('/project/nominal-denda/{id}', 'Project\NominalDendaController@deleteNominalDenda');
 });
 
 Route::get('project_plans/fill_presence/{id}', 'Project\ProjectPlansController@fill_presence');

@@ -100,7 +100,7 @@
                 </div>
 
                 <div class="btn-group">
-                    <button class="btn btn-danger" type="button" id="dropdownGiftButton" data-project="{{json_encode($item)}}" onclick="showDendaKotaModal(this)" style="font-size: 10px; padding: 1px; margin: 0;"> Denda Kota </button>
+                    <button class="btn btn-danger" type="button" id="dropdownGiftButton" data-selection_id="{{$item->project_kota_id}}" data-type="project_kota" onclick="showDenda(this)" style="font-size: 10px; padding: 1px; margin: 0;"> Denda Kota </button>
                 </div>
             </div>
 
@@ -550,7 +550,7 @@
 {{-- AKHIR MODAL TAMBAH KOTA --}}
 
 <div class="modal fade" id="dendaKota" tabindex="-1" role="dialog" aria-labelledby="dendaKotaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="dendaKotaLabel">Denda Kota</h5>
@@ -563,13 +563,18 @@
                     <div class="row">
                         <input type="text" id="project_id" name="project_id" value="{{$project->id}}" hidden>
                         <input type="text" id="selection_id" name="selection_id" hidden>
+                        <input type="text" id="type" name="type" hidden>
+                        <input type="text" id="action" name="action" value="cerate" hidden>
+                        <input type="text" id="id" name="id" hidden>
                         <div class="col-sm">
                             <div class="form-group">
                                 <label>Variable</label>
-                                <select class="form-control" name="variable_id" required>
+                                <select class="form-control" name="variable_id" id="variable_id" required>
                                     <option value="">Pilih Variable Denda</option>
                                     @foreach ($variables as $variable)
-                                        <option value="{{ $variable->id }}">{{ $variable->variable_name }}</option>
+                                        <option value="{{ $variable->id }}">{{ $variable->variable_name }} @if ($variable->default)
+                                            (Default)
+                                        @endif</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -577,11 +582,20 @@
                         <div class="col-sm">
                             <div class="form-group">
                                 <label>Nominal Denda</label>
-                                <input type="text" class="form-control" name="nominal" required>
+                                <input type="text" class="form-control"  id="nominal" name="nominal" required>
                             </div>
                         </div>
                         <div class="col-sm">
-                            <button class="btn btn-success" type="submit" style="margin-top: 25px;">Tambah</button>
+                            <div class="form-group">
+                                <label>Dari</label>
+                                <select class="form-control" id="from" name="from" required>
+                                    <option value="undefined">Undefined</option>
+                                    <option value="[total]">Total</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <button class="btn btn-success" type="submit" style="margin-top: 25px;">Simpan</button>
                         </div>
                     </div>
                 </form>
@@ -592,11 +606,12 @@
                             <tr>
                                 <th>Variable</th>
                                 <th>Nominal Denda</th>
+                                <th>Dari</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
 
-                        <tbody id="data-denda-kota">
+                        <tbody id="data-denda">
 
                         </tbody>
                     </table>
@@ -613,14 +628,17 @@
 
 @section('javascript')
 <script>
-    function showDendaKotaModal(e) {
+    function showDenda(e) {
         $('#dendaKota').modal('show');
         let form = $('#formDendaKota');
-        let data = e.dataset.project
-        data = JSON.parse(data);
+        let selectionId = e.dataset.selection_id
+        let type = e.dataset.type
+
         form[0].reset();
-        $('#selection_id').val(data.project_kota_id);
-        getDataDenda(data.project_kota_id, 'data-denda-kota', editDendaKota);
+        $('#selection_id').val(selectionId);
+        $('#type').val(type);
+        $('#action').val('create');
+        getDataDenda(selectionId, 'data-denda', editDenda);
     }
 
     function getDataDenda(selectionId, bodyTable, handleEdit) {
@@ -636,8 +654,9 @@
                 hasil.forEach((e) => {
                     html += "<tr>";
                     html += "<td>" + e.variable.variable_name + "</td>";
-                    html += "<td>" + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(e.nominal) + "</td>";
-                    html += `<td><button class="btn btn-sm btn-primary" onclick="handleEdit(e.variable.id, e.nominal)">Edit</button> <button class="btn btn-sm btn-danger">Hapus</button></td>`;
+                    html += e.variable.default ? "<td>" + e.nominal + "</td>" : "<td>" + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(e.nominal) + "</td>";
+                    html += e.variable.default ? "<td>" + e.from + "</td>" : "<td></td>";
+                    html += e.variable.default ? `<td><button class="btn btn-sm btn-primary" onclick="editDenda('${e.id}','${e.variable.id}', '${e.nominal}', '${e.type}', '${e.project_id}', '${e.selection_id}', '${e.from}')">Edit</button></td>` : `<td><button class="btn btn-sm btn-primary" onclick="editDenda('${e.id}','${e.variable.id}', '${e.nominal}', '${e.type}', '${e.project_id}', '${e.selection_id}', '${e.from}')">Edit</button> <button class="btn btn-sm btn-danger" onclick="deleteDenda('${e.id}', '${e.selection_id}')">Hapus</button></td>`;
                     html += "</tr>";
                 });
 
@@ -654,14 +673,14 @@
         let form = $(this);
         let body = form.serializeArray();
         body.push({name: '_token', value: '{{ csrf_token() }}'});
-        body.push({name: 'type', value: 'project_kota'});
         $.ajax({
             url: "{{ url('project/nominal-denda') }}",
             type: "POST",
             data: body,
             dataType: "json",
             success: function(hasil) {
-                getDataDenda(body[1].value, 'data-denda-kota', editDendaKota);
+                $('#action').val('create');
+                getDataDenda(body[1].value, 'data-denda', editDenda);
             },
             error: function(error) {
                 console.log(error)
@@ -669,8 +688,31 @@
         });
     })
 
-    function editDendaKota(variableId, nominal) {
-        console.log(variableId, nominal);
+    function editDenda(id, variableId, nominal, type, projectId, selectionId, from) {
+        $('#selection_id').val(selectionId);
+        $('#type').val(type);
+        $('#nominal').val(nominal);
+        $('#variable_id').val(variableId);
+        $('#from').val(from);
+        $('#action').val('update');
+        $('#id').val(id);
+    }
+
+    function deleteDenda(id, selectionId) {
+        $.ajax({
+            url: "{{ url('project/nominal-denda') }}/" + id,
+            type: "DELETE",
+            dataType: "json",
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(hasil) {
+                getDataDenda(selectionId, 'data-denda', editDenda);
+            },
+            error: function(error) {
+                console.log(error)
+            }
+        });
     }
 
     $('#btn-denda').click(function() {

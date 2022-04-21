@@ -23,14 +23,19 @@ class NominalDendaController extends Controller
 
     public function storeNominalDenda()
     {
-        $nominalDenda = new NominalDenda();
-        $nominalDenda->project_id = $this->request->project_id;
+        if ($this->request->action == 'update') {
+            $nominalDenda = NominalDenda::find($this->request->id);
+        } else {
+            $nominalDenda = new NominalDenda();
+            $nominalDenda->project_id = $this->request->project_id;
+            $nominalDenda->selection_id = $this->request->selection_id;
+        }
         $nominalDenda->variable_id = $this->request->variable_id;
         $nominalDenda->nominal = $this->request->nominal;
-        $nominalDenda->selection_id = $this->request->selection_id;
         $nominalDenda->type = $this->request->type;
+        $nominalDenda->from = $this->request->from;
         $isSaved = $nominalDenda->save();
-        return response()->json(["success" => $isSaved]);
+        return response()->json(["success" => $nominalDenda]);
     }
 
     public function updateNominalDenda($id)
