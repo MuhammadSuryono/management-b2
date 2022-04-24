@@ -142,7 +142,7 @@
             <th>Email</th>
             <th>Bank</th>
             <th>Nomor Rekening</th>
-            <th>Honor</th>
+            <th>Total Honor</th>
             @if ($nominalDenda != null)
                 @foreach ($nominalDenda as $denda)
                     <th>{{$denda->variable->variable_name}} <br/>{{$denda->variable->default ? "":"Rp."}} {{$denda->variable->default ? $denda->nominal : number_format($denda->nominal)}}{{$denda->variable->default ? "%":""}}</th>
@@ -237,7 +237,12 @@
             </td>
             <td>
                 <?php
-                $total = $item->default_honor - $item->denda * $count;
+                if ($item->type == "borongan") {
+                    $total = $item->default_honor;
+                } else {
+                    $total = $item->default_honor - $item->denda * $count;
+                }
+
                 echo "Rp. " . number_format($total);
                 ?>
             </td>
