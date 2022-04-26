@@ -98,8 +98,8 @@ class ProjectKotasController extends Controller
                 $nominalDenda->project_id = $request->project_id;
                 $nominalDenda->selection_id = $projectKota->id;
                 $nominalDenda->type = 'project_kota';
-                $nominalDenda->nominal = '0.02';
-                $nominalDenda->from = '[total]';
+                $nominalDenda->nominal = $variable->default_value;
+                $nominalDenda->from = $variable->default_from;
                 $nominalDenda->save();
             }
 

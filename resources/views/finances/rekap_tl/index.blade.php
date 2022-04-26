@@ -145,7 +145,7 @@
             <th>Total Honor</th>
             @if ($nominalDenda != null)
                 @foreach ($nominalDenda as $denda)
-                    <th>{{$denda->variable->variable_name}} <br/>{{$denda->variable->default ? "":"Rp."}} {{$denda->variable->default ? $denda->nominal : number_format($denda->nominal)}}{{$denda->variable->default ? "%":""}}</th>
+                    <th>{{$denda->variable->variable_name}} <br/>{{$denda->variable->default ? "":"Rp."}} {{$denda->variable->default ? $denda->nominal : number_format($denda->nominal)}}{{$denda->variable->default ? "%":""}} ({{isset($denda->projectKota) ? $denda->projectKota->kota->kota : ''}})</th>
                 @endforeach
             @endif
             <th>Denda</th>
@@ -205,8 +205,19 @@
             </td>
 
             @if ($nominalDenda != null)
+                {{$totalDenda = 0}}
                 @foreach ($nominalDenda as $denda)
-                    <td>Rp. 0</td>
+                    @if($item->denda_static != null)
+                        @if(isset($item->denda_static[$denda->id]))
+                            {{$totalDenda = $item->denda_static[$denda->id]}}
+                        @else
+                            {{$totalDenda = 0}}
+                        @endif
+                    @else
+                        {{$totalDenda = 0}}
+                    @endif
+                    {{$item->default_honor = $item->default_honor - $totalDenda}}
+                    <td>Rp. {{number_format($totalDenda)}}</td>
                 @endforeach
             @endif
             <td>
@@ -219,28 +230,20 @@
                 ?>
             </td>
             <td>
-                <?php
-                $teamCode = sprintf('%04d', $item->no_team);
-                $cityCode = sprintf('%03d', $item->kota_id);
-                $count = DB::table('respondents')->where('srvyr', '=', $cityCode . $teamCode)
-                    ->when(isset($_GET['project_id']) && $_GET['project_id'] != 'all', function ($query) use ($request) {
-                        return $query->where('project_id', '=', $_GET['project_id']);
-                    })
-                    ->whereIn('status_qc_id', array(2, 3, 6, 9))->count();
-                echo $count;
-                ?>
+                {{$item->count_respondent_dos}}
             </td>
             <td>
+                @php $item->default_honor = $item->default_honor - $item->default_honor_do @endphp
                 <?php
-                echo "Rp. " . number_format($item->denda * $count);
+                echo "Rp. " . number_format($item->default_honor_do);
                 ?>
             </td>
             <td>
                 <?php
                 if ($item->type == "borongan") {
-                    $total = $item->default_honor;
+                    $total = $item->default_honor - $item->default_honor_do;
                 } else {
-                    $total = $item->default_honor - $item->denda * $count;
+                    $total = $item->default_honor - $item->denda * 0;
                 }
 
                 echo "Rp. " . number_format($total);

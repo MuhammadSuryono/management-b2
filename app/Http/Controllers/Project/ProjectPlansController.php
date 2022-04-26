@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Project_jabatan;
 use App\Project_kota;
 use App\Project_team;
+use App\ProjectPlan;
+use App\ProjectPlanMaster;
 use App\Task;
 use App\Lokasi;
 use App\Project;
@@ -38,6 +40,33 @@ class ProjectPlansController extends Controller
             ->join('digitalisasimarketing.project_plan_master as db2', 'project_plans.task_id', '=', 'db2.id_pp_master')
             ->select(['project_plans.*', 'db2.nama_kegiatan', 'db2.has_presence'])
             ->get();
+
+        if (count($project_plans) == 0 || strpos(json_encode($project_plans), 'Field Work') == false) {
+            $projectPlansMaster = ProjectPlanMaster::where('nama_kegiatan', 'Field Work')->first();
+            $project = Project::find(session('current_project_id'));
+            $data = [
+                'project_id' => session('current_project_id'),
+                'urutan' => count($project_plans) == 0 ? 0 : count($project_plans) + 1,
+                'task_id' => $projectPlansMaster->id_pp_master,
+                'date_start_target' => $project->tgl_kickoff,
+                'date_finish_target' => $project->tgl_akhir_kontrak,
+                'date_start_real' => $project->tgl_kickoff,
+                'hour_start_real' => "08:00:00",
+                'date_finish_real' => $project->tgl_akhir_kontrak,
+                'hour_finish_real' => "17:00:00",
+                'user_id' => session('user_id'),
+                'ket' => 'Field Work',
+            ];
+
+            $projectPlans = new Project_plan();
+            $projectPlans->fill($data);
+            $isSaved = $projectPlans->save();
+
+            $project_plans = DB::table('project_plans')->where('project_plans.project_id', session('current_project_id'))
+                ->join('digitalisasimarketing.project_plan_master as db2', 'project_plans.task_id', '=', 'db2.id_pp_master')
+                ->select(['project_plans.*', 'db2.nama_kegiatan', 'db2.has_presence'])
+                ->get();
+        }
         return view('projects.project_plans.index', compact('project_plans', 'add_url'));
     }
 

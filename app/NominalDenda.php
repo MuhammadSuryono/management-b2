@@ -12,4 +12,9 @@ class NominalDenda extends Model
     {
         return $this->belongsTo('App\ProjectVariable', 'variable_id');
     }
+
+    public function projectKota()
+    {
+        return $this->belongsTo('App\Project_Kota', 'selection_id');
+    }
 }
