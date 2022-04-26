@@ -72,13 +72,24 @@ class RekapTlController extends Controller
             if ($team->type_tl == "reguler") {
                 $team->default_honor = $team->gaji;
             } else if ($team->type_tl == "borongan") {
-                $totalRespondent = Respondent::where('project_id', '=', $team->projectKota->project_id)
-                ->whereIn('status_qc_id', array(5, 1, 0, 10))->count();
+                $members = Project_team::where('project_kota_id', $team->projectKota->id)->where('team_leader', $team->team_leader)->where('srvyr', '!=', "")->pluck('srvyr');
+                $respondents = Respondent::where('project_id', '=', $team->projectKota->project_id)->where("kota_id", $team->projectKota->kota_id)
+                ->whereIn('status_qc_id', array(5, 1, 0, 10))->whereIn('srvyr', $members)->get();
 
-                $honor_category = Project_honor::where('project_kota_id', $team->project_kota_id)->get();
-                if ($honor_category != null) {
-                    foreach ($honor_category as $key => $value) {
-                        $team->default_honor += $value->honor * $totalRespondent;
+                $categoryHonors = [];
+                foreach ($respondents as $respondent) {
+                    $categoryHonor = $respondent->kategori_honor;
+                    if (count($categoryHonors) == 0) {
+                        isset($categoryHonors[$categoryHonor]) ? $categoryHonors[$categoryHonor] += 1 : $categoryHonors = [$categoryHonor => 1];
+                    } else {
+                        isset($categoryHonors[$categoryHonor]) ? $categoryHonors[$categoryHonor] += 1 : $categoryHonors = [$categoryHonor => 1];
+                    }
+                }
+
+                foreach ($categoryHonors as $key => $categoryHonor) {
+                    $honor_category = Project_honor::where('project_kota_id', $team->project_kota_id)->where('nama_honor', $key)->get();
+                    foreach ($honor_category as $keyHonor => $value) {
+                        $team->default_honor += $value->honor * $categoryHonor;
                     }
                 }
             }
