@@ -266,9 +266,6 @@
                 <input type="hidden" name="project_id" value="<?= isset($_GET['project_id']) ? $_GET['project_id'] : '' ?>">
                 <input type="hidden" name="jabatan_id" value="<?= isset($_GET['jabatan_id']) ? $_GET['jabatan_id'] : '' ?>">
                 <input type="hidden" name="link" value="<?= $_SERVER['REQUEST_URI'] ?>">
-{{--                <button class='btn btn-primary btn-sm btn-ajukan' type="button" data-toggle="modal" data-target="#ajukanModal" data-id="<?= $item->id ?>" data-nextstatus="2" data-total="<?= $total ?>">--}}
-{{--                    Ajukan--}}
-{{--                </button>--}}
             </td>
             @endif
         </tr>
