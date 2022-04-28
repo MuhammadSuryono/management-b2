@@ -77,65 +77,50 @@ class RekapTlController extends Controller
             $team->default_honor_do = 0;
             $team->count_respondent_dos = 0;
 
-            $members = Project_team::where('project_kota_id', $team->projectKota->id)->where('team_leader', $team->team_leader)->where('srvyr', '!=', "")->pluck('srvyr');
+            $members = Project_team::where('project_kota_id', $team->projectKota->id)->where('team_leader', $team->team_id)->where('srvyr', '!=', "")->pluck('srvyr');
+            $respondentDos = Respondent::where('project_id', '=', $team->projectKota->project_id)
+                ->where("kota_id", $team->projectKota->kota_id)
+                ->whereIn('status_qc_id', array(2, 3, 6, 9))->whereIn('srvyr', $members)->get();
 
-            if ($team->type_tl == "reguler") {
-                $team->default_honor = $team->gaji;
-                $team->denda_static = [];
+            $team->respondent_dos = $respondentDos;
+            $team->count_respondent_dos = $respondentDos->count();
+            $team->denda_static = [];
 
-                $respondentDos = Respondent::where('project_id', '=', $team->projectKota->project_id)
-                    ->where("kota_id", $team->projectKota->kota_id)
-                    ->whereIn('status_qc_id', array(2, 3, 6, 9))->whereIn('srvyr', $members)->get();
-
-                $categoryHonorDos = [];
-                foreach ($respondentDos as $respondent) {
-                    $categoryHonor = $respondent->kategori_honor_do;
+            $categoryHonorDos = [];
+            foreach ($respondentDos as $respondent) {
+                $categoryHonor = $respondent->kategori_honor_do;
+                if ($categoryHonor != "") {
                     if (count($categoryHonorDos) == 0) {
                         isset($categoryHonorDos[$categoryHonor]) ? $categoryHonorDos[$categoryHonor] += 1 : $categoryHonorDos = [$categoryHonor => 1];
                     } else {
                         isset($categoryHonorDos[$categoryHonor]) ? $categoryHonorDos[$categoryHonor] += 1 : $categoryHonorDos = [$categoryHonor => 1];
                     }
                 }
+            }
 
-                foreach ($categoryHonorDos as $key => $categoryHonor) {
-                    $honor_category = Project_honor_do::where('project_kota_id', $team->project_kota_id)->where('nama_honor_do', $key)->get();
-
-                    foreach ($honor_category as $keyHonor => $value) {
-                        $team->default_honor_do += $value->honor_do * $categoryHonor;
-                    }
+            foreach ($categoryHonorDos as $key => $categoryHonor) {
+                $honor_category = Project_honor_do::where('project_kota_id', $team->project_kota_id)->where('nama_honor_do', $key)->get();
+                foreach ($honor_category as $keyHonor => $value) {
+                    $team->default_honor_do += $value->honor_do * $categoryHonor;
                 }
+            }
 
-                $team->respondent_dos = [];
+            if ($team->type_tl == "reguler") {
+                $team->default_honor = $team->gaji;
             } else if ($team->type_tl == "borongan") {
                 $respondents = Respondent::where('project_id', '=', $team->projectKota->project_id)
                     ->where("kota_id", $team->projectKota->kota_id)
                     ->whereIn('status_qc_id', array(5, 1, 0, 10))->whereIn('srvyr', $members)->get();
 
-                // 'status_qc_id', array(2, 3, 6, 9)
-                $respondentDos = Respondent::where('project_id', '=', $team->projectKota->project_id)
-                    ->where("kota_id", $team->projectKota->kota_id)
-                    ->whereIn('status_qc_id', array(2, 3, 6, 9))->whereIn('srvyr', $members)->get();
-
-                $team->respondent_dos = $respondentDos;
-                $team->count_respondent_dos = $respondentDos->count();
-
                 $categoryHonors = [];
                 foreach ($respondents as $respondent) {
                     $categoryHonor = $respondent->kategori_honor;
-                    if (count($categoryHonors) == 0) {
-                        isset($categoryHonors[$categoryHonor]) ? $categoryHonors[$categoryHonor] += 1 : $categoryHonors = [$categoryHonor => 1];
-                    } else {
-                        isset($categoryHonors[$categoryHonor]) ? $categoryHonors[$categoryHonor] += 1 : $categoryHonors = [$categoryHonor => 1];
-                    }
-                }
-
-                $categoryHonorDos = [];
-                foreach ($respondentDos as $respondent) {
-                    $categoryHonor = $respondent->kategori_honor_do;
-                    if (count($categoryHonorDos) == 0) {
-                        isset($categoryHonorDos[$categoryHonor]) ? $categoryHonorDos[$categoryHonor] += 1 : $categoryHonorDos = [$categoryHonor => 1];
-                    } else {
-                        isset($categoryHonorDos[$categoryHonor]) ? $categoryHonorDos[$categoryHonor] += 1 : $categoryHonorDos = [$categoryHonor => 1];
+                    if ($categoryHonor != "") {
+                        if (count($categoryHonors) == 0) {
+                            isset($categoryHonors[$categoryHonor]) ? $categoryHonors[$categoryHonor] += 1 : $categoryHonors = [$categoryHonor => 1];
+                        } else {
+                            isset($categoryHonors[$categoryHonor]) ? $categoryHonors[$categoryHonor] += 1 : $categoryHonors = [$categoryHonor => 1];
+                        }
                     }
                 }
 
@@ -144,14 +129,6 @@ class RekapTlController extends Controller
 
                     foreach ($honor_category as $keyHonor => $value) {
                         $team->default_honor += $value->honor * $categoryHonor;
-                    }
-                }
-
-                foreach ($categoryHonorDos as $key => $categoryHonor) {
-                    $honor_category = Project_honor_do::where('project_kota_id', $team->project_kota_id)->where('nama_honor_do', $key)->get();
-
-                    foreach ($honor_category as $keyHonor => $value) {
-                        $team->default_honor_do += $value->honor_do * $categoryHonor;
                     }
                 }
 

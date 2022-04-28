@@ -148,7 +148,6 @@
                     <th>{{$denda->variable->variable_name}} <br/>{{$denda->variable->default ? "":"Rp."}} {{$denda->variable->default ? $denda->nominal : number_format($denda->nominal)}}{{$denda->variable->default ? "%":""}} ({{isset($denda->projectKota) ? $denda->projectKota->kota->kota : ''}})</th>
                 @endforeach
             @endif
-            <th>Denda</th>
             <th>Respondent DO</th>
             <th>Total Denda</th>
             <th>Total</th>
@@ -159,7 +158,7 @@
     </thead>
     <tbody>
         @foreach ($teams as $item)
-        <?php $total = 0; ?>
+        <?php $total = 0; $totalDenda = 0;?>
         <tr>
             <th scope='row'>{{$loop->iteration}}</th>
             <td>{{$item->team->nama}}</td>
@@ -204,38 +203,39 @@
 
             </td>
 
-            @if ($nominalDenda != null)
-                {{$totalDenda = 0}}
-                @foreach ($nominalDenda as $denda)
-                    @if($item->denda_static != null)
-                        @if(isset($item->denda_static[$denda->id]))
-                            {{$totalDenda = $item->denda_static[$denda->id]}}
-                        @else
-                            {{$totalDenda = 0}}
-                        @endif
-                    @else
-                        {{$totalDenda = 0}}
-                    @endif
-                    {{$item->default_honor = $item->default_honor - $totalDenda}}
-                    <td>Rp. {{number_format($totalDenda)}}</td>
-                @endforeach
-            @endif
-            <td>
                 <?php
-                if (isset($item->denda)) {
-                    echo  "Rp. " . number_format($item->denda);
+                $totalDendaNominal = 0;
+                if (isset($nominalDenda)) {
+                    foreach ($nominalDenda as $denda){
+                        if($item->denda_static != null){
+                            if(isset($item->denda_static[$denda->id])){
+                                $denda = $item->denda_static[$denda->id];
+                                $totalDendaNominal += $denda;
+                                echo "<td>Rp. ".number_format($denda)."</td>";
+                            }else {
+                                $totalDendaNominal += 0;
+                                echo "<td>Rp. ".number_format(0)."</td>";
+                            }
+                        } else {
+                            $totalDendaNominal += 0;
+                            echo "<td>Rp. ".number_format(0)."</td>";
+                        }
+                    }
                 } else {
-                    echo  "Rp. 0";
+                    echo "<td>Rp. ".number_format(0)."</td>";
                 }
+                $totalDenda += $totalDendaNominal;
+                $item->default_honor = $item->default_honor - $totalDendaNominal;
+
                 ?>
-            </td>
+
             <td>
                 {{$item->count_respondent_dos}}
             </td>
             <td>
-                @php $item->default_honor = $item->default_honor - $item->default_honor_do @endphp
                 <?php
-                echo "Rp. " . number_format($item->default_honor_do);
+                $item->default_honor = $item->default_honor - $item->default_honor_do;
+                echo "Rp. " . number_format($item->default_honor_do + $totalDenda);
                 ?>
             </td>
             <td>
