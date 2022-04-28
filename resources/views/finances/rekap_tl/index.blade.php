@@ -149,6 +149,7 @@
                     <th>{{$denda->variable->variable_name}} <br/>{{$denda->variable->default ? "":"Rp."}} {{$denda->variable->default ? $denda->nominal : number_format($denda->nominal)}}{{$denda->variable->default ? "%":""}} ({{isset($denda->projectKota) ? $denda->projectKota->kota->kota : ''}})</th>
                 @endforeach
             @endif
+            <th>Total Keterlambatan</th>
             <th>Respondent DO</th>
             <th>Respondent Non DO</th>
             <th>Total Denda</th>
@@ -231,7 +232,7 @@
                 $item->default_honor = $item->default_honor - $totalDendaNominal;
 
                 ?>
-
+            <td>{{$item->total_keterlambatan}}</td>
             <td>
                 {{$item->count_respondent_dos}}
             </td>

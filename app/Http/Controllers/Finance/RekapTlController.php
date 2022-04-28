@@ -140,6 +140,7 @@ class RekapTlController extends Controller
                 ];
 
                 $team->denda_static = [];
+                $team->total_keterlambatan = 0;
                 foreach ($dataNominalDenda as $denda) {
                     if ($denda->variable->variable_name == 'Keterlambatan' && $denda->selection_id == $team->projectKota->id) {
                         $projectPlans = Project_plan::where('ket', 'Field Work')->where('project_id', $team->projectKota->project_id)->first();
@@ -150,6 +151,8 @@ class RekapTlController extends Controller
                                 ->where("kota_id", $team->projectKota->kota_id)
                                 ->whereDate('intvdate', '>=', $projectPlans->date_finish_real)
                                 ->whereIn('srvyr', $members)->count();
+
+                            $team->total_keterlambatan += $respondentsDenda;
 
                             isset($team->denda_static[$id]) ?  $team->denda_static[$id] = (int)((float)((int)$denda->nominal * ((int)strtr($denda->from, $variables))) * $respondentsDenda)
                                 : $team->denda_static = [
