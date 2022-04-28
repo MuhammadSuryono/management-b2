@@ -105,13 +105,16 @@ class RekapTlController extends Controller
                 }
             }
 
+            $respondents = Respondent::where('project_id', '=', $team->projectKota->project_id)
+                ->where("kota_id", $team->projectKota->kota_id)
+                ->whereIn('status_qc_id', array(5, 1, 0, 10))->whereIn('srvyr', $members)->get();
+
+            $team->respondents = $respondents;
+            $team->count_respondent_non_dos = $respondents->count();
+
             if ($team->type_tl == "reguler") {
                 $team->default_honor = $team->gaji;
             } else if ($team->type_tl == "borongan") {
-                $respondents = Respondent::where('project_id', '=', $team->projectKota->project_id)
-                    ->where("kota_id", $team->projectKota->kota_id)
-                    ->whereIn('status_qc_id', array(5, 1, 0, 10))->whereIn('srvyr', $members)->get();
-
                 $categoryHonors = [];
                 foreach ($respondents as $respondent) {
                     $categoryHonor = $respondent->kategori_honor;
