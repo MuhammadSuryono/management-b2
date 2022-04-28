@@ -76,6 +76,7 @@ class RekapTlController extends Controller
         foreach ($teams as $team) {
             $team->default_honor_do = 0;
             $team->count_respondent_dos = 0;
+            $team->total_keterlambatan = 0;
 
             $members = Project_team::where('project_kota_id', $team->projectKota->id)->where('team_leader', $team->team_id)->where('srvyr', '!=', "")->pluck('srvyr');
             $respondentDos = Respondent::where('project_id', '=', $team->projectKota->project_id)
@@ -139,8 +140,6 @@ class RekapTlController extends Controller
                   '[total]' => $team->default_honor,
                 ];
 
-                $team->denda_static = [];
-                $team->total_keterlambatan = 0;
                 foreach ($dataNominalDenda as $denda) {
                     if ($denda->variable->variable_name == 'Keterlambatan' && $denda->selection_id == $team->projectKota->id) {
                         $projectPlans = Project_plan::where('ket', 'Field Work')->where('project_id', $team->projectKota->project_id)->first();
