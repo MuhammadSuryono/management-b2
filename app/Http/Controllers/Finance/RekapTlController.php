@@ -105,13 +105,16 @@ class RekapTlController extends Controller
                 }
             }
 
+            $respondents = Respondent::where('project_id', '=', $team->projectKota->project_id)
+                ->where("kota_id", $team->projectKota->kota_id)
+                ->whereIn('status_qc_id', array(5, 1, 0, 10))->whereIn('srvyr', $members)->get();
+
+            $team->respondents = $respondents;
+            $team->count_respondent_non_dos = $respondents->count();
+
             if ($team->type_tl == "reguler") {
                 $team->default_honor = $team->gaji;
             } else if ($team->type_tl == "borongan") {
-                $respondents = Respondent::where('project_id', '=', $team->projectKota->project_id)
-                    ->where("kota_id", $team->projectKota->kota_id)
-                    ->whereIn('status_qc_id', array(5, 1, 0, 10))->whereIn('srvyr', $members)->get();
-
                 $categoryHonors = [];
                 foreach ($respondents as $respondent) {
                     $categoryHonor = $respondent->kategori_honor;
@@ -137,6 +140,7 @@ class RekapTlController extends Controller
                 ];
 
                 $team->denda_static = [];
+                $team->total_keterlambatan = 0;
                 foreach ($dataNominalDenda as $denda) {
                     if ($denda->variable->variable_name == 'Keterlambatan' && $denda->selection_id == $team->projectKota->id) {
                         $projectPlans = Project_plan::where('ket', 'Field Work')->where('project_id', $team->projectKota->project_id)->first();
@@ -147,6 +151,8 @@ class RekapTlController extends Controller
                                 ->where("kota_id", $team->projectKota->kota_id)
                                 ->whereDate('intvdate', '>=', $projectPlans->date_finish_real)
                                 ->whereIn('srvyr', $members)->count();
+
+                            $team->total_keterlambatan += $respondentsDenda;
 
                             isset($team->denda_static[$id]) ?  $team->denda_static[$id] = (int)((float)((int)$denda->nominal * ((int)strtr($denda->from, $variables))) * $respondentsDenda)
                                 : $team->denda_static = [

@@ -137,6 +137,7 @@
         <tr>
             <th>No</th>
             <th>Nama</th>
+            <th>Status</th>
             <th>Kota</th>
             <th>No. Telp</th>
             <th>Email</th>
@@ -148,7 +149,9 @@
                     <th>{{$denda->variable->variable_name}} <br/>{{$denda->variable->default ? "":"Rp."}} {{$denda->variable->default ? $denda->nominal : number_format($denda->nominal)}}{{$denda->variable->default ? "%":""}} ({{isset($denda->projectKota) ? $denda->projectKota->kota->kota : ''}})</th>
                 @endforeach
             @endif
+            <th>Total Keterlambatan</th>
             <th>Respondent DO</th>
+            <th>Respondent Non DO</th>
             <th>Total Denda</th>
             <th>Total</th>
             @if(isset($_GET['project_id']) && isset($_GET['jabatan_id']) && $_GET['jabatan_id'] != 'all')
@@ -162,6 +165,7 @@
         <tr>
             <th scope='row'>{{$loop->iteration}}</th>
             <td>{{$item->team->nama}}</td>
+            <td>{{ucwords($item->type_tl)}}</td></td>
             <td>
                 @if(isset($item->projectKota->kota))
                 {{$item->projectKota->kota->kota}}
@@ -228,9 +232,12 @@
                 $item->default_honor = $item->default_honor - $totalDendaNominal;
 
                 ?>
-
+            <td>{{$item->total_keterlambatan}}</td>
             <td>
                 {{$item->count_respondent_dos}}
+            </td>
+            <td>
+                {{$item->count_respondent_non_dos}}
             </td>
             <td>
                 <?php
@@ -250,7 +257,7 @@
                 ?>
             </td>
 
-            @if(isset($_GET['project_id']) && isset($_GET['jabatan_id']) && $_GET['jabatan_id'] != 'all')
+            @if(isset($_GET['project_id']))
             <td>
 
                 <input class="ajukanCheck" type="checkbox" value="<?= $item->id ?>" name="id[]" style="width: 1.5rem;height: 1.5rem;">
@@ -259,9 +266,9 @@
                 <input type="hidden" name="project_id" value="<?= isset($_GET['project_id']) ? $_GET['project_id'] : '' ?>">
                 <input type="hidden" name="jabatan_id" value="<?= isset($_GET['jabatan_id']) ? $_GET['jabatan_id'] : '' ?>">
                 <input type="hidden" name="link" value="<?= $_SERVER['REQUEST_URI'] ?>">
-                <!-- <button class='btn btn-primary btn-sm btn-ajukan' type="button" data-toggle="modal" data-target="#ajukanModal" data-id="<?= $item->id ?>" data-nextstatus="2" data-total="<?= $total ?>">
-                    Ajukan
-                </button> -->
+{{--                <button class='btn btn-primary btn-sm btn-ajukan' type="button" data-toggle="modal" data-target="#ajukanModal" data-id="<?= $item->id ?>" data-nextstatus="2" data-total="<?= $total ?>">--}}
+{{--                    Ajukan--}}
+{{--                </button>--}}
             </td>
             @endif
         </tr>
