@@ -25,15 +25,18 @@ use App\Project_team;
 use App\Project_kota;
 use App\Team;
 use App\Team_payment_marking;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class RekapTlController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Application|Factory|View
      */
     public function index(Request $request)
     {
@@ -148,7 +151,7 @@ class RekapTlController extends Controller
                         if ($projectPlans) {
                             $respondentsDenda = Respondent::where('project_id', '=', $team->projectKota->project_id)
                                 ->where("kota_id", $team->projectKota->kota_id)
-                                ->whereDate('intvdate', '>=', $projectPlans->date_finish_real)
+                                ->whereDate('intvdate', '>', $projectPlans->date_finish_real)
                                 ->whereIn('srvyr', $members)->count();
 
                             $team->total_keterlambatan += $respondentsDenda;
