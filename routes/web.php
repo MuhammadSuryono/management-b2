@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/login', 'Otentikasi\OtentikasiController@login')->name('login');
 Route::post('/otentikasi/logout', 'Otentikasi\OtentikasiController@logout')->name('logout');
 Route::post('/otentikasi/cek_login', 'Otentikasi\OtentikasiController@cek_login');
+Route::middleware(['publicUrl'])->group(function () {
+    Route::get('/vendor/register', [\App\Http\Controllers\Team\TeamsController::class, 'add_new_vendor_page']);
+});
+Route::post('/vendor/personal/register', [\App\Http\Controllers\Team\TeamsController::class, 'store_team']);
 
 // Route::get('/otentikasi/email_reset_password','OtentikasiController@email_reset_password')->name('login');
 // Route::post('/otentikasi/send_reset_password','OtentikasiController@send_reset_password')->name('login');
@@ -25,6 +29,13 @@ Route::middleware(['checklogin'])->group(function () {
     Route::get('/home', 'DashboardController@index')->name('home');
     Route::get('/', function () {
         return redirect('/home');
+    });
+
+    Route::group(['prefix' => 'setting'], function () {
+        Route::get('/route', [\App\Http\Controllers\Otentikasi\SettingController::class, 'index_route']);
+        Route::post('/route/create', [\App\Http\Controllers\Otentikasi\SettingController::class, 'create_route']);
+        Route::post('/route/update', [\App\Http\Controllers\Otentikasi\SettingController::class, 'update_route']);
+        Route::get('/route/{id}/delete', [\App\Http\Controllers\Otentikasi\SettingController::class, 'delete_route']);
     });
 
     Route::get('/kirimemail', 'DashboardController@kirimemail');
