@@ -184,6 +184,9 @@
                 @if( array_search('Reset Password', $acc_menu,TRUE))
                 <li><a href="{{url('/users/reset_password')}}">Reset Password</a></li>
                 @endif
+                @if( array_search('Setting Route', $acc_menu,TRUE))
+                    <li><a href="{{url('/setting/route')}}">Setting Route</a></li>
+                @endif
             </ul>
 
         </li>

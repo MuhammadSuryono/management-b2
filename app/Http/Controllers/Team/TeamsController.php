@@ -11,9 +11,16 @@ use App\Pekerjaan;
 use App\User;
 use App\Team_jabatan;
 use App\Jabatan;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 
 class TeamsController extends Controller
@@ -21,7 +28,7 @@ class TeamsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -38,7 +45,7 @@ class TeamsController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -73,8 +80,8 @@ class TeamsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -136,7 +143,7 @@ class TeamsController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Team  $team
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Team $team)
     {
@@ -147,7 +154,7 @@ class TeamsController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Team  $team
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Team $team)
     {
@@ -179,9 +186,9 @@ class TeamsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @param  \App\Team  $team
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Team $team)
     {
@@ -248,7 +255,7 @@ class TeamsController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Team  $team
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Team $team)
     {
@@ -266,5 +273,70 @@ class TeamsController extends Controller
         $file = $request->project;
         // return response()->file(url('uploads/' . $file));
         return response()->file(public_path('uploads/' . $file));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return Application|Factory|View
+     */
+    public function add_new_vendor_page()
+    {
+        $team = Team::first();
+        $genders = Gender::all();
+        $kotas = Kota::all();
+        $pendidikans = Pendidikan::all();
+        $pekerjaans = Pekerjaan::all();
+        $users = User::all();
+        $bank = DB::connection('mysql3')->table('bank')->get()->sortBy('nama');
+        $tgl_skr = date("Y-m-d");
+        $create_edit = 'create';
+        $action_url = url('/vendor/personal/register');
+        return view('teams.teams.register_vendor', compact(
+            'team',
+            'genders',
+            'kotas',
+            'pendidikans',
+            'pekerjaans',
+            'users',
+            'bank',
+            'tgl_skr',
+            'create_edit',
+            'action_url'
+        ));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param Request $request
+     * @return Application|RedirectResponse|Redirector
+     * @throws ValidationException
+     */
+    public function store_team(Request $request)
+    {
+        $this->validate($request, [
+            'nama' => 'required|unique:teams|max:60',
+            'gender_id' => 'required|integer',
+            'ktp' => 'required|min:16|max:16',
+            'hp' => 'required|min:9|max:13',
+            'email' => 'required|email|unique:teams',
+            'alamat' => 'required|min:10',
+            'kota_id' => 'required|integer',
+            'tgl_lahir' => 'required',
+            'pendidikan_id' => 'required|integer',
+            'pekerjaan_id' => 'required|integer',
+            'tgl_registrasi' => 'required'
+        ]);
+
+        $requestAll = $request->all();
+        $requestAll['no_team'] = Team::where('kota_id', $request->kota_id)->max('no_team') + 1;
+
+        try {
+            Team::create($requestAll);
+            return redirect('/vendor/register')->with('success', 'Data registrasi berhasil disimpan');
+        } catch (\Exception $e) {
+            return redirect('/vendor/register')->with('error', 'Data gagal disimpan, dengan error: ' . $e->getMessage());
+        }
     }
 }
