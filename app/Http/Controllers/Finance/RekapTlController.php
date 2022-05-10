@@ -42,37 +42,37 @@ class RekapTlController extends Controller
     {
 
         $kotas = Project_kota::join('kotas', 'project_kotas.kota_id', '=', 'kotas.id')->select('kotas.*')
-        ->when(isset($request->project_id) && $request->project_id != 'all', function ($query) use ($request) {
-            return $query->where('project_id', $request->project_id);
-        })->orderBy('kotas.kota', 'ASC')->distinct()->get();
+            ->when(isset($request->project_id) && $request->project_id != 'all', function ($query) use ($request) {
+                return $query->where('project_id', $request->project_id);
+            })->orderBy('kotas.kota', 'ASC')->distinct()->get();
 
         $jabatans = [];
 
-        $teams = Project_team::with(['team','projectKota' => function($q) {
+        $teams = Project_team::with(['team', 'projectKota' => function ($q) {
             $q->with(['kota']);
         }])
-        ->leftJoin('project_kotas', 'project_teams.project_kota_id', '=', 'project_kotas.id')
-        ->where('team_leader', '=', 0)
-        ->whereNotIn('project_teams.id', function ($query) {
-            $query->select('project_team_id')->from('pembayaran_tls');
-        })
-        ->when(($request->kota_id != 'all' && $request->kota_id), function ($query2) use ($request) {
-            return $query2->where('project_kotas.kota_id', '=',  $request->kota_id);
-        })
-        ->when(($request->project_id != 'all' && $request->kotproject_ida_id), function ($query2) use ($request) {
-            return $query2->where('project_kotas.project_id', '=',  $request->project_id);
-        })->get();
+            ->leftJoin('project_kotas', 'project_teams.project_kota_id', '=', 'project_kotas.id')
+            ->where('team_leader', '=', 0)
+            ->whereNotIn('project_teams.id', function ($query) {
+                $query->select('project_team_id')->from('pembayaran_tls');
+            })
+            ->when(($request->kota_id != 'all' && $request->kota_id), function ($query2) use ($request) {
+                return $query2->where('project_kotas.kota_id', '=', $request->kota_id);
+            })
+            ->when(($request->project_id != 'all' && $request->kotproject_ida_id), function ($query2) use ($request) {
+                return $query2->where('project_kotas.project_id', '=', $request->project_id);
+            })->orderByDesc('project_teams.id')->get();
 
         $projects = Project::all()->sortBy('nama');
 
         $nominalDenda = NominalDenda::when(isset($request->project_id) && $request->project_id != 'all', function ($query) use ($request) {
             return $query->where('project_id', $request->project_id);
         })
-        ->when(($request->kota_id != 'all' && $request->kota_id), function ($query2) use ($request) {
-            $projectKota = Project_kota::where('kota_id', $request->kota_id)->where('project_id', $request->project_id)->first();
-            return $query2->where('selection_id', '=',  $projectKota->id)->where('type', 'project_kota');
-        })
-        ->with(['variable','projectKota'])->get();
+            ->when(($request->kota_id != 'all' && $request->kota_id), function ($query2) use ($request) {
+                $projectKota = Project_kota::where('kota_id', $request->kota_id)->where('project_id', $request->project_id)->first();
+                return $query2->where('selection_id', '=', $projectKota->id)->where('type', 'project_kota');
+            })
+            ->with(['variable', 'projectKota'])->get();
 
         $dataNominalDenda = $nominalDenda;
 
@@ -82,32 +82,10 @@ class RekapTlController extends Controller
             $team->total_keterlambatan = 0;
 
             $members = Project_team::where('project_kota_id', $team->projectKota->id)->where('team_leader', $team->team_id)->where('srvyr', '!=', "")->pluck('srvyr');
-            $respondentDos = Respondent::where('project_id', '=', $team->projectKota->project_id)
-                ->where("kota_id", $team->projectKota->kota_id)
-                ->whereIn('status_qc_id', array(2, 3, 6, 9))->whereIn('srvyr', $members)->get();
 
-            $team->respondent_dos = $respondentDos;
-            $team->count_respondent_dos = $respondentDos->count();
+            $team->respondent_dos = [];
+            $team->count_respondent_dos = 0;
             $team->denda_static = [];
-
-            $categoryHonorDos = [];
-            foreach ($respondentDos as $respondent) {
-                $categoryHonor = $respondent->kategori_honor_do;
-                if ($categoryHonor != "") {
-                    if (count($categoryHonorDos) == 0) {
-                        isset($categoryHonorDos[$categoryHonor]) ? $categoryHonorDos[$categoryHonor] += 1 : $categoryHonorDos = [$categoryHonor => 1];
-                    } else {
-                        isset($categoryHonorDos[$categoryHonor]) ? $categoryHonorDos[$categoryHonor] += 1 : $categoryHonorDos = [$categoryHonor => 1];
-                    }
-                }
-            }
-
-            foreach ($categoryHonorDos as $key => $categoryHonor) {
-                $honor_category = Project_honor_do::where('project_kota_id', $team->project_kota_id)->where('nama_honor_do', $key)->get();
-                foreach ($honor_category as $keyHonor => $value) {
-                    $team->default_honor_do += $value->honor_do * $categoryHonor;
-                }
-            }
 
             $respondents = Respondent::where('project_id', '=', $team->projectKota->project_id)
                 ->where("kota_id", $team->projectKota->kota_id)
@@ -116,9 +94,39 @@ class RekapTlController extends Controller
             $team->respondents = $respondents;
             $team->count_respondent_non_dos = $respondents->count();
 
+            $team->total_fee = 0;
+
             if ($team->type_tl == "reguler") {
                 $team->default_honor = $team->gaji;
+                $team->total_fee = $team->default_honor;
             } else if ($team->type_tl == "borongan") {
+                $respondentDos = Respondent::where('project_id', '=', $team->projectKota->project_id)
+                    ->where("kota_id", $team->projectKota->kota_id)
+                    ->whereIn('status_qc_id', array(2, 3, 6, 9))->whereIn('srvyr', $members)->get();
+
+                $team->respondent_dos = $respondentDos;
+                $team->count_respondent_dos = $respondentDos->count();
+
+                $categoryHonorDos = [];
+                foreach ($respondentDos as $respondent) {
+                    $categoryHonor = $respondent->kategori_honor_do;
+                    if ($categoryHonor != "") {
+                        if (count($categoryHonorDos) == 0) {
+                            isset($categoryHonorDos[$categoryHonor]) ? $categoryHonorDos[$categoryHonor] += 1 : $categoryHonorDos = [$categoryHonor => 1];
+                        } else {
+                            isset($categoryHonorDos[$categoryHonor]) ? $categoryHonorDos[$categoryHonor] += 1 : $categoryHonorDos = [$categoryHonor => 1];
+                        }
+                    }
+                }
+
+                foreach ($categoryHonorDos as $key => $categoryHonor) {
+                    $honor_category = Project_honor_do::where('project_kota_id', $team->project_kota_id)->where('nama_honor_do', $key)->get();
+
+                    foreach ($honor_category as $keyHonor => $value) {
+                        $team->default_honor_do += $value->honor_do * $categoryHonor;
+                    }
+                }
+
                 $categoryHonors = [];
                 foreach ($respondents as $respondent) {
                     $categoryHonor = $respondent->kategori_honor;
@@ -138,38 +146,100 @@ class RekapTlController extends Controller
                         $team->default_honor += $value->honor * $categoryHonor;
                     }
                 }
+                $team->total_fee = $team->default_honor;
+                $team->total_fee -= $team->default_honor_do;
 
-                $variables = [
-                  '[total]' => $team->default_honor,
-                ];
+                $team->total_fee -= 1260000;
+            }
 
-                foreach ($dataNominalDenda as $denda) {
-                    if ($denda->variable->variable_name == 'Keterlambatan' && $denda->selection_id == $team->projectKota->id) {
-                        $projectPlans = Project_plan::where('ket', 'Field Work')->where('project_id', $team->projectKota->project_id)->first();
-                        $id = $denda->id;
-
-                        if ($projectPlans) {
-                            $respondentsDenda = Respondent::where('project_id', '=', $team->projectKota->project_id)
-                                ->where("kota_id", $team->projectKota->kota_id)
-                                ->whereDate('intvdate', '>', $projectPlans->date_finish_real)
-                                ->whereIn('srvyr', $members)->count();
-
-                            $team->total_keterlambatan += $respondentsDenda;
-
-                            isset($team->denda_static[$id]) ?  $team->denda_static[$id] = (int)((float)((int)$denda->nominal * ((int)strtr($denda->from, $variables))) * $respondentsDenda)
-                                : $team->denda_static = [
-                                    $id => (int)((float)$denda->nominal * ((int)strtr($denda->from, $variables))) * $respondentsDenda
-                            ];
-
-                        }
-
+            $variables = [
+                '[total]' => $team->default_honor,
+            ];
+            foreach ($dataNominalDenda as $denda) {
+                if ($denda->selection_id == $team->projectKota->id) {
+                    try {
+                        $methode = $this->methode_count_denda($denda, $team, $members, $variables)[$denda->type_variable];
+                        call_user_func_array([$this, $methode['function']], $methode['parameter']);
+                    } catch (\Exception $e) {
+                        continue;
                     }
                 }
-
             }
+            $totalDendaStatic = 0;
+            foreach ($team->denda_static as $key => $value) {
+                $totalDendaStatic += $value;
+            }
+            $team->total_fee -= $totalDendaStatic;
         }
 
-        return view('finances.rekap_tl.index', compact('teams', 'projects', 'kotas', 'jabatans', 'nominalDenda'));
+        $jsonData = $teams->toArray();
+
+        return view('finances.rekap_tl.index', compact('teams', 'projects', 'kotas', 'jabatans', 'nominalDenda', 'jsonData'));
+    }
+
+    public function methode_count_denda($denda, $team, $members, $variables)
+    {
+        return [
+            'keterlambatan' => [
+                'function' => 'count_denda_keterlambatan',
+                'parameter' => [$denda, $team, $members, $variables]
+            ],
+            'gift' => [
+                'function' => 'count_denda_do_gift',
+                'parameter' => [$denda, $team, $members, $variables]
+            ]
+        ];
+    }
+
+    public function count_denda_keterlambatan($denda, $team, $members, $variables)
+    {
+        $projectPlans = Project_plan::where('ket', 'Field Work')->where('project_id', $team->projectKota->project_id)->first();
+        $id = $denda->id;
+
+        if ($projectPlans) {
+            $respondentsDenda = Respondent::where('project_id', '=', $team->projectKota->project_id)
+                ->where("kota_id", $team->projectKota->kota_id)
+                ->whereDate('intvdate', '>', $projectPlans->date_finish_real)
+                ->whereIn('srvyr', $members)->count();
+
+            $team->total_keterlambatan = $respondentsDenda;
+            $dataDenda = (int)(((float)$denda->nominal / 100) * ((int)strtr($denda->from, $variables))) * $respondentsDenda;
+            if(isset($team->denda_static[$id])) {
+                $team->denda_static[$id] += $dataDenda;
+            }  else {
+                $team->denda_static = [$id => $dataDenda];
+            };
+
+        }
+    }
+
+    public function count_denda_do_gift($denda, $team, $members, $variables)
+    {
+        $id = $denda->id;
+        $respondentsDenda = Respondent::where('project_id', '=', $team->projectKota->project_id)
+            ->join('respondent_gifts', 'respondent_gifts.respondent_id', '=', 'respondents.id')
+            ->where("kota_id", $team->projectKota->kota_id)
+            ->whereIn('srvyr', $members);
+
+        if ($denda->take_from == '[respondent_do]') {
+            $respondentsDenda = $respondentsDenda->where('respondent_gifts.status_pembayaran_id', 3)
+                ->whereIn('status_qc_id', array(2, 3, 6, 9));
+        }
+
+        if ($denda->take_from == '[respondent]') {
+            $respondentsDenda = $respondentsDenda->where('respondent_gifts.status_pembayaran_id', 3)
+                ->whereIn('status_qc_id', array(5, 1, 0, 10));
+        }
+
+        $respondentsDenda = $respondentsDenda->count();
+
+        $team->total_denda_dynamic[$denda->variable->variable_name] = $respondentsDenda;
+        $dataDenda = (int)$denda->nominal * $respondentsDenda;
+        if(isset($team->denda_static[$id])) {
+            $team->denda_static[$id] += $dataDenda;
+        }  else {
+            $team->denda_static = [$id => $dataDenda];
+        };
     }
 
     public function indexRtp(Request $request)
@@ -333,6 +403,7 @@ class RekapTlController extends Controller
         // dd($request);
         // $request->project_id = 33;
         $nextStatus = $request->nextStatus;
+        dd($request->data);
         $divisi = Divisi::where("id", session('divisi_id'))->first();
         // dd('here');
         if ($nextStatus == 2) {
