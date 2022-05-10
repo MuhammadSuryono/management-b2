@@ -581,16 +581,43 @@
                         </div>
                         <div class="col-sm">
                             <div class="form-group">
-                                <label>Nominal Denda</label>
-                                <input type="text" class="form-control"  id="nominal" name="nominal" required>
+                                <label>Type Variable</label>
+                                <select class="form-control" name="type_variable" id="type_variable" required>
+                                    <option value="">Pilih Type Variable</option>
+                                    <option value="keterlambatan">Keterlambatan</option>
+                                    <option value="gift">Gift</option>
+                                    <option value="btf">BTF</option>
+                                    <option value="input_manual">Input Manual</option>
+                                </select>
                             </div>
                         </div>
+                        <div class="col-sm">
+                            <div class="form-group">
+                                <label>Nilai</label>
+                                <input type="text" class="form-control"  id="nominal" name="nominal" required>
+                                <small class="text-danger"><i>Nilai bisa anda masukkan sebagai persentase atau nominal</i></small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-sm">
                             <div class="form-group">
                                 <label>Dari</label>
                                 <select class="form-control" id="from" name="from" required>
                                     <option value="undefined">Undefined</option>
                                     <option value="[total]">Total</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm">
+                            <div class="form-group">
+                                <label>Diambil Dari/Setiap</label>
+                                <select class="form-control" id="take_from" name="take_from" required>
+                                    <option value="undefined">Undefined</option>
+                                    <option value="[respondent]">Respondent</option>
+                                    <option value="[respondent_do]">Respondent DO</option>
+                                    <option value="[respondent_btf]">Respondent BTF</option>
                                 </select>
                             </div>
                         </div>
@@ -605,8 +632,10 @@
                         <thead>
                             <tr>
                                 <th>Variable</th>
+                                <th>Type</th>
                                 <th>Nominal Denda</th>
                                 <th>Dari</th>
+                                <th>Diambil Dari/Setiap</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -654,9 +683,11 @@
                 hasil.forEach((e) => {
                     html += "<tr>";
                     html += "<td>" + e.variable.variable_name + "</td>";
+                    html += "<td>" + e.type_variable + "</td>";
                     html += e.variable.default ? "<td>" + e.nominal + "</td>" : "<td>" + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(e.nominal) + "</td>";
                     html += e.variable.default ? "<td>" + e.from + "</td>" : "<td></td>";
-                    html += e.variable.default ? `<td><button class="btn btn-sm btn-primary" onclick="editDenda('${e.id}','${e.variable.id}', '${e.nominal}', '${e.type}', '${e.project_id}', '${e.selection_id}', '${e.from}')">Edit</button></td>` : `<td><button class="btn btn-sm btn-primary" onclick="editDenda('${e.id}','${e.variable.id}', '${e.nominal}', '${e.type}', '${e.project_id}', '${e.selection_id}', '${e.from}')">Edit</button> <button class="btn btn-sm btn-danger" onclick="deleteDenda('${e.id}', '${e.selection_id}')">Hapus</button></td>`;
+                    html += "<td>" + e.take_from + "</td>";
+                    html += e.variable.default ? `<td><button class="btn btn-sm btn-primary" onclick="editDenda('${e.id}','${e.variable.id}', '${e.nominal}', '${e.type}', '${e.project_id}', '${e.selection_id}', '${e.from}', '${e.type_variable}', '${e.take_from}')">Edit</button></td>` : `<td><button class="btn btn-sm btn-primary" onclick="editDenda('${e.id}','${e.variable.id}', '${e.nominal}', '${e.type}', '${e.project_id}', '${e.selection_id}', '${e.from}',  '${e.type_variable}', '${e.take_from}')">Edit</button> <button class="btn btn-sm btn-danger" onclick="deleteDenda('${e.id}', '${e.selection_id}')">Hapus</button></td>`;
                     html += "</tr>";
                 });
 
@@ -679,6 +710,7 @@
             data: body,
             dataType: "json",
             success: function(hasil) {
+                console.log(hasil)
                 $('#action').val('create');
                 getDataDenda(body[1].value, 'data-denda', editDenda);
             },
@@ -688,13 +720,16 @@
         });
     })
 
-    function editDenda(id, variableId, nominal, type, projectId, selectionId, from) {
+    function editDenda(id, variableId, nominal, type, projectId, selectionId, from, typeVariable, tFrom) {
         $('#selection_id').val(selectionId);
         $('#type').val(type);
         $('#nominal').val(nominal);
         $('#variable_id').val(variableId);
         $('#from').val(from);
         $('#action').val('update');
+        console.log(typeVariable, tFrom)
+        $('#type_variable').val(typeVariable);
+        $('#take_from').val(tFrom);
         $('#id').val(id);
     }
 

@@ -34,6 +34,8 @@ class NominalDendaController extends Controller
         $nominalDenda->nominal = $this->request->nominal;
         $nominalDenda->type = $this->request->type;
         $nominalDenda->from = $this->request->from;
+        $nominalDenda->type_variable = $this->request->type_variable;
+        $nominalDenda->take_from = $this->request->take_from;
         $isSaved = $nominalDenda->save();
         return response()->json(["success" => $nominalDenda]);
     }
