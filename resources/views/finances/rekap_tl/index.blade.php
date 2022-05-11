@@ -408,8 +408,6 @@
             })
 
             if (data.length > 0) {
-                // $('#loadingProsessAjukan').modal('show')
-
                 $.ajax({
                     url: form.attr('action'),
                     type: 'POST',

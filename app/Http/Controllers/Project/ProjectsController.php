@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Project;
 
+use App\Helpers\GuzzleRequester;
 use Session;
 use App\Http\Controllers\Controller;
 use App\Customer2;
 use App\Project;
-use App\Budget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Import_excel;
@@ -38,6 +38,12 @@ use Requestby;
 
 class ProjectsController extends Controller
 {
+    protected $guzzle;
+    public function __construct()
+    {
+        $this->guzzle = new GuzzleRequester();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -384,11 +390,14 @@ class ProjectsController extends Controller
             ->where('status', '!=', 'Finish')
             ->orderBy('nama')
             ->get();
+        $projectName = sprintf('%s|%s', $project->nama, $project->nama . ' - ' . $project->methodology);
+        $res = $this->guzzle->request('GET', sprintf('/api/pengajuan/read?name=%s', $projectName));
+        $budget = null;
 
-        $budget =  DB::connection('mysql2')->table('pengajuan')->select('*')->where('nama', $project->nama)->first();
-        if (!$budget) {
-            $budget =  DB::connection('mysql2')->table('pengajuan')->select('*')->where('nama', $project->nama . ' - ' . $project->methodology)->first();
+        if ($res->getStatusCode() == 200) {
+            $budget = $res->getBody()->data;
         }
+
         if ($budget)
             $unlock_budget = 1;
         else
@@ -776,17 +785,18 @@ class ProjectsController extends Controller
 
     public function budgetIntegration(Request $request)
     {
-        $itemBudget = [];
         $id = $request->id;
         $project = Project::where('id', $id)->first();
+        $projectName = sprintf('%s|%s', $project->nama . ' - ' . $project->methodology, $project->nama);
+        $res = $this->guzzle->request('GET', sprintf('pengajuan/read?name=%s', $projectName));
+        $itemBudget = [];
+        $budget = null;
+
+        if ($res->getStatusCode() == 200) {
+            $itemBudget = $res->getBody()->data->items;
+            $budget = $res->getBody()->data;
+        }
         $integration_settings = Project_budget_integration::where('project_id', $id)->first();
-        $budget =  DB::connection('mysql2')->table('pengajuan')->select('*')->where('nama', $project->nama)->first();
-        if (!$budget) {
-            $budget =  DB::connection('mysql2')->table('pengajuan')->select('*')->where('nama', $project->nama . ' - ' . $project->methodology)->first();
-        }
-        if ($budget) {
-            $itemBudget = DB::connection('mysql2')->table('selesai')->select('*')->where('waktu', $budget->waktu)->get();
-        }
 
         if (@unserialize($integration_settings->pembayaran_interviewer))
             $pembayaran_interviewer = unserialize($integration_settings->pembayaran_interviewer);
@@ -797,11 +807,7 @@ class ProjectsController extends Controller
              pk.id AS project_kota_id, pj.id AS project_jabatan_id, j.jabatan, pj.jabatan_id
         FROM  project_kotas pk
             LEFT JOIN project_jabatans pj ON pk.id = pj.project_kota_id
-            -- LEFT JOIN project_teams pt ON pj.id = pt.project_jabatan_id
-            -- LEFT JOIN kotas k ON pk.kota_id = k.id
             LEFT JOIN jabatans j ON pj.jabatan_id = j.id
-            -- LEFT JOIN teams t ON pt.team_id = t.id
-            -- LEFT JOIN provinsi xx ON pk.id_provinsi = xx.id
         WHERE pk.project_id = ' . $id .
             ' GROUP BY jabatan');
         return view('projects.projects.budget_integration', compact('id', 'budget', 'itemBudget', 'integration_settings', 'pembayaran_interviewer', 'jabatan'));
