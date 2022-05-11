@@ -154,7 +154,7 @@
             <th>Respondent Non DO</th>
             <th>Total Denda</th>
             <th>Total</th>
-            @if(isset($_GET['project_id']) && isset($_GET['jabatan_id']) && $_GET['jabatan_id'] != 'all')
+            @if(isset($_GET['project_id']))
             <th>Action</th>
             @endif
         </tr>
@@ -260,7 +260,7 @@
             @if(isset($_GET['project_id']))
             <td>
 
-                <input class="ajukanCheck" type="checkbox" value="<?= $item->id ?>" name="id[]" style="width: 1.5rem;height: 1.5rem;">
+                <input class="ajukanCheck" type="checkbox" onchange="markPayment({{$item->project_team_id}})" value="<?= $item->project_team_id ?>" name="id[]" style="width: 1.5rem;height: 1.5rem;">
                 <input type="hidden" name="total-<?= $item->id ?>" value="<?= $total ?>">
                 <input type="hidden" name="nextStatus" value="2">
                 <input type="hidden" name="project_id" value="<?= isset($_GET['project_id']) ? $_GET['project_id'] : '' ?>">
@@ -311,6 +311,47 @@
     </div>
 </div>
 
+<div class="modal fade" id="loadingProsessAjukan"  data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="ajukanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"  role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img src="https://icons8.com/preloaders/dist/media/hero-preloaders.svg">
+                <div class="spinner-border text-primary" role="status"></div><br/>
+                <h5>Pengajuan anda sedang dalam proses...</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="statusPengajuanSuccess"  data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="ajukanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"  role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img id="image_status" src="https://cdn.dribbble.com/users/39201/screenshots/3694057/nutmeg.gif" width="70%"><br/>
+                <h5 id="message_status">Data Anda Telah Berhasil Di Ajukan</h5><br/>
+                <button type="button" class="btn btn-outline-success" data-dismiss="modal" aria-label="Close">
+                    Keluar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="statusPengajuanFailed"  data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="ajukanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"  role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img id="image_status" src="https://png.pngtree.com/element_our/20190531/ourlarge/pngtree-exclamation-mark-png-image_1273780.jpg" width="70%"><br/>
+                <h5 id="message_error">Error: </h5>
+                <h5 id="message_status">Data Anda Gagal Diajukan. Klik button dibawah untuk keluar dan ajukan kembali</h5><br/>
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close">
+                    Keluar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @php
     function dataFunc($data) {
         return $data;
@@ -320,9 +361,73 @@
 
 @section('javascript')
 <script>
+    let stateMark = []
+
+    function markPayment(id) {
+        if (!stateMark.includes(id)) {
+            stateMark.push(id)
+        } else {
+            stateMark.splice(stateMark.indexOf(id), 1)
+        }
+    }
+
+    function escapeHtml(text) {
+        var map = {
+            '&amp;': '&',
+            '&#038;': "&",
+            '&lt;': '<',
+            '&gt;': '>',
+            '&quot;': '"',
+            '&#039;': "'",
+            '&#8217;': "’",
+            '&#8216;': "‘",
+            '&#8211;': "–",
+            '&#8212;': "—",
+            '&#8230;': "…",
+            '&#8221;': '”'
+        };
+
+        return text.replace(/\&[\w\d\#]{2,5}\;/g, function(m) { return map[m]; });
+    }
+
+
     $(document).ready(function() {
+        let teams = {!! json_encode($teams) !!} //data teams
+        localStorage.setItem('teams', JSON.stringify(teams))
         $('#buttonAjukan').click(function() {
-            $('#form-change-status').submit();
+            const form = $('#form-change-status')
+            let teams = localStorage.getItem('teams')
+            teams = JSON.parse(teams)
+            let data = []
+            stateMark.forEach(function(id) {
+              teams.forEach(function(team) {
+                if (team.project_team_id == id) {
+                  data.push(team)
+                }
+              })
+            })
+
+            if (data.length > 0) {
+                // $('#loadingProsessAjukan').modal('show')
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    dataType: "json",
+                    data: {
+                        data: data,
+                        _token: '{{csrf_token()}}'
+                    },
+                }).done(function(res) {
+                    console.log(res)
+                }).fail(function(res) {
+                    console.log("Error")
+                    console.log(res)
+                })
+            }else {
+                alert('Tidak ada data yang dipilih')
+            }
+            // $('#form-change-status').submit();
         })
         $('.card-box.table-responsive a').hide();
 
