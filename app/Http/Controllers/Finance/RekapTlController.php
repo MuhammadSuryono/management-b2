@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Divisi;
+use App\Helpers\GuzzleRequester;
 use App\Http\Controllers\Controller;
 use App\Project_honor_do;
 use App\Project_plan;
@@ -29,6 +30,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class RekapTlController extends Controller
@@ -84,10 +86,10 @@ class RekapTlController extends Controller
             $team->denda_static = [];
             $team->total_fee = 0;
 
-            $members = Project_team::where('project_kota_id', $team->projectKota->id)->where('team_leader', $team->team_id)->where('srvyr', '!=', "")->pluck('srvyr');
+            $members = Project_team::where('project_kota_id', $team->projectKota->id)->where('team_leader', $team->team_id)->pluck('srvyr');
 
             $respondents = Respondent::where('project_id', '=', $team->projectKota->project_id)
-                ->where("kota_id", $team->projectKota->kota_id)
+//                ->where("kota_id", $team->projectKota->kota_id)
                 ->whereIn('status_qc_id', array(5, 1, 0, 10))->whereIn('srvyr', $members)->get();
 
             $team->count_respondent_non_dos = $respondents->count();
@@ -436,180 +438,211 @@ class RekapTlController extends Controller
 
     public function changeStatus(Request $request)
     {
-        return response()->json(['status' => 'success', 'message' => 'Status berhasil diubah', 'data' => $request->data]);
-        $nextStatus = $request->nextStatus;
-        $divisi = Divisi::where("id", session('divisi_id'))->first();
-        // dd('here');
-        if ($nextStatus == 2) {
+        $this->validate($request, [
+           'data' => 'required|array',
+            '_token' => 'required',
+        ]);
+        $dataNotProcess = [];
+        $client = new GuzzleRequester();
 
+        $data = json_decode(json_encode($request->all()), FALSE);
+        foreach ($data->data as $key => $value) {
+            if ($value->team->email == "" && $value->team->hp == "") {
+                $dataNotProcess[] = $value;
+                continue;
+            }
 
-            // $team = Team::where('id', $projectTeam->team_id)->first();
-        } else {
-            $projectTeam = Pembayaran_tl::select('pembayaran_tls.*', 'project_teams.team_id')
-                ->join('project_teams', 'project_teams.id', '=', 'pembayaran_tls.project_team_id')
-                ->where('pembayaran_tls.id', $request->id)
-                ->first();
-        }
+            if ($value->team->email == "" && (strlen($value->team->hp) < 9 || strlen($value->team->hp) > 13)) {
+                $dataNotProcess[] = $value;
+                continue;
+            }
 
-        // dd($projectTeam);
-        // dd($projectTeam);
+            $project = Project::where('id', $value->project_kota->project_id)->first();
+            if (!$project) {
+                $dataNotProcess[] = $value;
+                continue;
+            }
 
-        // if (!isset($team->kode_bank) || !isset($team->nomor_rekening)) {
-        //     return redirect(url()->previous())->with('status-fail', 'Data kepemilikan bank atau nomor rekening belum ada');
-        // }
+            $itemBpu = Project_budget_integration_tl::select('item_budget_id')->where('project_id', $project->id)->first();
+            $projectName = sprintf('%s|%s', $project->nama, $project->nama . ' - ' . $project->methodology);
 
-        $project = Project::where('id', $request->project_id)->first();
+            $resp = $client->request('GET', '/api/pengajuan/read?name=' . $projectName);
+            if ($resp->getStatusCode() != 200) {
+                $dataNotProcess[] = $value;
+                continue;
+            }
 
-        // dd($project);
-
-        $itemBpu = Project_budget_integration_tl::select('item_budget_id')->where('project_id', $project->id)->where('jabatan_id', $request->jabatan_id)->first();
-
-        $budget =  DB::connection('mysql2')->table('pengajuan')->select('*')->where('nama', $project->nama)->first();
-
-        // dd($budget);
-        if (isset($budget)) {
-            $term = DB::connection('mysql2')->table('bpu')->where('no', $itemBpu->item_budget_id)->where('waktu', $budget->waktu)->max('term');
-
-            $selesai = DB::connection('mysql2')->table('selesai')->where('no', $itemBpu->item_budget_id)->where('waktu', $budget->waktu)->first();
-
+            $budget = $resp->getBody()->data;
             $user = User::where('id', session('user_id'))->first();
 
-            $userBudget = DB::connection('mysql2')->table('tb_user')->where('id_user', $user->id_user_budget)->first();
-
-            $get_kas = DB::connection('mysql5')->table('kas')->select('*')->where('label_kas', 'Kas Project')->first();
-
-            $get_jenis_pembayaran = DB::connection('mysql6')->table('jenis_pembayaran')->select('*')->where('jenispembayaran', $selesai->status)->first();
-
-            if ($nextStatus == 2) {
-
-                for ($i = 0; $i < count($request->id); $i++) {
-                    $projectTeam = Project_team::select('project_teams.*', 'project_kotas.project_id AS project_id')
-                        ->join('project_jabatans', 'project_jabatans.id', '=', 'project_teams.project_jabatan_id')
-                        ->join('project_kotas', 'project_kotas.id', '=', 'project_jabatans.project_kota_id')
-                        ->where('project_teams.id', $request->id[$i])->first();
-
-
-                    $team = Team::where('id', $projectTeam->team_id)->first();
-
-                    $bank = DB::connection('mysql3')->table('bank')->select('*')->where('kode', $team->kode_bank)->first();
-
-                    $total = "total-" . $request->id[$i];
-
-                    if ($get_jenis_pembayaran) {
-                        if ($request->total > $get_jenis_pembayaran->max_transfer) {
-                            $metode_pembayaran = 'MRI Kas';
-                        } else {
-                            $metode_pembayaran = 'MRI PAL';
-                        }
-                    }
-
-                    $insertBpu = DB::connection('mysql2')->table('bpu')->insert([
-                        'no' => $itemBpu->item_budget_id,
-                        'jumlah' => $request->$total,
-                        'namapenerima' => $team->nama,
-                        'norek' => $team->nomor_rekening,
-                        'namabank' => isset($bank->swift_code) ? $bank->swift_code : 'Tidak ada',
-                        'emailpenerima' => isset($team->email) ? $team->email : 'Tidak ada',
-                        'metode_pembayaran' => $metode_pembayaran,
-                        'status' => 'Belum Di Bayar',
-                        'persetujuan' => 'Belum Disetujui',
-                        'term' => $term + 1,
-                        'status_pengajuan_bpu' => 0,
-                        'pengaju' => $userBudget->nama_user,
-                        'divisi' => $userBudget->divisi,
-                        'waktu' => $budget->waktu,
-                        'from_another_app' => 1,
-                        'created_at' => date('Y-m-d')
-                    ]);
-
-                    $noid = DB::connection('mysql2')->table('bpu')->select('noid')->orderBy('noid', 'desc')->first();
-
-                    $update = Pembayaran_tl::insert([
-                        'project_team_id' => $request->id[$i],
-                        'project_id' => $project->id,
-                        'total' => $request->$total,
-                        'status_pembayaran_id' => $nextStatus,
-                        'bpu_term' => $term + 1,
-                        'metode_pembayaran' => $metode_pembayaran,
-                        'bpu_noid' => $noid->noid,
-                        'tanggal_pengajuan' => date('Y-m-d'),
-                        'created_at' => date('Y-m-d H:i:s')
-                    ]);
-
-                    $date = date('my');
-                    $count = DB::connection('mysql4')->table('data_transfer')->select('transfer_req_id')->where('transfer_req_id', 'like', $date . '%')->orderBy('transfer_req_id', 'desc')->first();
-                    $count = (int)substr($count->transfer_req_id, -4);
-                    $formatId = $date . sprintf('%04d', $count + 1);
-
-                    if ($bank->swift_code == "CENAIDJA") {
-                        $biayaTrf = 0;
-                    } else {
-                        $biayaTrf = 2900;
-                    }
-
-                    if ($metode_pembayaran = 'MRI PAL') {
-                        $insertTrasfer =  DB::connection('mysql4')->table('data_transfer')->insert([
-                            'transfer_req_id' => $formatId,
-                            'transfer_type' => 3,
-                            'jenis_pembayaran_id' => 1,
-                            'keterangan' => $selesai->status,
-                            'waktu_request' =>  $budget->waktu,
-                            'norek' => $team->nomor_rekening,
-                            'pemilik_rekening' => $team->nama,
-                            'bank' => $bank->nama,
-                            'kode_bank' => $bank->swift_code,
-                            'berita_transfer' => 'Pembayaran Honor',
-                            'jumlah' => $request->$total,
-                            'terotorisasi' => 2,
-                            'hasil_transfer' => 1,
-                            'ket_transfer' => 'Antri',
-                            'nm_pembuat' => session('nama'),
-                            'nm_validasi' => '',
-                            'nm_manual' => '',
-                            'jenis_project' => $budget->jenis,
-                            'nm_project' => $budget->nama,
-                            'noid_bpu' => $noid->noid,
-                            'biaya_trf' => $biayaTrf,
-                            'email_pemilik_rekening' => isset($team->email) ? $team->email : '',
-                            'jadwal_transfer' => date('Y-m-d H:i:s'),
-                            'rekening_sumber' => $get_kas->rekening
-                        ]);
-                    }
-                }
-            } else if ($nextStatus == 3) {
-                $arrId = explode(',', $request->id);
-                $arrTotal = explode(',', $request->total);
-
-                for ($i = 0; $i < count($arrId); $i++) {
-                    $pembayaranTl = Pembayaran_tl::where('id', $arrId[$i])->first();
-                    $update = Pembayaran_tl::where('id', $pembayaranTl->id)->update([
-                        'status_pembayaran_id' => $nextStatus,
-                        'keterangan_pembayaran' => $request->ket_pembayaran,
-                        'tanggal_pembayaran' => date('Y-m-d'),
-                    ]);
-
-                    $insertBpu = DB::connection('mysql2')->table('bpu')->where('noid', $pembayaranTl->bpu_noid)->update([
-                        'jumlahbayar' => $arrTotal[$i],
-                        'persetujuan' => 'Disetujui oleh sistem',
-                        'status' => 'Telah Di Bayar',
-                    ]);
-                }
-            } else if ($nextStatus == 4) {
-                $arrId = explode(',', $request->id);
-                $arrTotal = explode(',', $request->total);
-
-                for ($i = 0; $i < count($arrId); $i++) {
-                    $pembayaranTl = Pembayaran_tl::where('id', $arrId[$i])->first();
-                    $update = Pembayaran_tl::where('id', $pembayaranTl->id)->update([
-                        'status_pembayaran_id' => $nextStatus,
-                        'keterangan_pembayaran' => $request->ket_pembayaran
-                    ]);
-                }
+            $bank = DB::connection('mysql3')->table('bank')->where('kode', '=', $value->team->kode_bank)->first();
+            if (!$bank) {
+                $dataNotProcess[] = $value;
+                continue;
             }
-        } else {
-            return redirect(url()->previous())->with('status-fail', 'Tidak ada budget terdeteksi');
+
+            $body = [
+                "no_item_budget" => $itemBpu->item_budget_id,
+                "time_budget" => $budget->waktu,
+                "id_user_budget" => $user->id_user_budget,
+                "type_kas" => 'Kas Project',
+                "budget_id" => $budget->noid,
+                "recipient" => [
+                    "name" => $value->team->nama,
+                    "bank_account_number" => $value->team->nomor_rekening,
+                    "code_bank" => $bank->swift_code,
+                    "email" => $value->team->email,
+                    "phone_number" => $value->team->hp,
+                    "bank_account_name" => $value->team->nama,
+                ]
+            ];
+            return response()->json($body, 200);
         }
 
+        return response()->json($dataNotProcess);
+
+//        if (isset($budget)) {
+//            // term and item budget handle BE -> send item_budget_id and waktu budget
+//            $term = DB::connection('mysql2')->table('bpu')->where('no', $itemBpu->item_budget_id)->where('waktu', $budget->waktu)->max('term');
+//            $selesai = DB::connection('mysql2')->table('selesai')->where('no', $itemBpu->item_budget_id)->where('waktu', $budget->waktu)->first();
+//
+//            // id_user budget send id user budget
+//            $user = User::where('id', session('user_id'))->first();
+//            $userBudget = DB::connection('mysql2')->table('tb_user')->where('id_user', $user->id_user_budget)->first();
+//
+//            // Kas project dan jenis pembayaran -> send type_kas -> get type paymenmt by BE
+//            $get_kas = DB::connection('mysql5')->table('kas')->select('*')->where('label_kas', 'Kas Project')->first();
+//            $get_jenis_pembayaran = DB::connection('mysql6')->table('jenis_pembayaran')->select('*')->where('jenispembayaran', $selesai->status)->first();
+//
+//            if ($nextStatus == 2) {
+//
+//                for ($i = 0; $i < count($request->id); $i++) {
+//                    $projectTeam = Project_team::select('project_teams.*', 'project_kotas.project_id AS project_id')
+//                        ->join('project_jabatans', 'project_jabatans.id', '=', 'project_teams.project_jabatan_id')
+//                        ->join('project_kotas', 'project_kotas.id', '=', 'project_jabatans.project_kota_id')
+//                        ->where('project_teams.id', $request->id[$i])->first();
+//
+//
+//                    $team = Team::where('id', $projectTeam->team_id)->first();
+//
+//                    $bank = DB::connection('mysql3')->table('bank')->select('*')->where('kode', $team->kode_bank)->first();
+//
+//                    $total = "total-" . $request->id[$i];
+//
+//                    if ($get_jenis_pembayaran) {
+//                        if ($request->total > $get_jenis_pembayaran->max_transfer) {
+//                            $metode_pembayaran = 'MRI Kas';
+//                        } else {
+//                            $metode_pembayaran = 'MRI PAL';
+//                        }
+//                    }
+//
+//                    $insertBpu = DB::connection('mysql2')->table('bpu')->insert([
+//                        'no' => $itemBpu->item_budget_id,
+//                        'jumlah' => $request->$total,
+//                        'namapenerima' => $team->nama,
+//                        'norek' => $team->nomor_rekening,
+//                        'namabank' => isset($bank->swift_code) ? $bank->swift_code : 'Tidak ada',
+//                        'emailpenerima' => isset($team->email) ? $team->email : 'Tidak ada',
+//                        'metode_pembayaran' => $metode_pembayaran,
+//                        'status' => 'Belum Di Bayar',
+//                        'persetujuan' => 'Belum Disetujui',
+//                        'term' => $term + 1,
+//                        'status_pengajuan_bpu' => 0,
+//                        'pengaju' => $userBudget->nama_user,
+//                        'divisi' => $userBudget->divisi,
+//                        'waktu' => $budget->waktu,
+//                        'from_another_app' => 1,
+//                        'created_at' => date('Y-m-d')
+//                    ]);
+//
+//                    $noid = DB::connection('mysql2')->table('bpu')->select('noid')->orderBy('noid', 'desc')->first();
+//
+//                    $update = Pembayaran_tl::insert([
+//                        'project_team_id' => $request->id[$i],
+//                        'project_id' => $project->id,
+//                        'total' => $request->$total,
+//                        'status_pembayaran_id' => $nextStatus,
+//                        'bpu_term' => $term + 1,
+//                        'metode_pembayaran' => $metode_pembayaran,
+//                        'bpu_noid' => $noid->noid,
+//                        'tanggal_pengajuan' => date('Y-m-d'),
+//                        'created_at' => date('Y-m-d H:i:s')
+//                    ]);
+//
+//                    $date = date('my');
+//                    $count = DB::connection('mysql4')->table('data_transfer')->select('transfer_req_id')->where('transfer_req_id', 'like', $date . '%')->orderBy('transfer_req_id', 'desc')->first();
+//                    $count = (int)substr($count->transfer_req_id, -4);
+//                    $formatId = $date . sprintf('%04d', $count + 1);
+//
+//                    if ($bank->swift_code == "CENAIDJA") {
+//                        $biayaTrf = 0;
+//                    } else {
+//                        $biayaTrf = 2900;
+//                    }
+//
+//                    if ($metode_pembayaran = 'MRI PAL') {
+//                        $insertTrasfer =  DB::connection('mysql4')->table('data_transfer')->insert([
+//                            'transfer_req_id' => $formatId,
+//                            'transfer_type' => 3,
+//                            'jenis_pembayaran_id' => 1,
+//                            'keterangan' => $selesai->status,
+//                            'waktu_request' =>  $budget->waktu,
+//                            'norek' => $team->nomor_rekening,
+//                            'pemilik_rekening' => $team->nama,
+//                            'bank' => $bank->nama,
+//                            'kode_bank' => $bank->swift_code,
+//                            'berita_transfer' => 'Pembayaran Honor',
+//                            'jumlah' => $request->$total,
+//                            'terotorisasi' => 2,
+//                            'hasil_transfer' => 1,
+//                            'ket_transfer' => 'Antri',
+//                            'nm_pembuat' => session('nama'),
+//                            'nm_validasi' => '',
+//                            'nm_manual' => '',
+//                            'jenis_project' => $budget->jenis,
+//                            'nm_project' => $budget->nama,
+//                            'noid_bpu' => $noid->noid,
+//                            'biaya_trf' => $biayaTrf,
+//                            'email_pemilik_rekening' => isset($team->email) ? $team->email : '',
+//                            'jadwal_transfer' => date('Y-m-d H:i:s'),
+//                            'rekening_sumber' => $get_kas->rekening
+//                        ]);
+//                    }
+//                }
+//            } else if ($nextStatus == 3) {
+//                $arrId = explode(',', $request->id);
+//                $arrTotal = explode(',', $request->total);
+//
+//                for ($i = 0; $i < count($arrId); $i++) {
+//                    $pembayaranTl = Pembayaran_tl::where('id', $arrId[$i])->first();
+//                    $update = Pembayaran_tl::where('id', $pembayaranTl->id)->update([
+//                        'status_pembayaran_id' => $nextStatus,
+//                        'keterangan_pembayaran' => $request->ket_pembayaran,
+//                        'tanggal_pembayaran' => date('Y-m-d'),
+//                    ]);
+//
+//                    $insertBpu = DB::connection('mysql2')->table('bpu')->where('noid', $pembayaranTl->bpu_noid)->update([
+//                        'jumlahbayar' => $arrTotal[$i],
+//                        'persetujuan' => 'Disetujui oleh sistem',
+//                        'status' => 'Telah Di Bayar',
+//                    ]);
+//                }
+//            } else if ($nextStatus == 4) {
+//                $arrId = explode(',', $request->id);
+//                $arrTotal = explode(',', $request->total);
+//
+//                for ($i = 0; $i < count($arrId); $i++) {
+//                    $pembayaranTl = Pembayaran_tl::where('id', $arrId[$i])->first();
+//                    $update = Pembayaran_tl::where('id', $pembayaranTl->id)->update([
+//                        'status_pembayaran_id' => $nextStatus,
+//                        'keterangan_pembayaran' => $request->ket_pembayaran
+//                    ]);
+//                }
+//            }
+//        } else {
+//            return redirect(url()->previous())->with('status-fail', 'Tidak ada budget terdeteksi');
+//        }
         if (isset($update)) {
             return redirect(url()->previous())->with('status', 'Status berhasil diubah');
         } else {
