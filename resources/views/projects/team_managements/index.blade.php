@@ -15,7 +15,7 @@
         position: absolute;
         left: -150px;
         transform: translate(0, 10px);
-        background-color: #bfbfbf;
+        background-color: #e3e2e2;
         padding: 1.5rem;
         box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
         width: auto;
@@ -634,9 +634,16 @@
                         <div class="col-sm">
                             <div class="form-group">
                                 <div class="popover__wrapper">
-                                    <div class="popover__content">
-                                        <p class="popover__message">Joseph Francis "Joey" Tribbiani, Jr.</p>
-                                        <img alt="Joseph Francis Joey Tribbiani, Jr." src="https://media.giphy.com/media/11SIBu3s72Co8w/giphy.gif">
+                                    <div class="popover__content" style="width: 500px">
+                                        <p class="popover__message">
+                                            <b>Tata Cara Pengisian Nilai</b>
+                                            <ol>
+                                                <li>Hanya menerima inputan berupa persentase/decimal atau nominal angka</li>
+                                                <li>Jika mengisi nilai dengan value percentase/decimal maka, nilai yang dimasukkan belum di bagi 100. Misalkan untuk 2%, anda cukup input angak dua, dan kemudian pilih parameter <b class="text-danger">Dari</b>
+                                                    Artinya menunjukkan nilai yang anda masukkan 2% dari nilai dari variable <b class="text-danger">Dari</b> yang dipilih</li>
+                                                <li>Jika anda ingin mengisi nominal angka, misalkan Rp. 2000, maka inputkan saja 2000 dan pilih parameter <b class="text-danger">Diambil Dari/Setiap</b> dan untuk parameter <b class="text-danger">Dari</b> biarkan undefined</li>
+                                            </ol>
+                                        </p>
                                     </div>
                                     <label>Nilai <span ><i class="fa fa-question-circle"></i> </span></label>
                                 </div>
