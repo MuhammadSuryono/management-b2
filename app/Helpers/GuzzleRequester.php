@@ -26,6 +26,10 @@ class GuzzleRequester
             'Connection' => 'close',
             CURLOPT_FORBID_REUSE => true,
             CURLOPT_FRESH_CONNECT => true,
+            'headers' => [
+                'Budget-Api-Key' => 'bWFuYWdlbWVudF9iMl8yMDIy',
+                'content-type' => 'application/json'
+            ]
         ]);
     }
 
@@ -35,20 +39,16 @@ class GuzzleRequester
         return $this;
     }
 
-    public function request($method, $uri, $options = []): GuzzleRequester
+    public function request($method, $uri, $options = [], $callback = false): GuzzleRequester
     {
-        self::_init();
-
+        $this->_init();
         try {
             $response = $this->client->request($method, $uri, $options);
             $this->statusCode = $response->getStatusCode();
             $this->body = json_decode($response->getBody()->getContents());
         } catch (\Exception $e) {
-            if (env('APP_ENV') === 'local') {
-                dd($e->getMessage());
-            }
-            abort(500, $e->getMessage());
-
+            $this->statusCode = $e->getCode();
+            $this->body = (object)["status" => false, "message" => "Unauthorized"];
         }
 
         return $this;

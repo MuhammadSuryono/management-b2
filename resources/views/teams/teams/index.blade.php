@@ -11,6 +11,7 @@
         <th>Usia</th>
         <th>Kota</th>
         <th>Peranan</th>
+        <th>Tanggal Register</th>
         <th>Action</th>
     </tr>
 </thead>
@@ -44,6 +45,7 @@
             ?>
             {{$result}}
         </td>
+        <td>{{$item->created_at}}</td>
         <td>
             <a title="Bahasa dikuasai" href="{{ url('/team_bahasas/')}}/{{$item->id}}" class='btn btn-secondary btn-sm'><i class="fa fa-language"></i></a>
             <a title="Peranan dikuasai" href="{{ url('/team_jabatans/')}}/{{$item->id}}" class='btn btn-secondary btn-sm'><i class="fa fa-child"></i></a>
