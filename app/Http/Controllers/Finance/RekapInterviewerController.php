@@ -73,6 +73,7 @@ class RekapInterviewerController extends Controller
                     })
                     ->where('team_payment_markings.project_id', $request->project_id)
                     ->where('posisi', 'Interviewer')
+                    ->groupBy('team_payment_markings.id')
                     ->get();
 
                 $teams = [];
@@ -98,6 +99,7 @@ class RekapInterviewerController extends Controller
                     ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
                         return $query->where('kota_id', '=', $request->kota_id);
                     })
+                    ->groupBy('respondents.id')
                     ->get();
                 $dbDigitalisasiMarketing = DB::connection('mysql3');
 
@@ -176,7 +178,7 @@ class RekapInterviewerController extends Controller
         $genders = Gender::all();
         $pekerjaans = Pekerjaan::all()->sortBy('pekerjaan');
         $is_valids = Isvalid::all();
-        
+
         return view('finances.rekap_interviewer.index', compact('teams',  'projects', 'kotas', 'pendidikans', 'ses_finals', 'genders', 'teams', 'pekerjaans', 'is_valids', 'honor_category', 'honor_do_category'));
     }
 

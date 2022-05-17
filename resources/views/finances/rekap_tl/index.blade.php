@@ -144,12 +144,12 @@
             <th>Bank</th>
             <th>Nomor Rekening</th>
             <th>Total Honor</th>
+            <th>Hari Keterlambatan</th>
             @if ($nominalDenda != null)
                 @foreach ($nominalDenda as $denda)
                     <th>{{$denda->variable->variable_name}} <br/>{{$denda->variable->default ? "":"Rp."}} {{$denda->variable->default ? $denda->nominal : number_format($denda->nominal)}}{{$denda->variable->default ? "%":""}} ({{isset($denda->projectKota) ? $denda->projectKota->kota->kota : ''}})</th>
                 @endforeach
             @endif
-            <th>Total Keterlambatan</th>
             <th>Respondent DO</th>
             <th>Respondent Non DO</th>
             <th>Total Denda</th>
@@ -206,6 +206,7 @@
                 ?>
 
             </td>
+            <td>{{$item->total_keterlambatan}}</td>s
 
                 <?php
                 $totalDendaNominal = 0;
@@ -232,7 +233,6 @@
                 $item->default_honor = $item->default_honor - $totalDendaNominal;
 
                 ?>
-            <td>{{$item->total_keterlambatan}}</td>
             <td>
                 {{$item->count_respondent_dos}}
             </td>
@@ -257,7 +257,7 @@
                 ?>
             </td>
 
-            @if(isset($_GET['project_id']))
+            @if(isset($_GET['project_id']) && $item->total_fee > 0)
             <td>
 
                 <input class="ajukanCheck" type="checkbox" onchange="markPayment({{$item->project_team_id}})" value="<?= $item->project_team_id ?>" name="id[]" style="width: 1.5rem;height: 1.5rem;">
@@ -267,6 +267,8 @@
                 <input type="hidden" name="jabatan_id" value="<?= isset($_GET['jabatan_id']) ? $_GET['jabatan_id'] : '' ?>">
                 <input type="hidden" name="link" value="<?= $_SERVER['REQUEST_URI'] ?>">
             </td>
+            @else
+                <td></td>
             @endif
         </tr>
         @endforeach
@@ -408,6 +410,7 @@
             })
 
             if (data.length > 0) {
+                $('#loadingProsessAjukan').modal('show')
                 $.ajax({
                     url: form.attr('action'),
                     type: 'POST',
@@ -417,10 +420,16 @@
                         _token: '{{csrf_token()}}'
                     },
                 }).done(function(res) {
-                    console.log(res)
+                    $('#loadingProsessAjukan').modal('hide')
+                    $('#statusPengajuanSuccess').modal('show')
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 5000)
                 }).fail(function(res) {
-                    console.log("Error")
-                    console.log(res)
+                    let message = res.statusText
+                    $('#loadingProsessAjukan').modal('hide')
+                    $('#message_error').innerText = message
+                    $('#statusPengajuanFailed').modal('show')
                 })
             }else {
                 alert('Tidak ada data yang dipilih')
