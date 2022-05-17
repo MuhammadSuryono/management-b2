@@ -231,27 +231,6 @@
     </div>
 </div>
 
-<!-- <div class="form-group row">
-    <label class="control-label col-md-3 col-sm-3 ">Nama Budget</label>
-    <div class="col-md-9 col-sm-9 ">
-        <select class="form-control" name="budget_id" id="budget_id" data-live-search="true" data-width="100%" required>
-            <option>Pilih Budget</option>
-            @foreach ($list_budget as $db)
-            <option value="{{$db->noid}}">{{$db->nama}}</option>
-            @endforeach
-        </select>
-    </div>
-</div>
-
-<div class="form-group row">
-    <label class="control-label col-md-3 col-sm-3 ">Item Budget</label>
-    <div class="col-md-9 col-sm-9 ">
-        <select class="form-control" name="item_budget_id" id="item_budget_id" data-live-search="true" data-width="100%" required>
-            <option value="">Pilih Item Budget</option>
-        </select>
-    </div>
-</div> -->
-
 {{-- </form> --}}
 {{-- AKHIR IWAYRIWAY --}}
 

@@ -36,6 +36,28 @@
 </head>
 
 <body class="nav-md">
+<style>
+    .table-scroll {
+        max-height: 380px;
+        overflow: auto;
+        display: inline-block;
+        width: 100%;
+        scrollbar-width: none;
+    }
+    .tableFixHead          {
+        overflow: auto;
+        height: 100px;
+    }
+    .tableFixHead thead th {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #2A3F54;
+        color: white;
+        border-color: white;
+    }
+</style>
 <div class="container body">
     <div class="main_container">
         <div class="col-md-3 left_col">

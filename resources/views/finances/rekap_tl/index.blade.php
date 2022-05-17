@@ -164,7 +164,7 @@
         <?php $total = 0; $totalDenda = 0;?>
         <tr>
             <th scope='row'>{{$loop->iteration}}</th>
-            <td>{{$item->team->nama}}</td>
+            <td><a href="{{route('detail_payment', ['projectTeamId' => $item->project_team_id])}}" target="_blank">{{$item->team->nama}}</a></td>
             <td>{{ucwords($item->type_tl)}}</td></td>
             <td>
                 @if(isset($item->projectKota->kota))
@@ -215,8 +215,8 @@
                         if($item->denda_static != null){
                             if(isset($item->denda_static[$denda->id])){
                                 $denda = $item->denda_static[$denda->id];
-                                $totalDendaNominal += $denda;
-                                echo "<td>Rp. ".number_format($denda)."</td>";
+                                $totalDendaNominal += $denda->total;
+                                echo "<td>Rp. ".number_format($denda->total)."</td>";
                             }else {
                                 $totalDendaNominal += 0;
                                 echo "<td>Rp. ".number_format(0)."</td>";
