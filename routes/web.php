@@ -406,6 +406,9 @@ Route::middleware(['checklogin'])->group(function () {
     Route::get('/project/{projectId}/nominal-denda/type/{type}/selection/{selectionId}', 'Project\NominalDendaController@showNominalDenda');
     Route::post('/project/nominal-denda', 'Project\NominalDendaController@storeNominalDenda');
     Route::delete('/project/nominal-denda/{id}', 'Project\NominalDendaController@deleteNominalDenda');
+
+    Route::get('project-team/{projectTeamId}/payment/detail', [\App\Http\Controllers\Finance\DetailPayment::class, 'detail'])->name('detail_payment');
+    Route::post('project-team/payment/detail/quantity', [\App\Http\Controllers\Finance\DetailPayment::class, 'getDetailData'])->name('detail_quantity');
 });
 
 Route::get('project_plans/fill_presence/{id}', 'Project\ProjectPlansController@fill_presence');

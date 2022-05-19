@@ -68,12 +68,12 @@ class ProjectsController extends Controller
      */
     public function create()
     {
-        $projectCommVoucher = DB::connection('mysql3')->table('comm_voucher')->select('nomor_project')
+        $projectCommVoucher = DB::connection('mysql3')->table('comm_voucher')->select('*')
             ->groupBy('nomor_project')
             ->whereRaw('LENGTH(nomor_project) = 18')
             ->get();
 
-        $projectSindikasi = DB::connection('mysql3')->table('data_sindikasi')->select('nama_project')
+        $projectSindikasi = DB::connection('mysql3')->table('data_sindikasi')->select('*')
             ->groupBy('nama_project')
             ->get();
 
@@ -383,13 +383,7 @@ class ProjectsController extends Controller
 
         $worksheet = Quest_code::where('project_id', $project->id)->get();
         $tmp_respondent = DB::table('tmp_respondents')->whereNull('intvdate')->orWhereNull('vstart')->orWhereNull('vend')->orWhereNull('duration')->orWhereNull('upload')->get();
-        $list_budget = DB::connection('mysql2')->table('pengajuan')
-            ->select('*')
-            ->where('tahun', '=', date('Y'))
-            ->where('jenis', '=', 'B2')
-            ->where('status', '!=', 'Finish')
-            ->orderBy('nama')
-            ->get();
+
         $projectName = sprintf('%s|%s', $project->nama, $project->nama . ' - ' . $project->methodology);
         $res = $this->guzzle->request('GET', sprintf('/api/pengajuan/read?name=%s', $projectName));
         $budget = null;
@@ -403,7 +397,7 @@ class ProjectsController extends Controller
         else
             $unlock_budget = 0;
 
-        return view('projects.projects.edit', compact('project', 'worksheet', 'tmp_respondent', 'list_budget', 'unlock_budget'));
+        return view('projects.projects.edit', compact('project', 'worksheet', 'tmp_respondent', 'unlock_budget'));
     }
 
     /**

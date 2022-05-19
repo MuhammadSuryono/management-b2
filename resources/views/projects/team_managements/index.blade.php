@@ -3,6 +3,46 @@
 @section('title2', 'Setting Team per kota')
 @section('content')
 @include('layouts.gentelella.table_top')
+<style>
+    .popover__wrapper {
+        position: relative;
+        margin-top: 1.5rem;
+        display: inline-block;
+    }
+    .popover__content {
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        left: -150px;
+        transform: translate(0, 10px);
+        background-color: #e3e2e2;
+        padding: 1.5rem;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        width: auto;
+    }
+    .popover__content:before {
+        position: absolute;
+        z-index: -1;
+        content: "";
+        right: calc(50% - 10px);
+        top: -8px;
+        border-style: solid;
+        border-width: 0 10px 10px 10px;
+        border-color: transparent transparent #bfbfbf transparent;
+        transition-duration: 0.3s;
+        transition-property: transform;
+    }
+    .popover__wrapper:hover .popover__content {
+        z-index: 10;
+        opacity: 1;
+        visibility: visible;
+        transform: translate(0, -20px);
+        transition: all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97);
+    }
+    .popover__message {
+        text-align: center;
+    }
+</style>
 <button title="tambah kota di proyek {{$project->nama}}" type="button" data-toggle="modal" data-target=".bs-example-modal-lg" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Tambah Kota</button>
 <thead>
     <tr class="text-center">
@@ -593,7 +633,20 @@
                         </div>
                         <div class="col-sm">
                             <div class="form-group">
-                                <label>Nilai</label>
+                                <div class="popover__wrapper">
+                                    <div class="popover__content" style="width: 500px">
+                                        <p class="popover__message">
+                                            <b>Tata Cara Pengisian Nilai</b>
+                                            <ol>
+                                                <li>Hanya menerima inputan berupa persentase/decimal atau nominal angka</li>
+                                                <li>Jika mengisi nilai dengan value percentase/decimal maka, nilai yang dimasukkan belum di bagi 100. Misalkan untuk 2%, anda cukup input angak dua, dan kemudian pilih parameter <b class="text-danger">Dari</b>
+                                                    Artinya menunjukkan nilai yang anda masukkan 2% dari nilai dari variable <b class="text-danger">Dari</b> yang dipilih</li>
+                                                <li>Jika anda ingin mengisi nominal angka, misalkan Rp. 2000, maka inputkan saja 2000 dan pilih parameter <b class="text-danger">Diambil Dari/Setiap</b> dan untuk parameter <b class="text-danger">Dari</b> biarkan undefined</li>
+                                            </ol>
+                                        </p>
+                                    </div>
+                                    <label>Nilai <span ><i class="fa fa-question-circle"></i> </span></label>
+                                </div>
                                 <input type="text" class="form-control"  id="nominal" name="nominal" required>
                                 <small class="text-danger"><i>Nilai bisa anda masukkan sebagai persentase atau nominal</i></small>
                             </div>
