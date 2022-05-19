@@ -30,7 +30,7 @@
                             <select class="selectpicker" name="nomor_rfq" id="nomor_rfq" data-live-search="true" data-width="100%" required>
                                 <option>Pilih Nomor Request</option>
                                 @foreach ($projectCommVoucher as $db)
-                                <option value="{{$db->nomor_project}}" data-tokens="{{$db->nomor_project}}" data-table="comm_voucher">{{$db->nomor_project}}</option>
+                                <option value="{{$db->nomor_project}}" data-tokens="{{$db->nomor_project}}" data-table="comm_voucher">{{$db->nomor_project}} - {{$db->nama_project_internal}}</option>
                                 @endforeach
                                 @foreach ($projectSindikasi as $db)
                                 <option value="{{$db->nama_project}}" data-tokens="{{$db->nama_project}}" data-table="data_sindikasi">{{$db->nama_project}}</option>

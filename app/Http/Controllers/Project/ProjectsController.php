@@ -68,12 +68,12 @@ class ProjectsController extends Controller
      */
     public function create()
     {
-        $projectCommVoucher = DB::connection('mysql3')->table('comm_voucher')->select('nomor_project')
+        $projectCommVoucher = DB::connection('mysql3')->table('comm_voucher')->select('*')
             ->groupBy('nomor_project')
             ->whereRaw('LENGTH(nomor_project) = 18')
             ->get();
 
-        $projectSindikasi = DB::connection('mysql3')->table('data_sindikasi')->select('nama_project')
+        $projectSindikasi = DB::connection('mysql3')->table('data_sindikasi')->select('*')
             ->groupBy('nama_project')
             ->get();
 
