@@ -30,6 +30,8 @@
     <!-- Custom Theme Style -->
     <link href="{{url('assets/gentelella')}}/build/css/custom.min.css" rel="stylesheet">
 
+    @yield('css')
+
     @if(isset($head_script_include))
         @include($head_script_include)
     @endif

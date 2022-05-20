@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Finance;
 
+use App\Helpers\GuzzleRequester;
 use App\Http\Controllers\Controller;
+use App\Pembayaran_tl;
+use App\Project_budget_integration_tl;
 use App\Project_kota;
 use App\Project_team;
 use App\User;
@@ -62,18 +65,17 @@ class RekapInterviewerController extends Controller
             if (in_array('internal', $pembayaran_interviewer) && in_array('external', $pembayaran_interviewer)) {
                 DB::enableQueryLog();
                 $dbDigitalisasiMarketing = DB::connection('mysql3');
-                $teamPaymentMarking = Team_payment_marking::select("team_payment_markings.*")->with(['team'])
+                $teamPaymentMarking = Team_payment_marking::select("team_payment_markings.*")->with(['team','projectTeam'])
                     ->leftJoin('project_teams', 'project_teams.id', '=', 'team_payment_markings.project_team_id')
                     ->leftJoin('project_kotas', 'project_kotas.id', '=', 'project_teams.project_kota_id')
                     ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
                         return $query->where('team_payment_markings.kota_id', '=', $request->kota_id);
                     })
-                    ->whereNotIn('team_payment_markings.team_id', function ($query) {
+                    ->whereNotIn('team_payment_markings.project_team_id', function ($query) {
                         $query->select('team_id')->from('pembayaran_interviewers');
                     })
                     ->where('team_payment_markings.project_id', $request->project_id)
                     ->where('posisi', 'Interviewer')
-                    ->groupBy('team_payment_markings.id')
                     ->get();
 
                 $teams = [];
@@ -90,6 +92,8 @@ class RekapInterviewerController extends Controller
                         }
                         $team->team->is_can_marking = $isCanMarking;
                         $team->team->bg_color = $bgColor;
+                        $team->team->project_team_id = $team->project_team_id;
+                        $team->team->project_id = $team->project_id;
                         $teams[] = $team->team;
                     }
                 }
@@ -129,6 +133,7 @@ class RekapInterviewerController extends Controller
                                         $pwt->project_kota = $projectKota->kota->kota;
                                         $pwt->bank = $bank != null ? $bank->nama : "-";
                                         $pwt->project_team_id = $projectTeam->id;
+                                        $pwt->project_id = $projectKota->project_id;
 
                                         $bgColor = "";
                                         $isCanMarking = true;
@@ -154,6 +159,7 @@ class RekapInterviewerController extends Controller
             // dd(count($teams));
             $kotas = Kota::all()->sortBy('kota');
         }
+
         $honor_category = [];
         $honor_do_category = [];
         if (isset($request->project_id)) {
@@ -184,51 +190,26 @@ class RekapInterviewerController extends Controller
 
     public function indexRtp(Request $request)
     {
-        // dd('here');
-        $honor_category = [];
-        $honor_do_category = [];
-        if ($request->project_id != 'all' && $request->project_id) {
-            $honor_category = Project_honor::join('project_kotas', 'project_kotas.id', '=', 'project_honors.project_kota_id')
-                ->where('project_kotas.project_id', '=', $request->project_id)
-                ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-                    return $query->where('kota_id', '=', $request->kota_id);
-                })
-                ->get();
-
-            $honor_do_category = Project_honor_do::join('project_kotas', 'project_kotas.id', '=', 'project_honor_dos.project_kota_id')
-                ->where('project_kotas.project_id', '=', $request->project_id)
-                ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-                    return $query->where('kota_id', '=', $request->kota_id);
-                })
-                ->get();
-            $teams = Pembayaran_interviewer::join('teams', 'teams.id', '=', 'pembayaran_interviewers.team_id')
-                ->where('pembayaran_interviewers.project_id', '=', $request->project_id)
-                ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-                    return $query->where('kota_id', '=', $request->kota_id);
-                })
-                ->when(isset($request->status_pembayaran_id) && trim($request->status_pembayaran_id) !== 'all', function ($query2) use ($request) {
-                    $query2->where('pembayaran_interviewers.status_pembayaran_id', '=', trim($request->status_pembayaran_id));
-                })
-                ->get();
-
-
-            $kotas = Pembayaran_interviewer::join('teams', 'teams.id', '=', 'pembayaran_interviewers.team_id')->join('kotas', 'teams.kota_id', '=', 'kotas.id')->select('kotas.*')->where('project_id', $request->project_id)->orderBy('kotas.kota', 'ASC')->distinct()->get();
-        } else {
-            $teams = [];
-            $kotas = Kota::all()->sortBy('kota');
-        }
-
+        $teams = Pembayaran_interviewer::selectRaw("project_teams.id as project_team_id, pembayaran_interviewers.*, project_teams.*")
+            ->leftJoin('project_teams', 'project_teams.id', '=', 'pembayaran_interviewers.team_id')
+            ->leftJoin('project_kotas', 'project_teams.project_kota_id', '=', 'project_kotas.id')
+            ->when(($request->project_id != 'all' && $request->kotproject_ida_id), function ($query2) use ($request) {
+                return $query2->where('pembayaran_interviewers.project_id', '=', $request->project_id);
+            })
+            ->when(($request->kota_id != 'all' && $request->kota_id), function ($query2) use ($request) {
+                return $query2->where('project_kotas.kota_id', '=', $request->kota_id);
+            })
+            ->when(isset($request->status_pembayaran_id) && trim($request->status_pembayaran_id) !== 'all', function ($query2) use ($request) {
+                $query2->where('pembayaran_interviewers.status_pembayaran_id', '=', trim($request->status_pembayaran_id));
+            })
+            ->get();
         $projects = Project::all()->sortBy('nama');
-        $pendidikans = Pendidikan::all()->sortBy('pendidikan');
-        $ses_finals = SesFinal::all();
-        $genders = Gender::all();
-        $pekerjaans = Pekerjaan::all()->sortBy('pekerjaan');
-        $is_valids = Isvalid::all();
+        $kotas = Project_kota::join('kotas', 'project_kotas.kota_id', '=', 'kotas.id')->select('kotas.*')
+            ->when(isset($request->project_id) && $request->project_id != 'all', function ($query) use ($request) {
+                return $query->where('project_id', $request->project_id);
+            })->orderBy('kotas.kota', 'ASC')->distinct()->get();
 
-        // $menus = Menu::all();
-        $add_url = url('/menus/create');
-        // $kotas = Kota::all()->sortBy('kota');
-        return view('finances.rekap_interviewer.index_rtp', compact('teams', 'add_url', 'projects', 'kotas', 'pendidikans', 'ses_finals', 'genders', 'teams', 'pekerjaans', 'is_valids', 'honor_category', 'honor_do_category'));
+        return view('finances.rekap_interviewer.index_rtp', compact('teams', 'projects', 'kotas'));
     }
 
     /**
@@ -326,166 +307,126 @@ class RekapInterviewerController extends Controller
 
     public function changeStatus(Request $request)
     {
-        // var_dump($_POST['id']);
-        // dd($request);
-        // $request->project_id = 33;
-        $nextStatus = $request->nextStatus;
-        // dd('here');
+        $this->validate($request, [
+            'data' => 'required|array',
+            '_token' => 'required',
+        ]);
+        $dataNotProcess = [];
+        $client = new GuzzleRequester();
         $divisi = Divisi::where("id", session('divisi_id'))->first();
-        $project = Project::where('id', $request->project_id)->first();
-        $itemBpu = Project_budget_integration::select('item_budget_id_pembayaran_interviewer')->where('project_id', $project->id)->first();
+        if ($divisi == null) {
+            return response()->json(["status" => false, "message" => "Divisi user undefined"]);
+        }
 
-        $budget =  DB::connection('mysql2')->table('pengajuan')->select('*')->where('nama', $project->nama)->first();
-        if (isset($budget)) {
-            $term = DB::connection('mysql2')->table('bpu')->where('no', $itemBpu->item_budget_id_pembayaran_interviewer)->where('waktu', $budget->waktu)->max('term');
+        $data = json_decode(json_encode($request->all()), FALSE);
+        foreach ($data->data as $key => $value) {
+            if ($value->email == "" && $value->hp == "") {
+                $dataNotProcess[] = [
+                    "data" => $value,
+                    "message" => "Email atau nomor HP Tidak boleh kosong"
+                ];
+                continue;
+            }
 
-            $selesai = DB::connection('mysql2')->table('selesai')->where('no', $itemBpu->item_budget_id_pembayaran_interviewer)->where('waktu', $budget->waktu)->first();
+            if ($value->email == "" && (strlen($value->hp) < 9 || strlen($value->hp) > 13)) {
+                $dataNotProcess[] = [
+                    "data" => $value,
+                    "message" => "Email kosong atau nomor handphone anda kurang dari 9 atau lebih dari 13 karaketer"
+                ];
+                continue;
+            }
 
+            $project = Project::where('id', $value->project_id)->first();
+            if (!$project) {
+                $dataNotProcess[] = [
+                    "data" => $value,
+                    "message" => "Project tidak ditemukan"
+                ];
+                continue;
+            }
+
+            $itemBpu = Project_budget_integration::where('project_id', $project->id)->first();
+            $projectName = sprintf('%s|%s', $project->nama, $project->nama . ' - ' . $project->methodology);
+            $resp = $client->request('GET', '/api/pengajuan/read?name=' . $projectName);
+            if ($resp->getStatusCode() != 200) {
+                $dataNotProcess[] = [
+                    "data" => $value,
+                    "message" => "Membaca data project $projectName ke Budget Error atau project tidak ditemukan di budget"
+                ];
+                continue;
+            }
+
+            $budget = $resp->getBody()->data;
             $user = User::where('id', session('user_id'))->first();
 
-            $userBudget = DB::connection('mysql2')->table('tb_user')->where('id_user', $user->id_user_budget)->first();
-
-            $get_kas = DB::connection('mysql5')->table('kas')->select('*')->where('label_kas', 'Kas Project')->first();
-
-            $get_jenis_pembayaran = DB::connection('mysql6')->table('jenis_pembayaran')->select('*')->where('jenispembayaran', $selesai->status)->first();
-
-            if ($nextStatus == 2) {
-                for ($i = 0; $i < count($request->id); $i++) {
-
-                    $team = Team::where('id', $request->id[$i])->first();
-                    $bank = DB::connection('mysql3')->table('bank')->select('*')->where('kode', $team->kode_bank)->first();
-                    // dd($bank);
-
-                    $total = "total-" . $request->id[$i];
-
-                    if ($get_jenis_pembayaran) {
-                        if ($request->total > $get_jenis_pembayaran->max_transfer) {
-                            $metode_pembayaran = 'MRI Kas';
-                        } else {
-                            $metode_pembayaran = 'MRI PAL';
-                        }
-                    }
-
-                    $insertBpu = DB::connection('mysql2')->table('bpu')->insert([
-                        'no' => $itemBpu->item_budget_id_pembayaran_interviewer,
-                        'jumlah' => $request->$total,
-                        'namapenerima' => $team->nama,
-                        'norek' => $team->nomor_rekening,
-                        'namabank' => isset($bank->swift_code) ? $bank->swift_code : 'Tidak ada',
-                        'emailpenerima' => isset($team->email) ? $team->email : 'Tidak ada',
-                        'metode_pembayaran' => $metode_pembayaran,
-                        'status' => 'Belum Di Bayar',
-                        'persetujuan' => 'Belum Disetujui',
-                        'term' => $term + 1,
-                        'status_pengajuan_bpu' => 0,
-                        'pengaju' => $userBudget->nama_user,
-                        'divisi' => $userBudget->divisi,
-                        'waktu' => $budget->waktu,
-                        'from_another_app' => 1,
-                        'created_at' => date('Y-m-d')
-                    ]);
-
-                    $noid = DB::connection('mysql2')->table('bpu')->select('noid')->orderBy('noid', 'desc')->first();
-
-                    $update = Pembayaran_interviewer::insert([
-                        'project_id' => $request->project_id,
-                        'team_id' => $request->id[$i],
-                        'total' => $request->$total,
-                        'status_pembayaran_id' => $nextStatus,
-                        'bpu_term' => $term + 1,
-                        'bpu_noid' => $noid->noid,
-                        'metode_pembayaran' => $metode_pembayaran,
-                        'tanggal_pengajuan' => date('Y-m-d'),
-                        'created_at' => date('Y-m-d H:i:s')
-                    ]);
-
-                    $date = date('my');
-                    $count = DB::connection('mysql4')->table('data_transfer')->select('transfer_req_id')->where('transfer_req_id', 'like', $date . '%')->orderBy('transfer_req_id', 'desc')->first();
-                    if ($count) {
-                        $count = (int)substr($count->transfer_req_id, -4);
-                    } else {
-                        $count = 0;
-                    }
-                    $formatId = $date . sprintf('%04d', $count + 1);
-
-                    if ($bank->swift_code == "CENAIDJA") {
-                        $biayaTrf = 0;
-                    } else {
-                        $biayaTrf = 2900;
-                    }
-
-                    if ($metode_pembayaran = 'MRI PAL') {
-                        $insertTrasfer =  DB::connection('mysql4')->table('data_transfer')->insert([
-                            'transfer_req_id' => $formatId,
-                            'transfer_type' => 3,
-                            'jenis_pembayaran_id' => 1,
-                            'keterangan' => $selesai->status,
-                            'waktu_request' =>  $budget->waktu,
-                            'norek' => $team->nomor_rekening,
-                            'pemilik_rekening' => $team->nama,
-                            'bank' => $bank->nama,
-                            'kode_bank' => $bank->swift_code,
-                            'berita_transfer' => 'Pembayaran Honor',
-                            'jumlah' => $request->$total,
-                            'terotorisasi' => 2,
-                            'hasil_transfer' => 1,
-                            'ket_transfer' => 'Antri',
-                            'nm_pembuat' => session('nama'),
-                            'nm_validasi' => '',
-                            'nm_manual' => '',
-                            'jenis_project' => $budget->jenis,
-                            'nm_project' => $budget->nama,
-                            'noid_bpu' => $noid->noid,
-                            'biaya_trf' => $biayaTrf,
-                            'email_pemilik_rekening' => isset($team->email) ? $team->email : '',
-                            'jadwal_transfer' => date('Y-m-d H:i:s'),
-                            'rekening_sumber' => $get_kas->rekening
-                        ]);
-                    }
-                    // dd('here');
-                }
-            } else if ($nextStatus == 3) {
-                $arrId = explode(',', $request->id);
-                $arrTotal = explode(',', $request->total);
-
-                for ($i = 0; $i < count($arrId); $i++) {
-                    $team = Team::where('id', $arrId[$i])->first();
-
-                    $pembayaranInterviewer = Pembayaran_interviewer::where('project_id', $request->project_id)->where('team_id', $team->id)->first();
-                    $update = Pembayaran_interviewer::where('id', $pembayaranInterviewer->id)->update([
-                        'status_pembayaran_id' => $nextStatus,
-                        'keterangan_pembayaran' => $request->ket_pembayaran,
-                        'tanggal_pembayaran' => date('Y-m-d'),
-                    ]);
-
-                    $insertBpu = DB::connection('mysql2')->table('bpu')->where('noid', $pembayaranInterviewer->bpu_noid)->update([
-                        'jumlahbayar' => $arrTotal[$i],
-                        'persetujuan' => 'Disetujui oleh sistem',
-                        'status' => 'Telah Di Bayar',
-                    ]);
-                }
-            } else if ($nextStatus == 4) {
-                $arrId = explode(',', $request->id);
-                $arrTotal = explode(',', $request->total);
-
-                for ($i = 0; $i < count($arrId); $i++) {
-                    $team = Team::where('id', $arrId[$i])->first();
-                    $pembayaranInterviewer = Pembayaran_interviewer::where('project_id', $request->project_id)->where('team_id', $team->id)->first();
-                    $update = Pembayaran_interviewer::where('id', $pembayaranInterviewer->id)->update([
-                        'status_pembayaran_id' => $nextStatus,
-                        'keterangan_pembayaran' => $request->ket_pembayaran
-                    ]);
-                }
+            $bank = DB::connection('mysql3')->table('bank')->where('kode', '=', $value->kode_bank)->first();
+            if (!$bank) {
+                $dataNotProcess[] = [
+                    "data" => $value,
+                    "message" => "Bank anda tidak terdaftar"
+                ];
+                continue;
             }
-        } else {
-            return redirect(url()->previous())->with('status-fail', 'Tidak ada budget terdeteksi');
+
+            $body = [
+                "no_item_budget" => $itemBpu->item_budget_id_pembayaran_interviewer,
+                "time_budget" => $budget->waktu,
+                "id_user_budget" => $user->id_user_budget,
+                "applicant" => session('nama'),
+                "division_applicant" => $divisi->nama_divisi,
+                "payment_description" => sprintf("%s", $value->kota->kota),
+                "payment_id" => $value->project_team_id,
+                "type_kas" => 'Kas Project',
+                "budget_id" => $budget->noid,
+                "total" => $value->total_fee,
+                "payment_date" => $this->generatePaymentDate($bank->swift_code),
+                "recipient" => [
+                    "name" => $value->nama,
+                    "bank_account_number" => $value->nomor_rekening,
+                    "code_bank" => $bank->swift_code,
+                    "email" => $value->email,
+                    "phone_number" => $value->hp,
+                    "bank_account_name" => $value->nama,
+                ]
+            ];
+
+            $resp = $client->request('POST', '/api/bpu/management/create', ["body" => json_encode($body)]);
+
+            $dataBpu = $resp->getBody()->data->data_bpu;
+            $dataTransfer = $resp->getBody()->data->data_transfer;
+            Pembayaran_interviewer::insert([
+                'team_id' => $value->project_team_id,
+                'project_id' => $value->project_id,
+                'total' => $value->total_fee,
+                'status_pembayaran_id' => 2,
+                'bpu_term' => $dataBpu->term,
+                'tanggal_pembayaran' => $dataBpu->tanggalbayar,
+                'metode_pembayaran' => $dataBpu->metode_pembayaran,
+                'keterangan_pembayaran' => sprintf("%s", $value->kota->kota),
+                'bpu_noid' => $dataBpu->noid,
+                'tanggal_pengajuan' => date('Y-m-d'),
+            ]);
         }
 
-        if (isset($update)) {
-            return redirect(url()->previous())->with('status', 'Status berhasil diubah');
-        } else {
-            return redirect(url()->previous())->with('status-fail', 'Status gagal diubah');
+        $message = "";
+        if (count($dataNotProcess) > 0) {
+            $message = "Data berikut tidak dapat diproses, dengan keterangan: ";
+            $notProcess = "";
+            foreach ($dataNotProcess as $key => $value) {
+                $notProcess = $value["data"]->team->nama;
+                $reason = $value["message"];
+                $notProcess = sprintf("%s: %s", $notProcess, $reason);
+                if ($key + 1 < count($dataNotProcess)) {
+                    $notProcess = ", ";
+                };
+            }
+
+            $message = $message . " " . $notProcess . ". Mohon periksa kembali data berikut";
+        }else {
+            $message = "Data anda berhasil di ajukan.";
         }
+
+        return response()->json(["status" => true, "message" => $message]);
     }
 
     public function marking(Request $request)
@@ -497,9 +438,9 @@ class RekapInterviewerController extends Controller
         $teams = [];
         $checkId = [];
 
-        foreach ($respondents as $r) {
+        foreach ($respondents as $k => $r) {
             if ($r->srvyr) {
-                $projectTeam = Project_team::with(['team','projectKota' => function($q) {
+                $projectTeam = Project_team::select("project_teams.*")->with(['team','projectKota' => function($q) {
                     $q->with(['kota']);
                 }])
                     ->leftJoin('project_kotas', 'project_teams.project_kota_id', '=', 'project_kotas.id')
@@ -519,7 +460,7 @@ class RekapInterviewerController extends Controller
                             $pwt->project_kota_id = $projectKota->kota_id;
                             $pwt->bank = $bank != null ? $bank->nama : "-";
                             $pwt->project_team_id = $projectTeam->id;
-                            $pwt->project_id = $projectTeam->project_id;
+                            $pwt->project_id = $projectKota->project_id;
 
                             $bgColor = "";
                             $isCanMarking = true;
@@ -537,7 +478,6 @@ class RekapInterviewerController extends Controller
                 }
             }
         }
-
         // $menus = Menu::all();
         $add_url = url('/menus/create');
         // $kotas = Kota::all()->sortBy('kota');

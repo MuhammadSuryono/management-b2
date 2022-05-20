@@ -4,31 +4,6 @@
 
 
 <h3 class="d-block text-center text-primary">Rekap TL: Pengajuan</h3>
-{{-- Filter --}}
-<div class="col-md-12 col-sm-12 ">
-    <div class="x_panel">
-        <div class="x_title">
-            <h2>Note</h2>
-            <ul class="nav navbar-right panel_toolbox">
-                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                </li>
-                <li><a class="close-link"><i class="fa fa-close"></i></a>
-                </li>
-            </ul>
-            <div class="clearfix"></div>
-        </div>
-        <div class="x_content">
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="card-box">
-                        <p>1. Pilih Filter project terlebih dahulu untuk melihat detail honor dan melakukan pembayaran</p>
-                        <p>2. Apabila pembayaran internal maka filter kota akan menyesuaikan data kota team yang di marking, tetapi apabila pembayaran external filter kota akan menyesuaikan data kota respondent </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 {{-- Filter --}}
 <div class="col-md-12 col-sm-12 ">
@@ -130,6 +105,14 @@
     </div>
 </div>
 
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{$errors->first()}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+@endif
 <form action="{{url('/rekap_tl/change_status')}}" method="POST" id="form-change-status">
     @csrf
     @include('layouts/gentelella/table_top')
@@ -267,7 +250,7 @@
                 <input type="hidden" name="jabatan_id" value="<?= isset($_GET['jabatan_id']) ? $_GET['jabatan_id'] : '' ?>">
                 <input type="hidden" name="link" value="<?= $_SERVER['REQUEST_URI'] ?>">
             </td>
-            @else
+                @elseif(isset($_GET['project_id']) && $item->total_fee < 0)
                 <td></td>
             @endif
         </tr>
@@ -330,7 +313,7 @@
         <div class="modal-content">
             <div class="modal-body text-center">
                 <img id="image_status" src="https://cdn.dribbble.com/users/39201/screenshots/3694057/nutmeg.gif" width="70%"><br/>
-                <h5 id="message_status">Data Anda Telah Berhasil Di Ajukan</h5><br/>
+                <h5 id="message_status_success">Data Anda Telah Berhasil Di Ajukan</h5><br/>
                 <button type="button" class="btn btn-outline-success" data-dismiss="modal" aria-label="Close">
                     Keluar
                 </button>
@@ -421,15 +404,14 @@
                     },
                 }).done(function(res) {
                     $('#loadingProsessAjukan').modal('hide')
-                    $('#statusPengajuanSuccess').modal('show')
+                    alert(res.message)
                     setTimeout(() => {
                         window.location.reload();
                     }, 5000)
                 }).fail(function(res) {
                     let message = res.statusText
                     $('#loadingProsessAjukan').modal('hide')
-                    $('#message_error').innerText = message
-                    $('#statusPengajuanFailed').modal('show')
+                    alert(message)
                 })
             }else {
                 alert('Tidak ada data yang dipilih')
@@ -445,12 +427,6 @@
             $('input[name=nextStatus]').val(nextStatus);
         })
 
-        iniJs("MASUK")
     });
-
-    function iniJs(data) {
-        const show= `@php echo dataFunc("`+ data +`") @endphp`;
-        console.log(show);
-    }
 </script>
 @endsection

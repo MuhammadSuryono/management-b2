@@ -221,6 +221,10 @@ class DetailPayment extends Controller
             "gift" => [
                 'function' => 'get_respondent_gift',
                 'parameter' => [$projectTeam, $members, $data]
+            ],
+            "input_manual" => [
+                'function' => 'get_manual_data',
+                'parameter' => [$projectTeam, $members, $data]
             ]
         ];
     }
@@ -269,6 +273,24 @@ class DetailPayment extends Controller
         if ($data->diambil_dari == '[respondent]') {
             $respondents = $respondents->where('respondent_gifts.status_pembayaran_id', 3)
                 ->whereIn('status_qc_id', array(5, 1, 0, 10));
+        }
+
+        return $respondents->get();
+    }
+
+    public function get_manual_data($projectTeam, $members, $data)
+    {
+        $respondents = Respondent::with(['kota'])->where('project_id', '=', $projectTeam->projectKota->project_id)
+            ->join('denda_manual', 'denda_manual.id_subject', '=', 'respondents.id')
+            ->where("kota_id", $projectTeam->projectKota->kota_id)
+            ->whereIn('srvyr', $members);
+
+        if ($data->diambil_dari == '[respondent_do]') {
+            $respondents = $respondents->whereIn('status_qc_id', array(2, 3, 6, 9));
+        }
+
+        if ($data->diambil_dari == '[respondent]') {
+            $respondents = $respondents->whereIn('status_qc_id', array(5, 1, 0, 10));
         }
 
         return $respondents->get();
