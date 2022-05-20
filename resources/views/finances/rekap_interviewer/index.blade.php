@@ -297,13 +297,14 @@ if (isset($_GET['project_id'])) {
                 <td class="text-center"><?= number_format($honorBrief) ?></td>
                 <?php $total += $honorBrief; ?>
                 <?php $totalKeseluruhan += $total; ?>
+            <?php $item->total_fee = $total ?>
                 <td>
                     Rp.{{number_format($total)}}
                 </td>
 
                 <td>
                     <!-- <div class="form-check"> -->
-                    <input class="ajukanCheck" type="checkbox" value="<?= $item->id ?>" name="id[]" style="width: 1.5rem;height: 1.5rem;" {{$item->is_can_marking ? "":"disabled"}}>
+                    <input class="ajukanCheck" type="checkbox" onchange="markPayment({{$item->project_team_id}})" style="width: 1.5rem;height: 1.5rem;" {{$item->is_can_marking ? "":"disabled"}}>
                     <input type="hidden" name="total-<?= $item->id ?>" value="<?= $total ?>">
                     <input type="hidden" name="nextStatus" value="2">
                     <input type="hidden" name="project_id" value="<?= isset($_GET['project_id']) ? $_GET['project_id'] : '' ?>">
@@ -326,44 +327,130 @@ if (isset($_GET['project_id'])) {
         Ajukan
     </button>
 </div>
+
+<div class="modal fade" id="loadingProsessAjukan"  data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="ajukanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"  role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img src="https://icons8.com/preloaders/dist/media/hero-preloaders.svg">
+                <div class="spinner-border text-primary" role="status"></div><br/>
+                <h5>Pengajuan anda sedang dalam proses...</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="statusPengajuanSuccess"  data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="ajukanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"  role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img id="image_status" src="https://cdn.dribbble.com/users/39201/screenshots/3694057/nutmeg.gif" width="70%"><br/>
+                <h5 id="message_status_success">Data Anda Telah Berhasil Di Ajukan</h5><br/>
+                <button type="button" class="btn btn-outline-success" data-dismiss="modal" aria-label="Close">
+                    Keluar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="statusPengajuanFailed"  data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="ajukanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"  role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img id="image_status" src="https://png.pngtree.com/element_our/20190531/ourlarge/pngtree-exclamation-mark-png-image_1273780.jpg" width="70%"><br/>
+                <h5 id="message_error">Error: </h5>
+                <h5 id="message_status">Data Anda Gagal Diajukan. Klik button dibawah untuk keluar dan ajukan kembali</h5><br/>
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close">
+                    Keluar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection('content')
 
 
-<!-- <div class="modal fade" id="ajukanModal" tabindex="-1" role="dialog" aria-labelledby="ajukanModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ajukanModalLabel">Konfirmasi Perubahan Status</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form action="{{url('/rekap_interviewer/change_status')}}" method="POST" id="form-change-status">
-                @csrf
-                <div class="modal-body">
-                    <input type="hidden" name="id">
-                    <input type="hidden" name="nextStatus">
-                    <input type="hidden" name="total">
-                    <input type="hidden" name="project_id" value="<?= isset($_GET['project_id']) ? $_GET['project_id'] : '' ?>">
-                    <input type="hidden" name="link" value="<?= $_SERVER['REQUEST_URI'] ?>">
-                    Klik Submit untuk melakukan perubahan status
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div> -->
 
 @section('javascript')
 <script>
-    $(document).ready(function() {
-        $('#buttonAjukan').click(function() {
-            $('#form-change-status').submit();
-        })
+    let stateMark = []
 
+    function markPayment(id) {
+        if (!stateMark.includes(id)) {
+            stateMark.push(id)
+        } else {
+            stateMark.splice(stateMark.indexOf(id), 1)
+        }
+
+        console.log(stateMark)
+    }
+
+    function escapeHtml(text) {
+        var map = {
+            '&amp;': '&',
+            '&#038;': "&",
+            '&lt;': '<',
+            '&gt;': '>',
+            '&quot;': '"',
+            '&#039;': "'",
+            '&#8217;': "’",
+            '&#8216;': "‘",
+            '&#8211;': "–",
+            '&#8212;': "—",
+            '&#8230;': "…",
+            '&#8221;': '”'
+        };
+
+        return text.replace(/\&[\w\d\#]{2,5}\;/g, function(m) { return map[m]; });
+    }
+
+    $(document).ready(function() {
+        let teams = {!! json_encode($teams) !!} //data teams
+        localStorage.setItem('teams', JSON.stringify(teams))
+        $('#buttonAjukan').click(function () {
+            const form = $('#form-change-status')
+            let teams = localStorage.getItem('teams')
+            teams = JSON.parse(teams)
+            let data = []
+            stateMark.forEach(function (id) {
+                teams.forEach(function (team) {
+                    if (team.project_team_id == id) {
+                        // team.project_id = params.project_id
+                        data.push(team)
+                    }
+                })
+            })
+
+            if (data.length > 0) {
+                $('#loadingProsessAjukan').modal('show')
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    dataType: "json",
+                    data: {
+                        data: data,
+                        _token: '{{csrf_token()}}'
+                    },
+                }).done(function (res) {
+                    $('#loadingProsessAjukan').modal('hide')
+                    alert(res.message)
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 5000)
+                }).fail(function (res) {
+                    let message = res.statusText
+                    console.log(res)
+                    $('#loadingProsessAjukan').modal('hide')
+                    alert(message)
+                })
+            } else {
+                alert('Tidak ada data yang dipilih')
+            }
+            // $('#form-change-status').submit();
+        })
+    })
+    $(document).ready(function() {
         const formatRupiah = (money) => {
             return new Intl.NumberFormat('id-ID', {
                 style: 'currency',

@@ -19,16 +19,19 @@
     <a href="{{ url('/project_team_managements')}}/{{$project->id}}">
         <button title="Menu untuk RA dan Finance" class='btn btn-primary' target="_blank" <?= (!in_array(Session::get('divisi_id'), [1, 3, 5])) ? 'disabled' : '' ?>><i class="fa fa-group"></i> Kota Survey </button>
     </a>
-    <a class="btn btn-primary" href="{{ url('/project')}}/{{$project->id}}/variable-denda">
+    <a class="btn btn-success" href="{{ route('input_manual_denda_page', ['projectId' => $project->id])}}">
+        <i class="fa fa-edit"></i> Input Manual Denda User
+    </a>
+    <a class="btn btn-success" href="{{ url('/project')}}/{{$project->id}}/variable-denda">
         <i class="fa fa-list-alt"></i> Variable Denda
     </a>
     <?php if ($unlock_budget) : ?>
         <a href="{{ url('/projects/budget_integration')}}/{{$project->id}}">
-            <button class='btn btn-primary' target="_blank" <?= (!in_array(Session::get('divisi_id'), [1, 5])) ? 'disabled' : '' ?>><i class="fa fa-group"></i> Integrasi Budget </button>
+            <button class='btn btn-success' target="_blank" <?= (!in_array(Session::get('divisi_id'), [1, 5])) ? 'disabled' : '' ?>><i class="fa fa-group"></i> Integrasi Budget </button>
         </a>
     <?php else : ?>
         <a>
-            <button class='btn btn-primary' target="_blank" <?= (!in_array(Session::get('divisi_id'), [1, 5])) ? 'disabled' : '' ?> data-toggle="tooltip" data-placement="top" title="Budget online belum dibuat"><i class="fa fa-group"></i> Integrasi Budget </button>
+            <button class='btn btn-success' target="_blank" <?= (!in_array(Session::get('divisi_id'), [1, 5])) ? 'disabled' : '' ?> data-toggle="tooltip" data-placement="top" title="Budget online belum dibuat"><i class="fa fa-group"></i> Integrasi Budget </button>
         </a>
     <?php endif; ?>
 
@@ -40,8 +43,8 @@
     {{-- AKHIR --}}
 
     <div class="dropdown d-inline">
-        <button title="Menu untuk RA" class="btn btn-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <?= (!in_array(Session::get('divisi_id'), [1, 3])) ? 'disabled' : '' ?>>
-            <i class="fa fa-file"></i>File Team Leader
+        <button title="Menu untuk RA" class="btn btn-dark" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <?= (!in_array(Session::get('divisi_id'), [1, 3])) ? 'disabled' : '' ?>>
+            <i class="fa fa-file"></i> File Team Leader
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             @if($project->file_team_leader)
@@ -56,8 +59,8 @@
         </div>
     </div>
     <div class="dropdown d-inline">
-        <button title="Menu untuk RA" class="btn btn-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <?= (!in_array(Session::get('divisi_id'), [1, 3])) ? 'disabled' : '' ?>>
-            <i class="fa fa-file"></i>File Kuesioner
+        <button title="Menu untuk RA" class="btn btn-dark" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <?= (!in_array(Session::get('divisi_id'), [1, 3])) ? 'disabled' : '' ?>>
+            <i class="fa fa-file"></i> File Kuesioner
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             @if($project->file_kuesioner)
@@ -71,11 +74,11 @@
     </div>
 
     <a href="{{ url('projects/set_flag_rules')}}/{{$project->id}}">
-        <button title="Menu untuk RA" class='btn btn-primary' <?= (!in_array(Session::get('divisi_id'), [1, 3])) ? 'disabled' : '' ?>><i class="fa fa-group"></i> Set Flag Rules </button>
+        <button title="Menu untuk RA" class='btn btn-danger' <?= (!in_array(Session::get('divisi_id'), [1, 3])) ? 'disabled' : '' ?>><i class="fa fa-group"></i> Set Flag Rules </button>
     </a>
 
     <div class="dropdown d-inline">
-        <button title="Menu untuk DP" class="btn btn-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspop up="true" aria-expanded="false" <?= (!in_array(Session::get('divisi_id'), [1, 2])) ? 'disabled' : '' ?>>
+        <button title="Menu untuk DP" class="btn btn-dark" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspop up="true" aria-expanded="false" <?= (!in_array(Session::get('divisi_id'), [1, 2])) ? 'disabled' : '' ?>>
             <i class="fa fa-file"></i>Upload Raw Responden
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -98,7 +101,7 @@
     </div>
 
     <div class="dropdown d-inline">
-        <button title="Menu untuk DP" class="btn btn-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <?= (!in_array(Session::get('divisi_id'), [1, 2])) ? 'disabled' : '' ?>>
+        <button title="Menu untuk DP" class="btn btn-dark" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <?= (!in_array(Session::get('divisi_id'), [1, 2])) ? 'disabled' : '' ?>>
             <i class="fa fa-file"></i>Create Worksheet Callback
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center;">
@@ -110,7 +113,7 @@
     </div>
 
     <div class="dropdown d-inline" data-toggle="tooltip" data-placement="top" title="Pastikan data responden nya telah di upload terlebih dahulu">
-        <button class="btn btn-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <?= (!in_array(Session::get('divisi_id'), [1, 2])) ? 'disabled' : '' ?>>
+        <button class="btn btn-dark" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <?= (!in_array(Session::get('divisi_id'), [1, 2])) ? 'disabled' : '' ?>>
             <i class="fa fa-file"></i>Upload Data Callback
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="text-align: center;">

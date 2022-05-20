@@ -409,6 +409,8 @@ Route::middleware(['checklogin'])->group(function () {
 
     Route::get('project-team/{projectTeamId}/payment/detail', [\App\Http\Controllers\Finance\DetailPayment::class, 'detail'])->name('detail_payment');
     Route::post('project-team/payment/detail/quantity', [\App\Http\Controllers\Finance\DetailPayment::class, 'getDetailData'])->name('detail_quantity');
+    Route::get('project/{projectId}/denda/input-manual', [\App\Http\Controllers\Project\ProjectDendaInputManualController::class, 'index'])->name('input_manual_denda_page');
+    Route::post('project/{projectId}/denda/input-manual', [\App\Http\Controllers\Project\ProjectDendaInputManualController::class, 'saveDendaManual']);
 });
 
 Route::get('project_plans/fill_presence/{id}', 'Project\ProjectPlansController@fill_presence');

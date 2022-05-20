@@ -4,33 +4,7 @@
 
 <?php $status = DB::table('status_pembayarans')->where('id', $_GET['status_pembayaran_id'])->first(); ?>
 
-<h3 class="d-block text-center text-primary">Rekap Interviewer: <?= $status->keterangan_pembayaran ?></h3>
-{{-- Filter --}}
-<div class="col-md-12 col-sm-12 ">
-    <div class="x_panel">
-        <div class="x_title">
-            <h2>Note</h2>
-            <ul class="nav navbar-right panel_toolbox">
-                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                </li>
-                <li><a class="close-link"><i class="fa fa-close"></i></a>
-                </li>
-            </ul>
-
-            <div class="clearfix"></div>
-        </div>
-        <div class="x_content">
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="card-box">
-                        <p>1. Pilih Filter project dan kota terlebih dahulu untuk melihat detail honor</p>
-                        <p>2. Apabila pembayaran internal maka filter kota akan menyesuaikan data kota team yang di marking, tetapi apabila pembayaran external filter kota akan menyesuaikan data kota respondent </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<h3 class="d-block text-center text-primary">Pembayaran Interviewer: <?= $status->keterangan_pembayaran ?></h3>
 
 <div class="col-md-12 col-sm-12 ">
     <div class="x_panel">
@@ -98,10 +72,6 @@
                                     <div align="center" class="form-group">
                                         <a href="{{url()->current()}}" type="button" class="btn btn-info text-white"> Reset </a>
                                         <button type="submit" class="btn btn-info"> Show </button>
-                                        <?php
-                                        $request = isset($_SERVER['QUERY_STRING']) ? ltrim($_SERVER['QUERY_STRING'], !empty($_SERVER['QUERY_STRING']))ltrim($_SERVER['QUERY_STRING'], !empty($_SERVER['QUERY_STRING'])) ;
-                                        ?>
-                                        <!-- <a href="{{url('respondents/pick_respondent?')}}{{$request}}" type="button" class="btn btn-info" id="btn-pick-respondent">Pick Respondent </a> -->
                                     </div>
                                 </div>
                         </form>
@@ -117,18 +87,9 @@
 $totalKeseluruhan = 0;
 $totalDiajukan = 0;
 $totalDibayar = 0;
-if (isset($_GET['project_id'])) {
-    foreach ($teams as $item) {
-        // $gift = DB::table('project_kotas')->where('project_kotas.kota_id', $item->kota_id)->where('project_kotas.project_id', $item->project_id)->join('project_honor_gifts', 'project_honor_gifts.project_kota_id', '=', 'project_kotas.id')->where(DB::raw('lower(nama_honor_gift)'), '=', strtolower($item->kategori_gift))->first();
-        if (isset($item->total)) {
-            $totalKeseluruhan += $item->total;
-            if (isset($item->status_pembayaran_id) && $item->status_pembayaran_id == 2) {
-                $totalDiajukan += $item->total;
-            }
-            if (isset($item->status_pembayaran_id) && $item->status_pembayaran_id == 3) {
-                $totalDibayar += $item->total;
-            }
-        }
+foreach ($teams as $item) {
+    if (isset($item->total)) {
+        $totalKeseluruhan += $item->total;
     }
 }
 ?>
@@ -175,21 +136,14 @@ if (isset($_GET['project_id'])) {
         <th>No</th>
         <th>Nama</th>
         <th>Kota</th>
+        <th>No. Telp</th>
+        <th>Email</th>
         <th>Bank</th>
         <th>Nomor Rekening</th>
-        @if(isset($_GET['project_id']))
-        <!-- <th>Target Perolehan</th> -->
-        @endif
-        <th>Total Respondent</th>
-        <th>Respondent OK</th>
-        <!-- <th>Respondent BTF</th> -->
-        <th>Responden DO</th>
-        @if(isset($_GET['project_id']))
-        <th>Term BPU</th>
-        <th>Total Diajukan</th>
         <th>Metode Pembayaran</th>
-        <th>Action</th>
-        @endif
+        <th>Jadwal Pembayaran</th>
+        <th>Keterangan Pembayaran</th>
+        <th>Total</th>
     </tr>
 </thead>
 <tbody>
@@ -197,198 +151,54 @@ if (isset($_GET['project_id'])) {
     <?php $total = 0; ?>
     <tr>
         <th scope='row'>{{$loop->iteration}}</th>
-        <td>{{$item->nama}}</td>
+        <td><a href="{{route('detail_payment', ['projectTeamId' => $item->project_team_id])}}" target="_blank">{{$item->team->nama}}</a></td>
+
         <td>
-            <?php $kota = DB::table('kotas')->where('id', '=', $item->kota_id)->first(); ?>
-            {{$kota->kota}}
-        </td>
-        <td>
-            @if(isset($item->kode_bank))
-            <?php
-            $bank = DB::connection('mysql3')->table('bank')->where('kode', '=', $item->kode_bank)->first();
-            if ($bank) {
-                echo $bank->nama;
-            }
-            ?>
+            @if(isset($item->projectKota->kota))
+                {{$item->projectKota->kota->kota}}
             @endif
         </td>
-        <td> @if($item->nomor_rekening!='')
-            {{$item->nomor_rekening}}
-            @else
-            Kosong
+        <td>
+            @if(isset($item->team->hp))
+                {{$item->team->hp}}
             @endif
         </td>
-        <?php if (isset($_GET['project_id'])) :
-            // $queryProjectKota = DB::table('project_kotas')->where('project_id', '=', $_GET['project_id'])->where('kota_id', '=', $item->kota_id)->first();
-        ?>
-            <!-- <td>
-                @if(isset($queryProjectKota->jumlah))
-                {{$queryProjectKota->jumlah}}
-                @else
-                Kosong
-                @endif
-            </td> -->
-        <?php endif; ?>
         <td>
-            <!-- total respondent -->
-            <?php $teamCode = sprintf('%04d', $item->no_team); ?>
-            <?php $cityCode = sprintf('%03d', $item->kota_id); ?>
-            <?php
-            if (isset($_GET['project_id'])) {
-                $count = DB::table('respondents')->where('srvyr', '=', $cityCode . $teamCode)->where('project_id', '=', $_GET['project_id'])->count();
-            } else {
-                $count = DB::table('respondents')->where('srvyr', '=', $cityCode . $teamCode)->count();
-            } ?>
-            <?php $code = $cityCode . $teamCode ?>
-            {{$count}}
+            @if(isset($item->team->email))
+                {{$item->team->email}}
+            @endif
         </td>
         <td>
-            <!-- respondent OK -->
-            <?php
-            if (isset($_GET['project_id'])) {
-                $countOk = DB::table('respondents')->where('srvyr', '=', $cityCode . $teamCode)->whereIn('status_qc_id',  array(5, 1, 0, 10))->where('project_id', '=', $_GET['project_id'])->count();
-            } else {
-                $countOk = DB::table('respondents')->where('srvyr', '=', $cityCode . $teamCode)->whereIn('status_qc_id',  array(5, 1, 0, 10))->count();
-            } ?>
-            <?php $code = $cityCode . $teamCode ?>
-            {{$countOk}}
+            @if(isset($item->team->kode_bank))
+                <?php
+                $bank = DB::connection('mysql3')->table('bank')->where('kode', '=', $item->team->kode_bank)->first();
+                if ($bank) {
+                    echo $bank->nama;
+                }
+                ?>
+            @endif
         </td>
         <td>
-            <!-- respondent DO -->
-            <?php
-            if (isset($_GET['project_id'])) {
-                $count = DB::table('respondents')->where('srvyr', '=', $cityCode . $teamCode)->whereIn('status_qc_id', array(2, 3, 6, 9))->where('project_id', '=', $_GET['project_id'])->count();
-            } else {
-                $count = DB::table('respondents')->where('srvyr', '=', $cityCode . $teamCode)->whereIn('status_qc_id', array(2, 3, 6, 9))->count();
-            } ?>
-            <?php $code = $cityCode . $teamCode ?>
-            {{$count}}
+            @if(isset($item->team->nomor_rekening))
+                {{$item->team->nomor_rekening}}
+            @endif
         </td>
+        <td>{{$item->metode_pembayaran}}</td>
+        <td>{{$item->tanggal_pembayaran}}</td>
+        <td>{{$item->keterangan_pembayaran}}</td>
+        <td>
+            {{"Rp. " . number_format($item->total)}}
 
-
-        @if(isset($_GET['project_id']))
-        <td>
-            {{$item->bpu_term}}
         </td>
-        <td>
-            Rp.{{number_format($item->total)}}
-        </td>
-        <td>
-            {{$item->metode_pembayaran}}
-        </td>
-
-        <td>
-            <?php if ($item->status_pembayaran_id != 3 && $item->metode_pembayaran != 'MRI PAL') : ?>
-
-                <input class="ajukanCheck" type="checkbox" value="<?= $item->id ?>" name="id" style="width: 1.5rem;height: 1.5rem;">
-                <input type="hidden" name="total-<?= $item->id ?>" value="<?= $item->total ?>">
-                <!-- <button class='btn btn-primary btn-sm btn-ajukan' type="button" data-toggle="modal" data-target="#ajukanModal" data-id="<?= $item->id ?>" data-nextstatus="<?= $item->status_pembayaran_id + 1 ?>" data-total="<?= $total ?>">
-                    @if($item->status_pembayaran_id == 1)
-                    Ajukan
-                    @elseif($item->status_pembayaran_id == 2)
-                    Bayar
-                    @elseif($item->status_pembayaran_id == 4)
-                    Bayar Ulang
-                    @endif
-                </button> -->
-            <?php endif; ?>
-        </td>
-        @endif
     </tr>
     @endforeach
 </tbody>
 @include('layouts.gentelella.table_bottom')
 <div class="row">
-    @if($_GET['status_pembayaran_id'] == 1)
-    <button class='btn btn-primary btn-lg ml-auto mr-5' id="btn-ajukan" type="button" data-toggle="modal" data-target="#ajukanModal" data-id="" data-nextstatus="<?= $_GET['status_pembayaran_id'] + 1 ?>">
-        Ajukan
-    </button>
-    @elseif($_GET['status_pembayaran_id'] == 2)
-    <button class='btn btn-primary btn-lg ml-auto mr-5' id="btn-ajukan" type="button" data-toggle="modal" data-target="#ajukanModal" data-id="" data-nextstatus="<?= $_GET['status_pembayaran_id'] + 1 ?>">
-        Bayar
-    </button>
-    @elseif($_GET['status_pembayaran_id'] == 4)
-    <button class='btn btn-primary btn-lg ml-auto mr-5' id="btn-ajukan" type="button" data-toggle="modal" data-target="#ajukanModal" data-id="" data-nextstatus="<?= $_GET['status_pembayaran_id'] + 1 ?>">
-        Bayar Ulang
-    </button>
-    @endif
 </div>
 @endsection('content')
 
 
-<!-- <div class="modal fade" id="" tabindex="-1" role="dialog" aria-labelledby="Label" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="Label">Konfirmasi Perubahan Status</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form action="{{url('/rekap_interviewer/change_status')}}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <input type="hidden" name="id">
-                    <input type="hidden" name="nextStatus">
-                    <input type="hidden" name="total">
-                    <input type="hidden" name="project_id" value="<?= isset($_GET['project_id']) ? $_GET['project_id'] : '' ?>">
-                    <input type="hidden" name="link" value="<?= $_SERVER['REQUEST_URI'] ?>">
-                    Klik Submit untuk melakukan perubahan status
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div> -->
-
-<!-- Modal -->
-<div class="modal fade" id="ajukanModal" tabindex="-1" role="dialog" aria-labelledby="ajukanModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ajukanModalLabel">Konfirmasi Perubahan Status</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form action="{{url('/rekap_interviewer/change_status')}}" method="POST" id="form-change-status">
-                @csrf
-                <div class="modal-body">
-                    <input type="hidden" name="id">
-                    <input type="hidden" name="total">
-                    <input type="hidden" name="nextStatus">
-                    <input type="hidden" name="project_id" value="<?= isset($_GET['project_id']) ? $_GET['project_id'] : '' ?>">
-                    <input type="hidden" name="link" value="<?= $_SERVER['REQUEST_URI'] ?>">
-
-                    <div id="input-bayar" style="display: none;">
-                        <div class="form-group">
-                            <label>Status Pembayaran</label>
-                            <div>
-                                <section id="jenis">
-                                    <input type="radio" name="status_bayar" id="success_paid" value="3" checked> <label for="success_paid"> Berhasil di Bayar</label>
-                                    <br>
-                                    <input type="radio" name="status_bayar" id="fail_paid" value="4"> <label for="fail_paid"> Gagal di Bayar</label>
-                                </section>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="ket_pembayaran">Keterangan</label>
-                            <textarea class="form-control" id="ket_pembayaran" name="ket_pembayaran" rows="3"></textarea>
-                        </div>
-                    </div>
-                    Klik Submit untuk melakukan perubahan status
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="btn-submit-ajukan-modal">Submit</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 
 

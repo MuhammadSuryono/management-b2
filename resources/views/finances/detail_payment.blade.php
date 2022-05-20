@@ -165,12 +165,17 @@
                                     <td>${item.intvdate}</td>
                                     <td>${item.respname}</td>
                                     <td>${item.kota.kota}</td>
-                                    <td>${item.status_qc_id}</td>
-                                    <td>
+                                    <td>${item.status_qc_id}</td>`
+                        if (item.value !== undefined) {
+                            html += `<td>${item.value}</td>`
+                        } else {
+                            html             += `<td>
                                         ${item.keterangan_qc === null ? "":item.keterangan_qc}<br/>
                                         ${item.keterangan_temuan_dp === null ? "":item.keterangan_temuan_dp}<br/>
-                                    </td>
-                                </tr>`
+                                    </td>`
+                        }
+
+                                html +=`</tr>`
                     })
                     $('#body-detail').html(html)
                 }

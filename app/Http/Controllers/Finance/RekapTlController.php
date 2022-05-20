@@ -49,6 +49,7 @@ class RekapTlController extends Controller
             })->orderBy('kotas.kota', 'ASC')->distinct()->get();
 
         $jabatans = [];
+        $errorMessage = null;
 
         $teams = Project_team::selectRaw("project_teams.*, project_teams.id as project_team_id")->with(['team', 'projectKota' => function ($q) {
             $q->with(['kota']);
@@ -153,7 +154,7 @@ class RekapTlController extends Controller
                         $methode = $this->methode_count_denda($denda, $team, $members, $variables)[$denda->type_variable];
                         call_user_func_array([$this, $methode['function']], $methode['parameter']);
                     } catch (\Exception $e) {
-                        dd($e->getMessage(), $e->getLine(), $e->getFile(), $e->getTrace());
+                        $errorMessage = ['error' => $e->getMessage()];
                         continue;
                     }
                 }
@@ -170,70 +171,31 @@ class RekapTlController extends Controller
 
         $jsonData = $teams->toArray();
 
-        return view('finances.rekap_tl.index', compact('teams', 'projects', 'kotas', 'jabatans', 'nominalDenda', 'jsonData'));
+        return view('finances.rekap_tl.index', compact('teams', 'projects', 'kotas', 'jabatans', 'nominalDenda', 'jsonData'))->withErrors($errorMessage);
     }
 
     public function indexRtp(Request $request)
     {
-        if ($request->project_id != 'all' && $request->project_id) {
-            $teams = Pembayaran_tl::select('project_teams.*', 'teams.nama', 'teams.alamat', 'teams.hp', 'teams.email', 'teams.kode_bank', 'teams.nomor_rekening', 'kotas.kota', 'pembayaran_tls.status_pembayaran_id', 'pembayaran_tls.total', 'pembayaran_tls.id', 'pembayaran_tls.metode_pembayaran')
-                ->join('project_teams', 'project_teams.id', '=', 'pembayaran_tls.project_team_id')
-                ->join('teams', 'teams.id', '=', 'project_teams.team_id')
-                ->join('kotas', 'kotas.id', '=', 'teams.kota_id')
-                ->join('project_jabatans', 'project_jabatans.id', '=', 'project_teams.project_jabatan_id')
-                ->where('pembayaran_tls.project_id', '=', $request->project_id)
-                ->when(isset($request->kota_id) && $request->kota_id != 'all', function ($query) use ($request) {
-                    return $query->where('teams.kota_id', '=', $request->kota_id);
-                })
-                ->when(isset($request->status_pembayaran_id) && trim($request->status_pembayaran_id) !== 'all', function ($query2) use ($request) {
-                    $query2->where('pembayaran_tls.status_pembayaran_id', '=', trim($request->status_pembayaran_id));
-                })
-                ->when(($request->jabatan_id != 'all' && $request->jabatan_id), function ($query2) use ($request) {
-                    return $query2->where('project_jabatans.jabatan_id', '=',  $request->jabatan_id);
-                })
-                ->get();
-
-            // dd($teams);
-
-            $kotas = Respondent::join('kotas', 'respondents.kota_id', '=', 'kotas.id')->select('kotas.*')->where('project_id', '=', $request->project_id)->orderBy('kotas.kota', 'ASC')->distinct()->get();
-
-            $jabatans = DB::select('SELECT pk.kota_id AS id_kota,
-            pk.id AS project_kota_id, pj.id AS project_jabatan_id, j.jabatan, pj.jabatan_id AS id
-            FROM  project_kotas pk
-                LEFT JOIN project_jabatans pj ON pk.id = pj.project_kota_id
-                LEFT JOIN jabatans j ON pj.jabatan_id = j.id
-                JOIN project_budget_integration_tls pb ON pj.jabatan_id = pb.jabatan_id
-            WHERE pk.project_id = ' . $request->project_id .
-                ' AND pb.item_budget_id IS NOT NULL GROUP BY jabatan');
-            // dd(count($teams));
-        } else {
-
-            $teams = Pembayaran_tl::select('project_teams.*', 'teams.nama', 'teams.alamat', 'teams.hp', 'teams.email', 'teams.kode_bank', 'teams.nomor_rekening', 'kotas.kota', 'pembayaran_tls.status_pembayaran_id', 'pembayaran_tls.total', 'pembayaran_tls.id')
-                ->join('project_teams', 'project_teams.id', '=', 'pembayaran_tls.project_team_id')
-                ->join('teams', 'teams.id', '=', 'project_teams.team_id')
-                ->join('kotas', 'kotas.id', '=', 'teams.kota_id')
-                ->when(isset($request->status_pembayaran_id) && trim($request->status_pembayaran_id) !== 'all', function ($query2) use ($request) {
-                    $query2->where('pembayaran_tls.status_pembayaran_id', '=', trim($request->status_pembayaran_id));
-                })
-                ->get();
-
-            // dd(count($teams));
-            $kotas = Kota::all()->sortBy('kota');
-            $jabatans = Jabatan::all()->sortBy('jabatan');
-        }
-        // dd($teams);
+        $teams = Pembayaran_tl::selectRaw("project_teams.id as project_team_id, pembayaran_tls.*, project_teams.*")
+            ->leftJoin('project_teams', 'project_teams.id', '=', 'pembayaran_tls.project_team_id')
+            ->leftJoin('project_kotas', 'project_teams.project_kota_id', '=', 'project_kotas.id')
+            ->when(($request->project_id != 'all' && $request->kotproject_ida_id), function ($query2) use ($request) {
+                return $query2->where('pembayaran_tls.project_id', '=', $request->project_id);
+            })
+            ->when(($request->kota_id != 'all' && $request->kota_id), function ($query2) use ($request) {
+                return $query2->where('project_kotas.kota_id', '=', $request->kota_id);
+            })
+            ->when(isset($request->status_pembayaran_id) && trim($request->status_pembayaran_id) !== 'all', function ($query2) use ($request) {
+                $query2->where('pembayaran_tls.status_pembayaran_id', '=', trim($request->status_pembayaran_id));
+            })
+            ->get();
         $projects = Project::all()->sortBy('nama');
-        $pendidikans = Pendidikan::all()->sortBy('pendidikan');
-        $ses_finals = SesFinal::all();
-        $genders = Gender::all();
-        // $teams = Team::all();
-        $pekerjaans = Pekerjaan::all()->sortBy('pekerjaan');
-        $is_valids = Isvalid::all();
+        $kotas = Project_kota::join('kotas', 'project_kotas.kota_id', '=', 'kotas.id')->select('kotas.*')
+            ->when(isset($request->project_id) && $request->project_id != 'all', function ($query) use ($request) {
+                return $query->where('project_id', $request->project_id);
+            })->orderBy('kotas.kota', 'ASC')->distinct()->get();
 
-        // $menus = Menu::all();
-        $add_url = url('/menus/create');
-        // $kotas = Kota::all()->sortBy('kota');
-        return view('finances.rekap_tl.index_rtp', compact('teams', 'add_url', 'projects', 'kotas', 'pendidikans', 'ses_finals', 'genders', 'teams', 'pekerjaans', 'is_valids', 'jabatans'));
+        return view('finances.rekap_tl.index_rtp', compact('teams', 'projects', 'kotas'));
     }
 
     /**
@@ -345,27 +307,39 @@ class RekapTlController extends Controller
         $data = json_decode(json_encode($request->all()), FALSE);
         foreach ($data->data as $key => $value) {
             if ($value->team->email == "" && $value->team->hp == "") {
-                $dataNotProcess[] = $value;
+                $dataNotProcess[] = [
+                    "data" => $value,
+                    "message" => "Email atau nomor HP Tidak boleh kosong"
+                ];
                 continue;
             }
 
             if ($value->team->email == "" && (strlen($value->team->hp) < 9 || strlen($value->team->hp) > 13)) {
-                $dataNotProcess[] = $value;
+                $dataNotProcess[] = [
+                    "data" => $value,
+                    "message" => "Email kosong atau nomor handphone anda kurang dari 9 atau lebih dari 13 karaketer"
+                ];
                 continue;
             }
 
             $project = Project::where('id', $value->project_kota->project_id)->first();
             if (!$project) {
-                $dataNotProcess[] = $value;
+                $dataNotProcess[] = [
+                    "data" => $value,
+                    "message" => "Project tidak ditemukan"
+                ];
                 continue;
             }
 
             $itemBpu = Project_budget_integration_tl::select('item_budget_id')->where('project_id', $project->id)->first();
-//            $projectName = sprintf('%s|%s', $project->nama, $project->nama . ' - ' . $project->methodology);
-            $projectName = "Project Research 010";
+            $projectName = sprintf('%s|%s', $project->nama, $project->nama . ' - ' . $project->methodology);
+
             $resp = $client->request('GET', '/api/pengajuan/read?name=' . $projectName);
             if ($resp->getStatusCode() != 200) {
-                $dataNotProcess[] = $value;
+                $dataNotProcess[] = [
+                    "data" => $value,
+                    "message" => "Membaca data project $projectName ke Budget Error atau project tidak ditemukan di budget"
+                ];
                 continue;
             }
 
@@ -374,7 +348,10 @@ class RekapTlController extends Controller
 
             $bank = DB::connection('mysql3')->table('bank')->where('kode', '=', $value->team->kode_bank)->first();
             if (!$bank) {
-                $dataNotProcess[] = $value;
+                $dataNotProcess[] = [
+                    "data" => $value,
+                    "message" => "Bank anda tidak terdaftar"
+                ];
                 continue;
             }
 
@@ -418,34 +395,25 @@ class RekapTlController extends Controller
             ]);
         }
 
-        $message = "Data anda berhasil di ajukan.";
+        $message = "";
         if (count($dataNotProcess) > 0) {
+            $message = "Data berikut tidak dapat diproses, dengan keterangan: ";
             $notProcess = "";
             foreach ($dataNotProcess as $key => $value) {
-                $notProcess = $value->team->nama;
+                $notProcess = $value["data"]->team->nama;
+                $reason = $value["message"];
+                $notProcess = sprintf("%s: %s", $notProcess, $reason);
                 if ($key + 1 < count($dataNotProcess)) {
                     $notProcess = ", ";
                 };
             }
 
-            $message = $message . " " . $notProcess . " Tidak dapat diproses. Mohon periksa kembali data berikut";
+            $message = $message . " " . $notProcess . ". Mohon periksa kembali data berikut";
+        }else {
+            $message = "Data anda berhasil di ajukan.";
         }
 
         return response()->json(["status" => true, "message" => $message]);
-    }
-
-    protected function generatePaymentDate($codeBank): string
-    {
-        $tanggal = date('Y-m-d');
-
-        $hour = mt_rand((int)date("h"),12);
-        $time = $hour.":".str_pad(mt_rand(0,59), 2, "0", STR_PAD_LEFT);
-
-        if ($codeBank != "CENAIDJA" && $hour > 12) {
-            $tanggal = date("Y-m-d", strtotime($tanggal . " +1 day"));
-            $time = mt_rand((int)8,12).":".str_pad(mt_rand(0,59), 2, "0", STR_PAD_LEFT);
-        }
-        return $tanggal . " " . $time.":00";
     }
 
     public function marking(Request $request)

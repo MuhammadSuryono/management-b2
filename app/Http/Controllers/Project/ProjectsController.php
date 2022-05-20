@@ -384,7 +384,8 @@ class ProjectsController extends Controller
         $worksheet = Quest_code::where('project_id', $project->id)->get();
         $tmp_respondent = DB::table('tmp_respondents')->whereNull('intvdate')->orWhereNull('vstart')->orWhereNull('vend')->orWhereNull('duration')->orWhereNull('upload')->get();
 
-        $projectName = sprintf('%s|%s', $project->nama, $project->nama . ' - ' . $project->methodology);
+//        $projectName = sprintf('%s|%s', $project->nama, $project->nama . ' - ' . $project->methodology);
+        $projectName = 'Project Research 010';
         $res = $this->guzzle->request('GET', sprintf('/api/pengajuan/read?name=%s', $projectName));
         $budget = null;
 
@@ -781,7 +782,8 @@ class ProjectsController extends Controller
     {
         $id = $request->id;
         $project = Project::where('id', $id)->first();
-        $projectName = sprintf('%s|%s', $project->nama . ' - ' . $project->methodology, $project->nama);
+//        $projectName = sprintf('%s|%s', $project->nama . ' - ' . $project->methodology, $project->nama);
+        $projectName = 'Project Research 010';
         $res = $this->guzzle->request('GET', sprintf('pengajuan/read?name=%s', $projectName));
         $itemBudget = [];
         $budget = null;

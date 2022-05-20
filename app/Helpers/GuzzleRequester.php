@@ -48,7 +48,7 @@ class GuzzleRequester
             $this->body = json_decode($response->getBody()->getContents());
         } catch (\Exception $e) {
             $this->statusCode = $e->getCode();
-            $this->body = (object)["status" => false, "message" => "Unauthorized"];
+            $this->body = (object)["status" => false, "message" => $e->getMessage()];
         }
 
         return $this;

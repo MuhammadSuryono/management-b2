@@ -152,4 +152,9 @@ class Respondent extends Model
             $query->where('pekerjaan_id', '<', '0');
         }
     }
+
+    public function dendaManual()
+    {
+        return $this->hasOne(DendaManual::class, 'id_subject', 'id');
+    }
 }
