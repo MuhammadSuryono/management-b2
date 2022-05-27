@@ -247,18 +247,22 @@ class DataQcsController extends Controller
             for ($i = 0; $i < count($request->option); $i++) {
                 $optionIndentity = $request->optionIdentity[$i];
                 $question = Quest_question::where('pertanyaan', $optionIndentity)->orderBy('id', 'DESC')->first();
-                if (!in_array($optionIndentity, $checkIdentity)) {
-                    array_push($checkIdentity, $optionIndentity);
-                    DB::table('quest_options')->where('quest_question_id', $question['id'])->delete();
+                if (isset($question['id'])) {
+                    if (!in_array($optionIndentity, $checkIdentity)) {
+                        array_push($checkIdentity, $optionIndentity);
+                        DB::table('quest_options')->where('quest_question_id', $question['id'])->delete();
+                    }
+                    if (!is_null($request->option[$i])) {
+                        Quest_option::insert([
+                            'quest_question_id' => $question['id'],
+                            'option' => $request->option[$i],
+                            'value' => ($request->value[$i]) ? $request->value[$i] : 0,
+                            'created_at' => $time
+                        ]);
+                    }
                 }
-                if (!is_null($request->option[$i])) {
-                    Quest_option::insert([
-                        'quest_question_id' => $question['id'],
-                        'option' => $request->option[$i],
-                        'value' => ($request->value[$i]) ? $request->value[$i] : 0,
-                        'created_at' => $time
-                    ]);
-                }
+
+
             }
         }
         return redirect('form_qc/load_template_qc/' . $checkCode['id'])->with('status', 'Berhasil disimpan');
@@ -702,7 +706,7 @@ class DataQcsController extends Controller
                     </td>
                 <td class='text-dark'> " . (isset($dp->respondent->kota->kota) ? $dp->respondent->kota->kota : '-') . " </td>
                 <td class='text-dark border-bottom border-primary' style='text-align: justify; padding: 5px 0px;'>
-                     " . $result . " 
+                     " . $result . "
                 </td>
             </tr>";
             }
@@ -789,7 +793,7 @@ class DataQcsController extends Controller
                         <td class='text-dark'> " . (isset($r->status_qc->keterangan_qc) ? $r->status_qc->keterangan_qc : '-') . " </td>
                         <td class='text-center'>
                             <span class='badge bg-" . $statusColor . "  text-white'>
-                                 " . (($status == '+') ? '-' : '+') .   $days . " Hari 
+                                 " . (($status == '+') ? '-' : '+') .   $days . " Hari
                             </span>
                         </td>
                         <td class='text-dark'> " . $r->batas_waktu_do  . "hari</td>";
