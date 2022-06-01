@@ -362,7 +362,7 @@ class RekapTlController extends Controller
                 "applicant" => session('nama'),
                 "division_applicant" => $divisi->nama_divisi,
                 "payment_description" => sprintf("%s|%s", $value->type_tl, $value->project_kota->kota->kota),
-                "payment_id" => $value->project_team_id,
+                "payment_id" => $value->project_team_id . "|tl",
                 "type_kas" => 'Kas Project',
                 "budget_id" => $budget->noid,
                 "total" => $value->total_fee,
