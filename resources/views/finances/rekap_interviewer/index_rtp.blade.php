@@ -144,6 +144,10 @@ foreach ($teams as $item) {
         <th>Jadwal Pembayaran</th>
         <th>Keterangan Pembayaran</th>
         <th>Total</th>
+        @if (isset($_GET['status_pembayaran_id']))
+
+        <th>Total Pembayaran</th>
+        @endif
     </tr>
 </thead>
 <tbody>
@@ -190,6 +194,13 @@ foreach ($teams as $item) {
             {{"Rp. " . number_format($item->total)}}
 
         </td>
+
+        @if (isset($_GET['status_pembayaran_id']))
+        <td>
+            {{"Rp. " . number_format($item->total_dibayarkan)}}
+
+        </td>
+        @endif
     </tr>
     @endforeach
 </tbody>

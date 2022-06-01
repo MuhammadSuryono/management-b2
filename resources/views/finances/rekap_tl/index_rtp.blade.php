@@ -99,6 +99,10 @@
         <th>Jadwal Pembayaran</th>
         <th>Keterangan Pembayaran</th>
         <th>Total</th>
+        @if ($_GET["status_pembayaran_id"])
+
+        <th>Total Pembayaran</th>
+        @endif
     </tr>
 </thead>
 <tbody>
@@ -145,6 +149,13 @@
             {{"Rp. " . number_format($item->total)}}
 
         </td>
+        @if ($_GET["status_pembayaran_id"])
+
+        <td>
+            {{"Rp. " . number_format($item->total_dibayarkan)}}
+
+        </td>
+        @endif
 
     </tr>
     @endforeach
