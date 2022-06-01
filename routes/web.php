@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Finance\CallbackPayment;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -412,7 +413,7 @@ Route::middleware(['checklogin'])->group(function () {
     Route::get('project/{projectId}/denda/input-manual', [\App\Http\Controllers\Project\ProjectDendaInputManualController::class, 'index'])->name('input_manual_denda_page');
     Route::post('project/{projectId}/denda/input-manual', [\App\Http\Controllers\Project\ProjectDendaInputManualController::class, 'saveDendaManual']);
 });
-
+Route::post('callback/payment', [CallbackPayment::class, 'callback']);
 Route::get('project_plans/fill_presence/{id}', 'Project\ProjectPlansController@fill_presence');
 Route::get('project_plans/fill_presence_respondent/{id}', 'Project\ProjectPlansController@fill_presence_respondent');
 Route::post('project_plans/store_presence', 'Project\ProjectPlansController@store_presence');
