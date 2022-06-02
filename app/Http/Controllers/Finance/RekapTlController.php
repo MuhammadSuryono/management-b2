@@ -334,7 +334,7 @@ class RekapTlController extends Controller
             $itemBpu = Project_budget_integration_tl::select('item_budget_id')->where('project_id', $project->id)->first();
             $projectName = sprintf('%s|%s', $project->nama, $project->nama . ' - ' . $project->methodology);
 
-            $resp = $client->request('GET', '/api/pengajuan/read?name=' . $projectName);
+            $resp = $client->request('GET', 'api/pengajuan/read?name=' . $projectName);
             if ($resp->getStatusCode() != 200) {
                 $dataNotProcess[] = [
                     "data" => $value,
@@ -372,12 +372,19 @@ class RekapTlController extends Controller
                     "bank_account_number" => $value->team->nomor_rekening,
                     "code_bank" => $bank->swift_code,
                     "email" => $value->team->email,
-                    "phone_number" => $value->team->hp,
+                    "phone_number" => "0895355698652",
                     "bank_account_name" => $value->team->nama,
                 ]
             ];
 
-            $resp = $client->request('POST', '/api/bpu/management/create', ["body" => json_encode($body)]);
+            $resp = $client->request('POST', 'api/bpu/management/create', ["body" => json_encode($body)]);
+            if ($resp->getStatusCode() != 200) {
+                $dataNotProcess[] = [
+                    "data" => $value,
+                    "message" => "Gagal melakukan pengajuan."
+                ];
+                continue;
+            }
 
             $dataBpu = $resp->getBody()->data->data_bpu;
             $dataTransfer = $resp->getBody()->data->data_transfer;
