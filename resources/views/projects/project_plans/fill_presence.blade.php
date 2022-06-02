@@ -357,6 +357,10 @@
             </div>
 
             <div class="container-custom">
+
+        @if($errors->any())
+        <h4 class="text-danger">{{$errors->first()}}</h4>
+        @endif
                 <input type="hidden" name="id" value="{{$project_plan->id}}">
                 <input type="hidden" name="is_respondent" value="{{$is_respondent}}">
                 <?php if ($is_respondent) : ?>

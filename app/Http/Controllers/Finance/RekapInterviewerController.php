@@ -156,7 +156,6 @@ class RekapInterviewerController extends Controller
 
         } else {
             $teams = [];
-            // dd(count($teams));
             $kotas = Kota::all()->sortBy('kota');
         }
 
@@ -347,7 +346,7 @@ class RekapInterviewerController extends Controller
 
             $itemBpu = Project_budget_integration::where('project_id', $project->id)->first();
             $projectName = sprintf('%s|%s', $project->nama, $project->nama . ' - ' . $project->methodology);
-            $resp = $client->request('GET', '/api/pengajuan/read?name=' . $projectName);
+            $resp = $client->request('GET', 'api/pengajuan/read?name=' . $projectName);
             if ($resp->getStatusCode() != 200) {
                 $dataNotProcess[] = [
                     "data" => $value,
@@ -390,7 +389,7 @@ class RekapInterviewerController extends Controller
                 ]
             ];
 
-            $resp = $client->request('POST', '/api/bpu/management/create', ["body" => json_encode($body)]);
+            $resp = $client->request('POST', 'api/bpu/management/create', ["body" => json_encode($body)]);
 
             $dataBpu = $resp->getBody()->data->data_bpu;
             $dataTransfer = $resp->getBody()->data->data_transfer;

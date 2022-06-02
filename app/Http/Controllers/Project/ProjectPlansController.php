@@ -25,6 +25,7 @@ use App\Project_absensi;
 use App\Project_absensi_respondent;
 use App\Respondent;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Redirect;
 
 class ProjectPlansController extends Controller
 {
@@ -693,11 +694,17 @@ class ProjectPlansController extends Controller
                 'created_at' => $time
             ]);
         } else {
-            $insert = Project_absensi::insert([
-                'project_plan_id' => $request->id,
-                'team_id' => $request->user,
-                'created_at' => $time
-            ]);
+            $absensi = Project_absensi::where('project_plan_id', $request->id)->where('team_id', $request->user)->first();
+            if ($absensi) {
+                return Redirect::back()->withErrors(['msg' => 'Peserta sudah absen']);
+            } else {
+                $insert = Project_absensi::insert([
+                    'project_plan_id' => $request->id,
+                    'team_id' => $request->user,
+                    'created_at' => $time
+                ]);
+            }
+
         }
 
         return view('otentikasis.login');
