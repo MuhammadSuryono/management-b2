@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
 class GuzzleRequester
 {
@@ -48,6 +49,7 @@ class GuzzleRequester
             $this->body = json_decode($response->getBody()->getContents());
         } catch (\Exception $e) {
             $this->statusCode = $e->getCode();
+            Log::info("message", [$e->getMessage()]);
             $this->body = (object)["status" => false, "message" => $e->getMessage()];
         }
 
