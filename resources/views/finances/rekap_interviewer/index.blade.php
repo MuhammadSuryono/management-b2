@@ -288,7 +288,7 @@ if (isset($_GET['project_id'])) {
                 if ($countOk >= $countMinBrief) {
                     $projectPlans = DB::table('project_plans')->where('project_id', $_GET['project_id'])->get();
                     foreach ($projectPlans as $pp) {
-                        $projectAbsensi = DB::table('project_absensis')->join('project_plans', 'project_plans.id', '=', 'project_absensis.project_plan_id')->where('project_id', $_GET['project_id'])->where('team_id', '=', $item->id)->where('project_absensis.project_plan_id', '=', $pp->id)->count();
+                        $projectAbsensi = DB::table('project_absensis')->join('project_plans', 'project_plans.id', '=', 'project_absensis.project_plan_id')->where('project_id', $_GET['project_id'])->where('team_id', '=', $item->no_team)->where('project_absensis.project_plan_id', '=', $pp->id)->count();
                         if ($pp->honor_briefing)
                             $honorBrief += ($pp->honor_briefing * $projectAbsensi);
                     }

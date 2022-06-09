@@ -47,6 +47,7 @@ class RekapInterviewerController extends Controller
      */
     public function index(Request $request)
     {
+        $client = new GuzzleRequester();
         $kotas = Project_kota::join('kotas', 'project_kotas.kota_id', '=', 'kotas.id')->select('kotas.*')
             ->when(isset($request->project_id) && $request->project_id != 'all', function ($query) use ($request) {
                 return $query->where('project_id', $request->project_id);
@@ -81,8 +82,9 @@ class RekapInterviewerController extends Controller
                 $teams = [];
                 if ($teamPaymentMarking != null) {
                     foreach ($teamPaymentMarking as $team) {
-                        $bank = $dbDigitalisasiMarketing->table('bank')->where('kode', '=', $team->team->kode_bank)->first();
-                        $team->team->bank = $bank != null ? $bank->nama : "-";
+                        $client->request('GET', 'api/bank?action=filter&kodebank=' . $team->team->kode_bank);
+                        $bank = $client->getBody()->data ?? null;
+                        $team->team->bank = $bank != null ? $bank[0]->namabank : "-";
 
                         $bgColor = "";
                         $isCanMarking = true;
@@ -128,10 +130,11 @@ class RekapInterviewerController extends Controller
                                 $isAlreadyPayment = Pembayaran_interviewer::where('project_id', $request->project_id)->where('team_id', $pwt->id)->first();
                                 if (!$isAlreadyPayment) {
                                     if (!in_array($pwt->id, $checkId)) {
-                                        $bank = $dbDigitalisasiMarketing->table('bank')->where('kode', '=', $pwt->kode_bank)->first();
+                                        $client->request('GET', 'api/bank?action=filter&kodebank=' . $pwt->kode_bank);
+                                        $bank = $client->getBody()->data ?? null;
                                         $pwt->type_tl = $leader->type_tl;
                                         $pwt->project_kota = $projectKota->kota->kota;
-                                        $pwt->bank = $bank != null ? $bank->nama : "-";
+                                        $pwt->bank = $bank != null ? $bank[0]->namabank : "-";
                                         $pwt->project_team_id = $projectTeam->id;
                                         $pwt->project_id = $projectKota->project_id;
 
@@ -208,7 +211,9 @@ class RekapInterviewerController extends Controller
                 return $query->where('project_id', $request->project_id);
             })->orderBy('kotas.kota', 'ASC')->distinct()->get();
 
-        return view('finances.rekap_interviewer.index_rtp', compact('teams', 'projects', 'kotas'));
+            $client = new GuzzleRequester();
+
+        return view('finances.rekap_interviewer.index_rtp', compact('teams', 'projects', 'kotas', 'client'));
     }
 
     /**
@@ -358,15 +363,6 @@ class RekapInterviewerController extends Controller
             $budget = $resp->getBody()->data;
             $user = User::where('id', session('user_id'))->first();
 
-            $bank = DB::connection('mysql3')->table('bank')->where('kode', '=', $value->kode_bank)->first();
-            if (!$bank) {
-                $dataNotProcess[] = [
-                    "data" => $value,
-                    "message" => "Bank anda tidak terdaftar"
-                ];
-                continue;
-            }
-
             $body = [
                 "no_item_budget" => $itemBpu->item_budget_id_pembayaran_interviewer,
                 "time_budget" => $budget->waktu,
@@ -378,11 +374,11 @@ class RekapInterviewerController extends Controller
                 "type_kas" => 'Kas Project',
                 "budget_id" => $budget->noid,
                 "total" => $value->total_fee,
-                "payment_date" => $this->generatePaymentDate($bank->swift_code),
+                "payment_date" => $this->generatePaymentDate($value->kode_bank),
                 "recipient" => [
                     "name" => $value->nama,
                     "bank_account_number" => $value->nomor_rekening,
-                    "code_bank" => $bank->swift_code,
+                    "code_bank" => $value->kode_bank,
                     "email" => $value->email,
                     "phone_number" => $value->hp,
                     "bank_account_name" => $value->nama,

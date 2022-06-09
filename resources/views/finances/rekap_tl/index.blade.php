@@ -167,12 +167,13 @@
             <td>
                 @if(isset($item->team->kode_bank))
                 <?php
-                $bank = DB::connection('mysql3')->table('bank')->where('kode', '=', $item->team->kode_bank)->first();
+                $client->request('GET', 'api/bank?action=filter&kodebank=' . $item->team->kode_bank);
+                $bank = $client->getBody()->data;
                 if ($bank) {
-                    echo $bank->nama;
+                    echo $bank[0]->namabank;
                 }
                 ?>
-                @endif
+            @endif
             </td>
             <td>
                 @if(isset($item->team->nomor_rekening))
