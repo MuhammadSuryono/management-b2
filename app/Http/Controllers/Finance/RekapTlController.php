@@ -170,8 +170,9 @@ class RekapTlController extends Controller
         }
 
         $jsonData = $teams->toArray();
+        $client = new GuzzleRequester();
 
-        return view('finances.rekap_tl.index', compact('teams', 'projects', 'kotas', 'jabatans', 'nominalDenda', 'jsonData'))->withErrors($errorMessage);
+        return view('finances.rekap_tl.index', compact('teams', 'projects', 'kotas', 'jabatans', 'nominalDenda', 'jsonData','client'))->withErrors($errorMessage);
     }
 
     public function indexRtp(Request $request)
@@ -195,7 +196,9 @@ class RekapTlController extends Controller
                 return $query->where('project_id', $request->project_id);
             })->orderBy('kotas.kota', 'ASC')->distinct()->get();
 
-        return view('finances.rekap_tl.index_rtp', compact('teams', 'projects', 'kotas'));
+            $client = new GuzzleRequester();
+
+        return view('finances.rekap_tl.index_rtp', compact('teams', 'projects', 'kotas', 'client'));
     }
 
     /**
@@ -346,15 +349,6 @@ class RekapTlController extends Controller
             $budget = $resp->getBody()->data;
             $user = User::where('id', session('user_id'))->first();
 
-            $bank = DB::connection('mysql3')->table('bank')->where('kode', '=', $value->team->kode_bank)->first();
-            if (!$bank) {
-                $dataNotProcess[] = [
-                    "data" => $value,
-                    "message" => "Bank anda tidak terdaftar"
-                ];
-                continue;
-            }
-
             $body = [
                 "no_item_budget" => $itemBpu->item_budget_id,
                 "time_budget" => $budget->waktu,
@@ -366,11 +360,11 @@ class RekapTlController extends Controller
                 "type_kas" => 'Kas Project',
                 "budget_id" => $budget->noid,
                 "total" => $value->total_fee,
-                "payment_date" => $this->generatePaymentDate($bank->swift_code),
+                "payment_date" => $this->generatePaymentDate($value->team->kode_bank),
                 "recipient" => [
                     "name" => $value->team->nama,
                     "bank_account_number" => $value->team->nomor_rekening,
-                    "code_bank" => $bank->swift_code,
+                    "code_bank" => $value->team->kode_bank,
                     "email" => $value->team->email,
                     "phone_number" => "0895355698652",
                     "bank_account_name" => $value->team->nama,

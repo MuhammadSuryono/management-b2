@@ -82,7 +82,7 @@
                             @endcomponent
 
                             {{-- Kode Bank --}}
-                            @Component('components.list_input', ['for_create_edit'=>$for_create_edit, 'detail_table'=>$team,'label_width1'=>'3','label_width2'=>'6','input_width1'=>'8', 'input_width2'=>'8', 'input_label'=>'Bank ', 'input_id'=>'kode_bank', 'list_field'=>'nama','master'=>$bank, 'master_id'=>'kode',])
+                            @Component('components.list_input', ['for_create_edit'=>$for_create_edit, 'detail_table'=>$team,'label_width1'=>'3','label_width2'=>'6','input_width1'=>'8', 'input_width2'=>'8', 'input_label'=>'Bank ', 'input_id'=>'kode_bank', 'list_field'=>'namabank','master'=>$bank, 'master_id'=>'kodebank',])
                             @Endcomponent
                         </div>
                     </div>
