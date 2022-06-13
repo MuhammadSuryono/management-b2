@@ -1,5 +1,5 @@
 @extends('maingentelellatable')
-<?php $total = $bank->count() + $e_wallet->count() ?>
+<?php $total = count($banks) + $e_wallet->count() ?>
 @section('title', 'Daftar Layanan : '. $total )
 @section('content')
 @include('layouts.gentelella.table_top')
@@ -19,11 +19,11 @@
         <td>{{$item->kode}}</td>
     </tr>
     @endforeach
-    @foreach ($bank as $item)
+    @foreach ($banks as $item)
     <tr>
         <th scope='row'>{{$i++}}</th>
-        <td>{{$item->nama}}</td>
-        <td>{{$item->kode}}</td>
+        <td>{{$item->namabank}}</td>
+        <td>{{$item->kodebank}}</td>
     </tr>
     @endforeach
 </tbody>

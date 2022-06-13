@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Umum;
 use App\Http\Controllers\Controller;
 use App\Divisi;
 use App\E_wallet;
+use App\Helpers\GuzzleRequester;
 use Illuminate\Http\Request;
 use DB;
 
@@ -17,10 +18,11 @@ class BanksController extends Controller
      */
     public function index()
     {
-        $bank = DB::connection('mysql3')->table('bank')->get()->sortBy('nama');
+        $client = new GuzzleRequester();
+        $client->request('GET', 'api/bank');
+        $banks=$client->getBody()->data;
         $e_wallet = E_wallet::get();
-        // $add_url = url('/divisis/create');
-        return view('umums.banks.index', compact('bank', 'e_wallet'));
+        return view('umums.banks.index', compact('banks', 'e_wallet'));
     }
 
     /**
