@@ -510,13 +510,15 @@ class ProjectsController extends Controller
                         return redirect('/projects/' . $request->id . '/edit')->with('status-fail', 'Upload gagal, Terdapat nomor telfon atau sbjnum yang sama dalam file.');
                     }
 
-                    $checkMobilephoneRespondent = Respondent::where('mobilephone', $record->mobilephone)->count();
-                    $checkSbjnumRespondent = Respondent::where('sbjnum', $record->sbjnum)->count();
+                    $checkMobilephoneRespondent = Respondent::where('mobilephone', $record->mobilephone)->first();
                     if ($checkMobilephoneRespondent) {
+                        $projectName = $checkMobilephoneRespondent->project_id == '' ? $checkMobilephoneRespondent->project_imported->project_imported:$checkMobilephoneRespondent->project->nama;
+
                         Import_excel::orderBy('id', 'desc')->limit(1)->delete();
-                        return redirect('/projects/' . $request->id . '/edit')->with('status-fail', 'Upload gagal, Nomor telfon ' . $record->mobilephone . ' sudah ada di database.');
+                        return redirect('/projects/' . $request->id . '/edit')->with('status-fail', 'Upload gagal, Silahkan keluarkan data responden dengan nama '.$record->respname.' dengan Nomor telfon ' . $record->mobilephone . ' karena nomor hp tersebut pernah terdata dengan nama '.$checkMobilephoneRespondent->respname.' project '.$projectName.'. Harap QC dahulu responden tersebut.');
                     }
 
+                    $checkSbjnumRespondent = Respondent::where('sbjnum', $record->sbjnum)->count();
                     if ($checkSbjnumRespondent) {
                         Import_excel::orderBy('id', 'desc')->limit(1)->delete();
                         return redirect('/projects/' . $request->id . '/edit')->with('status-fail', 'Upload gagal, sbjnum ' . $record->sbjnum . ' sudah ada di database.');
