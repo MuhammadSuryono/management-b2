@@ -378,9 +378,7 @@ $persentaseBelumQc = ($totalBersih) ? number_format((float)($belumQc / $totalBer
         <th>Gender</th>
         <th>Kota</th>
         <th>Kelurahan</th>
-        @if(count($user_role)>0)
         <th>HP</th>
-        @endif
         <th>Interviewer</th>
         <th>Pewitness</th>
         <th>Status QC</th>
@@ -452,9 +450,7 @@ $persentaseBelumQc = ($totalBersih) ? number_format((float)($belumQc / $totalBer
             {{$respondent->kelurahan->kelurahan}}
             @endif
         </td>
-        @if(count($user_role)>0)
-        <td>{{$respondent->mobilephone}}</td>
-        @endif
+            <td>{{$respondent->mobilephone}}</td>
         <td>
             <?php
             if ($respondent->srvyr) {
