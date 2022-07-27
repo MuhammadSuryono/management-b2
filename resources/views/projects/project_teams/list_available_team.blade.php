@@ -21,6 +21,7 @@
             @if($project_jabatan->jabatan->jabatan != "Team Leader (TL)")
             <div class="row">
                 <div class="col-lg-5">
+                    @if($haveLeader)
                     <div class="form-group">
                         <select name="leader" class="form-control" id="select-tl" required>
                             <option value="">Pilih Team Leader</option>
@@ -31,6 +32,7 @@
                             @endif
                         </select>
                     </div>
+                    @endif
                 </div>
             </div>
             @endif
@@ -53,7 +55,9 @@
                                     <th>Alamat</th>
                                     @if($showColumnHonor)
                                     <th>Honor</th>
+                                    @if($showColumnTypeTl)
                                     <th>Jenis TL</th>
+                                        @endif
                                     @endif
                                     @if($project_jabatan->jabatan->jabatan == "Team Leader (TL)")
                                         <th>Target</th>
@@ -92,6 +96,7 @@
                                                 <input type="text" id="honor-{{$item->id}}" name="honor[]" class="form-control honor" disabled="true" value="">
                                             </div>
                                         </td>
+                                            @if($showColumnTypeTl)
                                         <td>
                                             <div class="form-group">
                                                 <select class="form-control" name="jenis_tl[]" id="jenis_tl-{{$item->id}}" disabled="true">
@@ -101,6 +106,7 @@
                                                 </select>
                                             </div>
                                         </td>
+                                            @endif
                                         @endif
                                         @if($project_jabatan->jabatan->jabatan == "Team Leader (TL)")
                                             <td>

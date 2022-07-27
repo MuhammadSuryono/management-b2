@@ -42,8 +42,18 @@ class ProjectTeamsController extends Controller
     public function create($project_jabatan_id)
     {
         $project_jabatan = Project_jabatan::firstWhere('id', $project_jabatan_id);
+
+        $projectJabatanKota = Project_jabatan::where('project_kota_id', $project_jabatan->project_kota_id)->get();
+        $haveLeader = false;
+        foreach ($projectJabatanKota as $prj) {
+            if ($prj->jabatan_id == 9) {
+                $haveLeader = true;
+                break;
+            }
+        }
         $showTeam = true;
         $showColumnHonor = true;
+        $showColumnTypeTl = true;
         $typeTl = app('request')->input('type_tl');
         $leader = app('request')->input('leader');
         $team = app('request')->input('team');
@@ -51,11 +61,14 @@ class ProjectTeamsController extends Controller
             $showColumnHonor = false;
         }
 
+        if (!$haveLeader) $showColumnTypeTl = false;
+
         if ($typeTl != null && $team == "Interviewer") $showColumnHonor = false;
 
         $teams = DB::select('select teams.* from teams join team_jabatans on teams.id = team_jabatans.team_id where jabatan_id=?
         and team_id not in (select team_id from project_teams where project_jabatan_id=?)', [$project_jabatan->jabatan_id, $project_jabatan_id]);
-        if ($project_jabatan->jabatan->jabatan != "Team Leader (TL)") {
+
+        if ($project_jabatan->jabatan->jabatan != "Team Leader (TL)" && $haveLeader) {
             if ($leader == null) {
                 $showTeam = false;
             }
@@ -65,9 +78,10 @@ class ProjectTeamsController extends Controller
                 }])->get();
             }])->where('project_kota_id', $project_jabatan->project_kota_id)->where('jabatan_id', '9')->first();
 //            dd(json_encode($teams));
-            return view('projects.project_teams.add_team_list', compact('showTeam','project_jabatan', 'teamLeaders', 'teams', 'showColumnHonor'));
+            return view('projects.project_teams.add_team_list', compact('showTeam', 'haveLeader', 'showColumnTypeTl', 'project_jabatan', 'teamLeaders', 'teams', 'showColumnHonor'));
         }
-        return view('projects.project_teams.add_team_list', compact('showTeam','teams', 'project_jabatan', 'showColumnHonor'));
+        $teamLeaders = [];
+        return view('projects.project_teams.add_team_list', compact('showTeam', 'haveLeader', 'showColumnTypeTl', 'teams', 'project_jabatan', 'showColumnHonor','teamLeaders'));
     }
 
     public function create_old($project_jabatan_id)
